@@ -1,7 +1,11 @@
 from django.db import models
+from django.conf import settings
+
 
 
 class WeeklyLogs(models.Model):
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, 
+    on_delete = models.CASCADE, related_name = 'weekly_logs') 
     week_number = models.PositiveSmallIntegerField()  # 1–12
     week_start_date = models.DateField()
     week_end_date = models.DateField()

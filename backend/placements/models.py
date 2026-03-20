@@ -1,7 +1,11 @@
 from django.db import models
+from django.conf import settings
 
 
 class InternshipPlacement(models.Model):
+    student = models.ForeignKey(settings.AUTH_USER_MODEL,
+    on_delete=models.CASCADE,related_name='placements',
+    limit_choices_to={'role': 'student'})
     organisation_name = models.CharField(max_length=255)
     organisation_type = models.CharField(max_length=20)
     organisation_district = models.CharField(max_length=100)

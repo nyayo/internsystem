@@ -1,7 +1,16 @@
 from django.db import models
+from django.conf import settings
 
 
 class Evaluation(models.Model):
+    student = models.ForeignKey(settings.AUTH_USER_MODEL,
+    on_delete=models.CASCADE, related_name='evaluations_as_student',
+    limit_choices_to = {'role':'student'})
+
+    supervisor = models.ForeignKey(settings.AUTH_USER_MODEL, 
+    on_delete = models.CASCADE, related_name= 'evaluations_as_supervisor',
+    limit_choices_to = {'role': 'supervisor'})
+
     evaluation_type = models.CharField(max_length=10)
     status = models.CharField(max_length=15)
 
