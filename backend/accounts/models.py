@@ -3,12 +3,30 @@ from django.db import models
 
 
 class CustomUser(AbstractUser):
+    ROLES = (
+        ("student", "Student"),
+        ("workplace_supervisor", "Workplace Supervisor"),
+        ("academic_supervisor", "Academic Supervisor"),
+        ("internship_administrator", "Internship Administrator"),
+    )
+
+    GENDER = (("male", "Male"), ("female", "Female"))
+
+    ACCOUNT_STATUS = (
+        ("registered", "Registered"),
+        ("active", "Active"),
+        ("suspended", "Suspended"),
+        ("deactivated", "Deactivated"),
+    )
+
     phone_number = models.CharField(max_length=20)
-    role = models.CharField(max_length=30)
-    gender = models.CharField(max_length=20, blank=True)
+    role = models.CharField(max_length=30, choices=ROLES)
+    gender = models.CharField(max_length=20, blank=True, choices=GENDER)
     district = models.CharField(max_length=100, blank=True)
-    profile_photo = models.ImageField(upload_to="profiles/", blank=True, null=True)
-    account_status = models.CharField(max_length=20)
+    profile_photo = models.ImageField(
+        upload_to="profile_photos/", blank=True, null=True
+    )
+    account_status = models.CharField(max_length=20, choices=ACCOUNT_STATUS)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
