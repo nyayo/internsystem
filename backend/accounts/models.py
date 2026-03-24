@@ -19,12 +19,12 @@ class CustomUser(AbstractUser):
         ("deactivated", "Deactivated"),
     )
 
-    phone_number = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=20,)
     role = models.CharField(max_length=30, choices=ROLES)
     gender = models.CharField(max_length=20, blank=True, choices=GENDER)
     district = models.CharField(max_length=100, blank=True)
     profile_photo = models.ImageField(
-        upload_to="profile_photos/", blank=True, null=True
+        upload_to="profile_photos/", blank=True, null=True,
     )
     account_status = models.CharField(max_length=20, choices=ACCOUNT_STATUS)
     is_active = models.BooleanField(default=True)
