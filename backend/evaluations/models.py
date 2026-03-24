@@ -19,13 +19,13 @@ class Evaluation(models.Model):
     )
     
     placement = models.ForeignKey(InternshipPlacement,
-    on_delete=models.CASCADE, related_name='evaluations',
+    on_delete=models.CASCADE, related_name='evaluations',null= True, blank= True
     )
 
     evaluator = models.ForeignKey(settings.AUTH_USER_MODEL, 
-    on_delete = models.CASCADE, related_name= 'evaluations_as_supervisor',
+    on_delete = models.CASCADE, related_name= 'evaluations_as_supervisor', null= True, blank= True,
     limit_choices_to = {'role': 'workplace_supervisor'})
-    acknowledged_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.SET_NULL, 
+    acknowledged_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.SET_NULL, null= True, blank= True,
     related_name="acknowledged_evaluations", limit_choices_to={"role":"accademic supervisor"})
     evaluation_type = models.CharField(max_length=10, choices=EVALUATION_TYPE)
 
@@ -43,7 +43,7 @@ class Evaluation(models.Model):
         verbose_name = "Evaluation"
         verbose_name_plural = "Evaluations"
         ordering = ["placement", "evaluation_type"]
-        unique_together = ("placement", "evaluation")
+        unique_together = ("placement", "evaluation_type")
 
 
 

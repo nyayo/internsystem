@@ -16,7 +16,7 @@ class WeeklyLogs(models.Model):
     ) 
     
     placement = models.ForeignKey(InternshipPlacement,
-     models.CASCADE,related_name='weekly_logs')
+     models.CASCADE,related_name='weekly_logs', null= True, blank= True)
     week_number = models.PositiveSmallIntegerField()  # 1–12
     week_start_date = models.DateField()
     week_end_date = models.DateField()
@@ -36,7 +36,7 @@ class WeeklyLogs(models.Model):
     academic_comment = models.TextField(blank=True, null=True)
     academic_grade = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     academic_assessed_by = models.ForeignKey(settings.AUTH_USER_MODEL, 
-    on_delete = models.SET_NULL, related_name="assessed_logs", limit_choices_to={"role":"academic_supervisor"})
+    on_delete = models.SET_NULL, null= True, blank= True, related_name="assessed_logs", limit_choices_to={"role":"academic_supervisor"})
     academic_assessed_at = models.DateTimeField(blank=True, null=True)
     submitted_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
