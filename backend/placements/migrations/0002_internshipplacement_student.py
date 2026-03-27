@@ -13,10 +13,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='internshipplacement',
-            name='student',
-            field=models.ForeignKey(default=1, limit_choices_to={'role': 'student'}, on_delete=django.db.models.deletion.CASCADE, related_name='placements', to=settings.AUTH_USER_MODEL),
-            preserve_default=False,
-        ),
+        
     ]
