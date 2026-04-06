@@ -5,12 +5,14 @@ from rest_framework.permissions  import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens     import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
+from backend.accounts.permissions import IsActiveAccount
+from backend.accounts.permissions import UserProfileSerializer, IsActiveAccount
 from backend.accounts.serializers import UserRegistrationSerializer, LoginSerializer
 
 
 class RegisterView(APIView):
     """
-    POST /api/auth/register/
+    POST /accounts/auth/register/
     Account starts with status = 'registered'and must verify email before login is permitted.
     """
     permission_classes = [AllowAny]
@@ -30,7 +32,7 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     """
-    POST /api/auth/login/
+    POST /accounts/auth/login/
     """
     permission_classes = [AllowAny]
  
@@ -56,4 +58,37 @@ class LoginView(APIView):
                 'student_number': user.student_number or '',
             },
         }, status=status.HTTP_200_OK)
+
+
+class LogoutView(APIView):
+    """
+    POST /accounts/auth/logout/
+    """
+    permission_classes = [IsAuthenticated]
+ 
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+        if not refresh_token:
+            return Response(
+                {'refresh': 'Refresh token is required.'},
+                status=status.HTTP_400_BAD_REQUEST)
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+        except TokenError:
+            return Response(
+                {'refresh': 'Token is invalid or already blacklisted.'},
+                status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Successfully logged out.'},
+                        status=status.HTTP_205_RESET_CONTENT)
+        
+class MeView(APIView):
+    """
+    GET /accounts/auth/me/
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+ 
+    def get(self, request):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 

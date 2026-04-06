@@ -101,26 +101,23 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
-class UserSerializers(serializers.ModelSerializer):
+class UserProfileSerializer(serializers.ModelSerializer):
+ 
+    full_name = serializers.SerializerMethodField()
+ 
     class Meta:
-        model = CustomUser
-        fields = ('id',
-                  'username',
-                  'email',
-                  'first_name',
-                  'last_name',
-                  'phone_number',
-                  'role',
-                  'gender',
-                  'district',
-                  'profile photo',
-                  'account_status',
-                  'is_active',
-                  'is_staff',
-                  'date_joined',
-                  'student_number',
-                  'programme',
-                  'job_title',
-                  'organisation_name')
-        read_only_fields = ('date_joined', 'is_active', 'is_staff')
+        model  = CustomUser
+        fields = [
+            'id', 'email', 'full_name', 'first_name', 'last_name',
+            'phone_number', 'role', 'gender', 'district',
+            'account_status', 'date_joined',
+            'student_number', 'programme', 'year_of_study',
+            'university', 'faculty', 'department',
+            'job_title', 'organisation_name',
+        ]
+        read_only_fields = fields
+ 
+    def get_full_name(self, obj):
+        return obj.get_full_name()
+
                   
