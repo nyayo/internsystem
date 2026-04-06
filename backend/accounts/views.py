@@ -14,6 +14,7 @@ from accounts.tokens import (
     generate_password_reset_token,
     verify_password_reset_token,
 )
+from accounts.emails import send_verification_email, send_password_reset_email
 
 
 class RegisterView(APIView):
@@ -30,16 +31,14 @@ class RegisterView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
         
-        # Generate verification token
+        # Generate token and send verification email
         token = generate_email_verification_token(user)
+        send_verification_email(user, token)
         
-        # TODO: Send email with verification link containing the token
-        # For now, return the token in response (remove in production)
         return Response({
-            'detail': 'Account created. Please verify your email.',
+            'detail': 'Account created. Please check your email to verify your account.',
             'email':  user.email,
             'role':   user.role,
-            'verification_token': token,  # Remove in production - send via email instead
         }, status=status.HTTP_201_CREATED)
 
 
@@ -215,24 +214,21 @@ class ResendVerificationView(APIView):
                 {'email': 'Email is required.'},
                 status=status.HTTP_400_BAD_REQUEST)
 
+        # Always return same message for security
+        response_msg = {'detail': 'If an account exists and is not yet verified, a verification email has been sent.'}
+
         try:
             user = CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
-            return Response(
-                {'detail': 'Verification email has been sent.'},
-                status=status.HTTP_200_OK)
+            return Response(response_msg, status=status.HTTP_200_OK)
 
         if user.account_status != 'registered':
-            return Response(
-                {'detail': 'Verification email has been sent.'},
-                status=status.HTTP_200_OK)
+            return Response(response_msg, status=status.HTTP_200_OK)
 
         token = generate_email_verification_token(user)
+        send_verification_email(user, token)
         
-        return Response({
-            'detail': 'Verification email has been sent.',
-            'verification_token': token,
-        }, status=status.HTTP_200_OK)
+        return Response(response_msg, status=status.HTTP_200_OK)
 
 
 class ForgotPasswordView(APIView):
@@ -249,7 +245,7 @@ class ForgotPasswordView(APIView):
                 {'email': 'Email is required.'},
                 status=status.HTTP_400_BAD_REQUEST)
 
-        response_msg = {'detail': 'Password reset email has been sent.'}
+        response_msg = {'detail': 'If an account exists, a password reset email has been sent.'}
 
         try:
             user = CustomUser.objects.get(email=email)
@@ -260,11 +256,9 @@ class ForgotPasswordView(APIView):
             return Response(response_msg, status=status.HTTP_200_OK)
 
         token = generate_password_reset_token(user)
+        send_password_reset_email(user, token)
         
-        return Response({
-            **response_msg,
-            'reset_token': token,
-        }, status=status.HTTP_200_OK)
+        return Response(response_msg, status=status.HTTP_200_OK)
 
 
 class ResetPasswordView(APIView):

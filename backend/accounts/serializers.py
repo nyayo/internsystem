@@ -16,7 +16,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'phone_number', 'role', 'gender', 'district',
             'password', 'password2',
             'student_number', 'programme', 'year_of_study',
-            'university', 'faculty', 'department',
+            'university',
             'job_title', 'organisation_name',
         ]
  
