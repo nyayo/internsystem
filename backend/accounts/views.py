@@ -5,15 +5,21 @@ from rest_framework.permissions  import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens     import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
-from backend.accounts.models import CustomUser
-from backend.accounts.permissions import IsActiveAccount, IsStudent, IsWorkplaceSupervisor, IsAcademicSupervisor, IsInternshipAdministrator
-from backend.accounts.serializers import UserRegistrationSerializer, LoginSerializer, UserProfileSerializer
+from accounts.models import CustomUser
+from accounts.permissions import IsActiveAccount, IsStudent, IsWorkplaceSupervisor, IsAcademicSupervisor, IsInternshipAdministrator
+from accounts.serializers import UserRegistrationSerializer, LoginSerializer, UserProfileSerializer
+from accounts.tokens import (
+    generate_email_verification_token,
+    verify_email_token,
+    generate_password_reset_token,
+    verify_password_reset_token,
+)
 
 
 class RegisterView(APIView):
     """
     POST /accounts/auth/register/
-    Account starts with status = 'registered'and must verify email before login is permitted.
+    Account starts with status = 'registered' and must verify email before login is permitted.
     """
     permission_classes = [AllowAny]
  
@@ -23,10 +29,17 @@ class RegisterView(APIView):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
+        
+        # Generate verification token
+        token = generate_email_verification_token(user)
+        
+        # TODO: Send email with verification link containing the token
+        # For now, return the token in response (remove in production)
         return Response({
             'detail': 'Account created. Please verify your email.',
             'email':  user.email,
             'role':   user.role,
+            'verification_token': token,  # Remove in production - send via email instead
         }, status=status.HTTP_201_CREATED)
 
 
@@ -146,4 +159,156 @@ class ChangePasswordView(APIView):
         user.save()
         return Response(
             {'detail': 'Password changed. Please log in again.'},
+            status=status.HTTP_200_OK)
+
+
+class VerifyEmailView(APIView):
+    """
+    POST /accounts/auth/verify-email/
+    Verifies the user's email using the token sent during registration.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response(
+                {'token': 'Verification token is required.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        user_id = verify_email_token(token)
+        if not user_id:
+            return Response(
+                {'token': 'Invalid or expired verification token.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response(
+                {'token': 'User not found.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        if user.account_status != 'registered':
+            return Response(
+                {'detail': 'Account is already verified.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        user.account_status = 'active'
+        user.save()
+        return Response(
+            {'detail': 'Email verified successfully. You can now log in.'},
+            status=status.HTTP_200_OK)
+
+
+class ResendVerificationView(APIView):
+    """
+    POST /accounts/auth/resend-verification/
+    Resends the verification email to the user.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').lower().strip()
+        if not email:
+            return Response(
+                {'email': 'Email is required.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            return Response(
+                {'detail': 'Verification email has been sent.'},
+                status=status.HTTP_200_OK)
+
+        if user.account_status != 'registered':
+            return Response(
+                {'detail': 'Verification email has been sent.'},
+                status=status.HTTP_200_OK)
+
+        token = generate_email_verification_token(user)
+        
+        return Response({
+            'detail': 'Verification email has been sent.',
+            'verification_token': token,
+        }, status=status.HTTP_200_OK)
+
+
+class ForgotPasswordView(APIView):
+    """
+    POST /accounts/auth/forgot-password/
+    Sends a password reset email to the user.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').lower().strip()
+        if not email:
+            return Response(
+                {'email': 'Email is required.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        response_msg = {'detail': 'Password reset email has been sent.'}
+
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            return Response(response_msg, status=status.HTTP_200_OK)
+
+        if user.account_status in ('suspended', 'deactivated'):
+            return Response(response_msg, status=status.HTTP_200_OK)
+
+        token = generate_password_reset_token(user)
+        
+        return Response({
+            **response_msg,
+            'reset_token': token,
+        }, status=status.HTTP_200_OK)
+
+
+class ResetPasswordView(APIView):
+    """
+    POST /accounts/auth/reset-password/
+    Resets the user's password using the token from forgot password email.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        token = request.data.get('token')
+        new_password = request.data.get('new_password')
+        new_password2 = request.data.get('new_password2')
+
+        if not all([token, new_password, new_password2]):
+            return Response(
+                {'detail': 'Token and both password fields are required.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        if new_password != new_password2:
+            return Response(
+                {'new_password': 'Passwords do not match.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        if len(new_password) < 8:
+            return Response(
+                {'new_password': 'Password must be at least 8 characters.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        user_id = verify_password_reset_token(token)
+        if not user_id:
+            return Response(
+                {'token': 'Invalid or expired reset token.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response(
+                {'token': 'User not found.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+        return Response(
+            {'detail': 'Password reset successfully. You can now log in.'},
             status=status.HTTP_200_OK)
