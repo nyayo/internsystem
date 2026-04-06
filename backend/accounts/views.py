@@ -5,9 +5,9 @@ from rest_framework.permissions  import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens     import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
-from backend.accounts.permissions import IsActiveAccount
-from backend.accounts.permissions import UserProfileSerializer, IsActiveAccount
-from backend.accounts.serializers import UserRegistrationSerializer, LoginSerializer
+from backend.accounts.models import CustomUser
+from backend.accounts.permissions import IsActiveAccount, IsStudent, IsWorkplaceSupervisor, IsAcademicSupervisor, IsInternshipAdministrator
+from backend.accounts.serializers import UserRegistrationSerializer, LoginSerializer, UserProfileSerializer
 
 
 class RegisterView(APIView):
@@ -92,3 +92,58 @@ class MeView(APIView):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class UserListView(APIView):
+    """
+    GET /api/auth/users/?role=student
+    Administrator only. Filter by role using query parameter.
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount,
+                          IsInternshipAdministrator]
+ 
+    def get(self, request):
+        role     = request.query_params.get('role')
+        queryset = CustomUser.objects.all().order_by('last_name', 'first_name')
+        if role:
+            queryset = queryset.filter(role=role)
+        serializer = UserProfileSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(APIView):
+    """
+    POST /accounts/auth/change-password/
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+ 
+    def post(self, request):
+        user             = request.user
+        current_password = request.data.get('current_password')
+        new_password     = request.data.get('new_password')
+        new_password2    = request.data.get('new_password2')
+ 
+        if not all([current_password, new_password, new_password2]):
+            return Response(
+                {'detail': 'All three password fields are required.'},
+                status=status.HTTP_400_BAD_REQUEST)
+ 
+        if not user.check_password(current_password):
+            return Response(
+                {'current_password': 'Current password is incorrect.'},
+                status=status.HTTP_400_BAD_REQUEST)
+ 
+        if new_password != new_password2:
+            return Response(
+                {'new_password': 'Passwords do not match.'},
+                status=status.HTTP_400_BAD_REQUEST)
+ 
+        if len(new_password) < 8:
+            return Response(
+                {'new_password': 'Password must be at least 8 characters.'},
+                status=status.HTTP_400_BAD_REQUEST)
+ 
+        user.set_password(new_password)
+        user.save()
+        return Response(
+            {'detail': 'Password changed. Please log in again.'},
+            status=status.HTTP_200_OK)
