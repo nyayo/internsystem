@@ -50,6 +50,57 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
+class LoginSerializer(serializers.Serializer):
+    email    = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+ 
+    def validate(self, attrs):
+        email    = attrs.get('email').lower().strip()
+        password = attrs.get('password')
+ 
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError(
+                {'email': 'No account found with this email address.'}
+            )
+ 
+        if not user.check_password(password):
+            raise serializers.ValidationError(
+                {'password': 'Incorrect password.'}
+            )
+ 
+        if user.account_status == 'registered':
+            raise serializers.ValidationError(
+                {'account': 'Please verify your email to activate your account.'}
+            )
+        if user.account_status == 'suspended':
+            raise serializers.ValidationError(
+                {'account': 'Your account is suspended. Contact the administrator.'}
+            )
+        if user.account_status == 'deactivated':
+            raise serializers.ValidationError(
+                {'account': 'Your account has been deactivated.'}
+            )
+ 
+        if not user.is_active:
+            raise serializers.ValidationError(
+                {'account': 'This account is inactive.'}
+            )
+ 
+        refresh = RefreshToken.for_user(user)
+        refresh['role']           = user.role
+        refresh['full_name']      = user.get_full_name()
+        refresh['email']          = user.email
+        refresh['account_status'] = user.account_status
+        refresh['student_number'] = user.student_number or ''
+ 
+        attrs['user']          = user
+        attrs['refresh_token'] = str(refresh)
+        attrs['access_token']  = str(refresh.access_token)
+        return attrs
+
+
 class UserSerializers(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
