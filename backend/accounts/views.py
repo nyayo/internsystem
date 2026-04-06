@@ -31,7 +31,6 @@ class RegisterView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
         
-        # Generate token and send verification email
         token = generate_email_verification_token(user)
         send_verification_email(user, token)
         
@@ -40,6 +39,45 @@ class RegisterView(APIView):
             'email':  user.email,
             'role':   user.role,
         }, status=status.HTTP_201_CREATED)
+
+
+class VerifyEmailView(APIView):
+    """
+    POST /accounts/auth/verify-email/
+    Verifies the user's email using the token sent during registration.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response(
+                {'token': 'Verification token is required.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        user_id = verify_email_token(token)
+        if not user_id:
+            return Response(
+                {'token': 'Invalid or expired verification token.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response(
+                {'token': 'User not found.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        if user.account_status != 'registered':
+            return Response(
+                {'detail': 'Account is already verified.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        user.account_status = 'active'
+        user.save()
+        return Response(
+            {'detail': 'Email verified successfully. You can now log in.'},
+            status=status.HTTP_200_OK)
 
 
 class LoginView(APIView):
@@ -161,44 +199,6 @@ class ChangePasswordView(APIView):
             status=status.HTTP_200_OK)
 
 
-class VerifyEmailView(APIView):
-    """
-    POST /accounts/auth/verify-email/
-    Verifies the user's email using the token sent during registration.
-    """
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        token = request.data.get('token')
-        if not token:
-            return Response(
-                {'token': 'Verification token is required.'},
-                status=status.HTTP_400_BAD_REQUEST)
-
-        user_id = verify_email_token(token)
-        if not user_id:
-            return Response(
-                {'token': 'Invalid or expired verification token.'},
-                status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user = CustomUser.objects.get(id=user_id)
-        except CustomUser.DoesNotExist:
-            return Response(
-                {'token': 'User not found.'},
-                status=status.HTTP_400_BAD_REQUEST)
-
-        if user.account_status != 'registered':
-            return Response(
-                {'detail': 'Account is already verified.'},
-                status=status.HTTP_400_BAD_REQUEST)
-
-        user.account_status = 'active'
-        user.save()
-        return Response(
-            {'detail': 'Email verified successfully. You can now log in.'},
-            status=status.HTTP_200_OK)
-
 
 class ResendVerificationView(APIView):
     """
@@ -214,8 +214,7 @@ class ResendVerificationView(APIView):
                 {'email': 'Email is required.'},
                 status=status.HTTP_400_BAD_REQUEST)
 
-        # Always return same message for security
-        response_msg = {'detail': 'If an account exists and is not yet verified, a verification email has been sent.'}
+        response_msg = {'detail': 'Verification email has been sent.'}
 
         try:
             user = CustomUser.objects.get(email=email)
@@ -245,7 +244,7 @@ class ForgotPasswordView(APIView):
                 {'email': 'Email is required.'},
                 status=status.HTTP_400_BAD_REQUEST)
 
-        response_msg = {'detail': 'If an account exists, a password reset email has been sent.'}
+        response_msg = {'detail': 'Password reset email has been sent.'}
 
         try:
             user = CustomUser.objects.get(email=email)

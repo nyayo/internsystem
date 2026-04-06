@@ -5,7 +5,6 @@ Uses Django's built-in signing module - no extra dependencies needed.
 from django.core import signing
 from django.conf import settings
 
-# Token expiry times in seconds
 EMAIL_VERIFY_TOKEN_MAX_AGE = 60 * 60 * 24  # 24 hours
 PASSWORD_RESET_TOKEN_MAX_AGE = 60 * 60  # 1 hour
 
