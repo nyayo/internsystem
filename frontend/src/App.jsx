@@ -1,19 +1,9 @@
-import { Routes, Route} from 'react-router';
-import LoginPage from './pages/login/LoginPage';
+JSX 
 
+import Register from "./pages/Register";
 
 function App() {
-  
-  return (
-    <div className="App">
-      <Routes>
-        <Route path="/" element={<LoginPage/>} />
-
-
-      </Routes>
- 
-    </div>
-  )
+  return <Register />;
 }
 
-export default App
+export default App;
