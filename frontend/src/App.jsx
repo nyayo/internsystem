@@ -1,6 +1,6 @@
 JSX 
 
-import Register from "./pages/Register";
+import Register from "./register/Register";
 
 function App() {
   return <Register />;
