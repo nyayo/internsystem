@@ -39,7 +39,7 @@ export default function Register() {
     <div className="container">
       <form className="form" onSubmit={handleSubmit}>
         <h2>Create Account</h2>
-        <p>Apply for internship easily</p>
+        <p>Apply for internships easily</p>
 
         {error && <p className="error">{error}</p>}
 
