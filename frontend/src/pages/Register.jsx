@@ -46,7 +46,7 @@ export default function Register() {
         <input
         type="text"
         name="fullName"
-        placeholder="fullName"
+        placeholder="FullName"
         onChange={handleChange}
         required
         />
