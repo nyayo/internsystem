@@ -49,3 +49,22 @@ class IsInternshipAdministrator(BasePermission):
             and request.user.role == 'internship_administrator'
         )
 
+class IsPlacementOwner(BasePermission):
+    message = "You can only access your own placement."
+
+    def has_object_permission(self, request, view, obj):
+        return obj.student == request.user
+
+
+class IsLinkedToPlacement(BasePermission):
+    message = "You are not linked to this placement."
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        return (
+            user == obj.student
+            or user == obj.academic_supervisor
+            or user == obj.workplace_supervisor
+            or user == obj.approved_by
+            or user.role == "internship_administrator"
+        )

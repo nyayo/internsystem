@@ -31,6 +31,8 @@ class CustomUser(AbstractUser):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     student_number = models.CharField(max_length=50, blank=True, unique=True, default="")
+    year_of_study = models.CharField(max_length=20, blank=True, default="")
+    university = models.CharField(max_length=200, blank=True, default="")
     programme = models.CharField(max_length=200, blank=True, default="")
     job_title = models.CharField(max_length=200, blank=True, default="")
     organisation_name = models.CharField(max_length=200, blank=True, default="")
@@ -40,3 +42,6 @@ class CustomUser(AbstractUser):
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
+    
+    def get_role_display(self):
+        return dict(self.ROLES).get(self.role, "Unknown Role")

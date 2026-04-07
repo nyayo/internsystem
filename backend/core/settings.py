@@ -146,3 +146,20 @@ SIMPLE_JWT = {
     "SIGNING_KEY": SECRET_KEY,
     "AUTH_HEADER_TYPES": ("Bearer",)
 }
+
+# Frontend URL for email links
+FRONTEND_URL = "http://localhost"
+
+# Email configuration
+# Console backend prints emails to terminal (for development)
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "noreply@internsystem.local"
+
+# For production, uncomment and configure SMTP:
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = "your-email@gmail.com"
+# EMAIL_HOST_PASSWORD = "your-app-password"
+# DEFAULT_FROM_EMAIL = "InternSystem <noreply@yourdomain.com>"
