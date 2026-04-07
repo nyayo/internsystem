@@ -36,7 +36,7 @@ export default function Register() {
   };
 
   return(
-    <div className="cointainer">
+    <div className="container">
       <form className="form" onSubmit={handleSubmit}>
         <h2>Create Account</h2>
         <p>Apply for internship easily</p>
