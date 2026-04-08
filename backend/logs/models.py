@@ -9,7 +9,7 @@ class WeeklyLogs(models.Model):
         ("submitted", "Submitted"),
         ("under_review", "Under Review"),
         ("endorsed", "Endorsed"),
-        ("resubmit", "Resubnit"),
+        ("resubmit", "Resubmit"),
         ("assessed", "Assessed"),
         ("closed", "Closed"),
     )
@@ -21,7 +21,7 @@ class WeeklyLogs(models.Model):
         null=True,
         blank=True,
     )
-    week_number = models.PositiveSmallIntegerField()  # 1–12
+    week_number = models.PositiveSmallIntegerField()
     week_start_date = models.DateField()
     week_end_date = models.DateField()
     activities_performed = models.TextField(
@@ -33,7 +33,7 @@ class WeeklyLogs(models.Model):
     )
     student_remarks = models.TextField(blank=True, help_text="Any additional remarks")
     status = models.CharField(max_length=20, choices=STATUS)
-    workplace_comment = models.TextField(blank=True, null=True)
+    workplace_remarks = models.TextField(blank=True, null=True)
     workplace_endorsed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -43,7 +43,8 @@ class WeeklyLogs(models.Model):
         limit_choices_to={"role": "workplace_supervisor"},
     )
     workplace_endorsed_at = models.DateTimeField(blank=True, null=True)
-    academic_comment = models.TextField(blank=True, null=True)
+    resubmit_reason = models.TextField(blank=True, null=True)
+    academic_remarks = models.TextField(blank=True, null=True)
     academic_grade = models.DecimalField(
         max_digits=5, decimal_places=2, null=True, blank=True
     )
