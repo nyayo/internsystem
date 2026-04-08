@@ -160,7 +160,50 @@ class WeeklyLogSubmitSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class WorkplaceEndorseSerializer(serializers.ModelSerializer):
+   
+    ACTION_CHOICES = (
+        ("endorse", "Endorse"),
+        ("return",  "Return for revision"),
+    )
+    action = serializers.ChoiceField(
+        choices=ACTION_CHOICES, write_only=True
+    )
 
+    class Meta:
+        model  = WeeklyLogs
+        fields = ["action", "resubmit_reason", "workplace_remarks"]
+
+    def validate(self, attrs):
+        if attrs.get("action") == "return" and not attrs.get("resubmit_reason", "").strip():
+            raise serializers.ValidationError(
+                {"resubmit_reason": "A reason is required when returning a log for revision."}
+            )
+        return attrs
+
+    def update(self, instance, validated_data):
+        from django.utils import timezone
+
+        if instance.status != "submitted":
+            raise serializers.ValidationError(
+                {"status": "Only submitted logs can be endorsed or returned."}
+            )
+        action = validated_data.pop("action")
+
+        instance.resubmit_reason = validated_data.get(
+            "resubmit_reason", instance.resubmit_reason
+        )
+        instance.workplace_remarks    =          validated_data.get("workplace_remarks", "")
+        instance.workplace_endorsed_by = self.context["request"].user
+        instance.workplace_endorsed_at = timezone.now()
+
+        if action == "endorse":
+            instance.status = "endorsed"
+        else:
+            instance.status = "resubmit"
+
+        instance.save()
+        return instance
 
 
 
