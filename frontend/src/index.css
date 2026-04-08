@@ -1,4 +1,16 @@
-HTML 
+HTML
+
+<!DOCTYPE html>
+<html :lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <title>Intern System</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type ="module" scr="/scr/main.jsx"></script>
+  </body>
+</html>
 
 
 
