@@ -1,4 +1,4 @@
-JSX 
+
 
 import Register from "./pages/registerPage/Register";
 

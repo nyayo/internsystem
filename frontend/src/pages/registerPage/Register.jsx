@@ -1,4 +1,4 @@
-JSX
+
 
 import { useState } from "react";
 import "./Register.css";
