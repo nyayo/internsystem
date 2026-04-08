@@ -1,8 +1,9 @@
 JSX 
 
-function App() {
-  return <h1>APP IS WORKING</h1>;
+import Register from "./pages/registerPage/Register";
 
+function App() {
+  return <Register />;
 }
 
 export default App;

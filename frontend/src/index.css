@@ -1,70 +1,8 @@
-CSS
+HTML 
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f7fb;
-}
 
-.container {
-  display:flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
 
-.foam {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  width: 320px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-}
 
-.form p {
-  font-size: 14px;
-  color: gray;
-  margin-bottom: 15px;
-}
 
-.form input,
-.form select {
-  width: 100%;
-  padding: 12px;
-  background: #4f46e5;
-  color:white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
 
-}
-
-.form button:hover {
-  background: #4338ca;
-}
-
-.checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  margin-bottom: 15px;
-}
-
-.error {
-  color: red;
-  font-size: 13px;
-
-}
-
-.login-text {
-  text-align: center;
-  margin-top: 10px;
-
-}
-
-.login-text {
-  color: #4f46e5;
-  cursor: pointer;
-}
 
