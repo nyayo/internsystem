@@ -204,6 +204,57 @@ class WorkplaceEndorseSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+    
+class AcademicAssessSerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model  = WeeklyLogs
+        fields = ["academic_remarks", "academic_grade"]
+
+    def validate_academic_grade(self, value):
+        if value is not None and (value < 0 or value > 100):
+            raise serializers.ValidationError(
+                "Grade must be between 0 and 100."
+            )
+        return value
+
+    def validate(self, attrs):
+        if not attrs.get("academic_grade") and attrs.get("academic_grade") != 0:
+            raise serializers.ValidationError(
+                {"academic_grade": "A grade is required to assess a log."}
+            )
+        return attrs
+
+    def update(self, instance, validated_data):
+        from django.utils import timezone
+
+        if instance.status != "endorsed":
+            raise serializers.ValidationError(
+                {"status": "Only endorsed logs can be assessed."}
+            )
+        instance.academic_remarks    = validated_data.get("academic_remarks", "")
+        instance.academic_grade      = validated_data.get("academic_grade")
+        instance.academic_assessed_by = self.context["request"].user
+        instance.academic_assessed_at = timezone.now()
+        instance.status              = "assessed"
+        instance.save()
+        return instance
+
+
+class WeeklyLogCloseSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model  = WeeklyLogs
+        fields = ["status"]
+
+    def update(self, instance, validated_data):
+        if instance.status != "assessed":
+            raise serializers.ValidationError(
+                {"status": "Only assessed logs can be closed."}
+            )
+        instance.status = "closed"
+        instance.save()
+        return instance    
 
 
 
