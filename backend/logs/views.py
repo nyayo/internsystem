@@ -75,6 +75,27 @@ def get_log_or_404(pk, user):
     return log, None
 
 
+class WeeklyLogListCreateView(APIView):
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+
+    def get(self, request):
+        queryset = get_log_queryset(request.user)
+
+        placement_id = request.query_params.get("placement")
+        log_status   = request.query_params.get("status")
+        week         = request.query_params.get("week")
+
+        if placement_id:
+            queryset = queryset.filter(placement_id=placement_id)
+        if log_status:
+            queryset = queryset.filter(status=log_status)
+        if week:
+            queryset = queryset.filter(week_number=week)
+
+        serializer = WeeklyLogListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HT
+
+
 
 
 
