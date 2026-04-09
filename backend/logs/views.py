@@ -156,9 +156,127 @@ class WeeklyLogDetailView(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class WeeklyLogSubmitView(APIView):
+   
+    permission_classes = [IsAuthenticated, IsActiveAccount, IsStudent]
+
+    def post(self, request, pk):
+        try:
+            log = WeeklyLogs.objects.get(
+                pk=pk, placement__student=request.user
+            )
+        except WeeklyLogs.DoesNotExist:
+            return Response(
+                {"detail": "Weekly log not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = WeeklyLogSubmitSerializer(
+            log, data={}, partial=True
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer.save()
+        return Response(
+            {
+                "detail": "Log submitted for workplace supervisor review.",
+                "status": log.status,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class WeeklyLogCloseView(APIView):
+    
+    permission_classes = [IsAuthenticated, IsActiveAccount, IsInternshipAdministrator]
+
+    def post(self, request, pk):
+        try:
+            log = WeeklyLogs.objects.get(pk=pk)
+        except WeeklyLogs.DoesNotExist:
+            return Response(
+                {"detail": "Weekly log not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = WeeklyLogCloseSerializer(
+            log, data={}, partial=True
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer.save()
+        return Response(
+            {
+                "detail": "Log closed successfully.",
+                "status": log.status,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
+class PlacementLogSummaryView(APIView):
+   
+    permission_classes = [IsAuthenticated, IsActiveAccount]
 
+    def get(self, request, placement_id):
+        try:
+            placement = InternshipPlacement.objects.get(pk=placement_id)
+        except InternshipPlacement.DoesNotExist:
+            return Response(
+                {"detail": "Placement not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+       
+        user = request.user
+        if not (
+            user == placement.student
+            or user == placement.workplace_supervisor
+            or user == placement.academic_supervisor
+            or user.role == "internship_administrator"
+        ):
+            return Response(
+                {"detail": "You are not linked to this placement."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        logs = WeeklyLogs.objects.filter(placement=placement)
+
+        
+        status_counts = {}
+        for code, _ in WeeklyLogs.STATUS:
+            status_counts[code] = logs.filter(status=code).count()
+
+       
+        graded = logs.filter(
+            academic_grade__isnull=False
+        ).values_list("academic_grade", flat=True)
+
+        avg_grade = None
+        if graded:
+            avg_grade = round(sum(graded) / len(graded), 2)
+
+        
+        log_list = WeeklyLogListSerializer(
+            logs.order_by("week_number"), many=True
+        ).data
+
+        return Response(
+            {
+                "placement_id":   placement.id,
+                "organisation":   placement.organisation_name,
+                "student":        placement.student.get_full_name(),
+                "total_weeks":    placement.duration_weeks,
+                "submitted":      logs.exclude(status="draft").count(),
+                "closed":         status_counts.get("closed", 0),
+                "average_grade":  avg_grade,
+                "status_counts":  status_counts,
+                "logs":           log_list,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 
