@@ -279,9 +279,41 @@ class PlacementLogSummaryView(APIView):
         )
 
 
+class PendingLogsView(APIView):
+    
+    permission_classes = [IsAuthenticated, IsActiveAccount]
 
+def get(self, request):
+        user = request.user
 
+        if user.role == "workplace_supervisor":
+            queryset = WeeklyLogs.objects.filter(
+                placement__workplace_supervisor=user,
+                status="submitted",
+            )
+        elif user.role == "academic_supervisor":
+            queryset = WeeklyLogs.objects.filter(
+                placement__academic_supervisor=user,
+                status="endorsed",
+            )
+        elif user.role == "internship_administrator":
+            queryset = WeeklyLogs.objects.filter(
+                status__in=("submitted", "endorsed")
+            )
+        else:
+            return Response(
+                {"detail": "Pending logs are not applicable for your role."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
+        serializer = WeeklyLogListSerializer(queryset, many=True)
+        return Response(
+            {
+                "count": queryset.count(),
+                "logs":  serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 
