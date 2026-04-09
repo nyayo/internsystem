@@ -93,7 +93,68 @@ class WeeklyLogListCreateView(APIView):
             queryset = queryset.filter(week_number=week)
 
         serializer = WeeklyLogListSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HT
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+def post(self, request):
+        if request.user.role != "student":
+            return Response(
+                {"detail": "Only students can create weekly logs."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serializer = WeeklyLogDetailSerializer(
+            data=request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer.save(status="draft")
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class WeeklyLogDetailView(APIView):
+   
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+
+    def get(self, request, pk):
+        log, err = get_log_or_404(pk, request.user)
+        if err:
+            return err
+        serializer = WeeklyLogDetailSerializer(log)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, pk):
+        log, err = get_log_or_404(pk, request.user)
+        if err:
+            return err
+
+        if request.user != log.placement.student:
+            return Response(
+                {"detail": "Only the student can edit a log."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if log.status not in ("draft", "resubmit"):
+            return Response(
+                {"detail": "Only draft or resubmit logs can be edited."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer = WeeklyLogDetailSerializer(
+            log,
+            data=request.data,
+            partial=True,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
