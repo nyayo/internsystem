@@ -13,6 +13,7 @@ from .serializers import (
     AcademicAssessSerializer,
     WeeklyLogCloseSerializer,
 )
+
 from .permissions import (
     IsActiveAccount,
     IsStudent,
@@ -41,8 +42,37 @@ def get_log_queryset(user):
         return WeeklyLogs.objects.all()
 
 
+    return WeeklyLogs.objects.none()
 
 
+def get_log_or_404(pk, user):
+   
+    try:
+        log = WeeklyLogs.objects.select_related(
+            "placement__student",
+            "placement__workplace_supervisor",
+            "placement__academic_supervisor",
+            "workplace_endorsed_by",
+            "academic_assessed_by",
+        ).get(pk=pk)
+    except WeeklyLogs.DoesNotExist:
+        return None, Response(
+            {"detail": "Weekly log not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    if not (
+        user == log.placement.student
+        or user == log.placement.workplace_supervisor
+        or user == log.placement.academic_supervisor
+        or user.role == "internship_administrator"
+    ):
+        return None, Response(
+            {"detail": "You are not linked to this placement."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    return log, None
 
 
 
