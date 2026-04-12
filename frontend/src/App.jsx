@@ -1,5 +1,3 @@
-
-
 import Register from "./pages/registerPage/Register";
 
 function App() {
