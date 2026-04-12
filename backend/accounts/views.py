@@ -38,6 +38,7 @@ class RegisterView(APIView):
             'detail': 'Account created. Please check your email to verify your account.',
             'email':  user.email,
             'role':   user.role,
+            'token': token
         }, status=status.HTTP_201_CREATED)
 
 

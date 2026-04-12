@@ -14,7 +14,7 @@ from .serializers import (
     WeeklyLogCloseSerializer,
 )
 
-from .permissions import (
+from accounts.permissions import (
     IsActiveAccount,
     IsStudent,
     IsWorkplaceSupervisor,
@@ -96,7 +96,7 @@ class WeeklyLogListCreateView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
-def post(self, request):
+    def post(self, request):
         if request.user.role != "student":
             return Response(
                 {"detail": "Only students can create weekly logs."},
@@ -183,6 +183,81 @@ class WeeklyLogSubmitView(APIView):
             {
                 "detail": "Log submitted for workplace supervisor review.",
                 "status": log.status,
+            },
+            status=status.HTTP_200_OK,
+        )
+class WeeklyLogEndorseView(APIView):
+    
+    permission_classes = [IsAuthenticated, IsActiveAccount, IsWorkplaceSupervisor]
+
+    def post(self, request, pk):
+        try:
+            log = WeeklyLogs.objects.get(pk=pk)
+        except WeeklyLogs.DoesNotExist:
+            return Response(
+                {"detail": "Weekly log not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if log.placement.workplace_supervisor != request.user:
+            return Response(
+                {"detail": "You are not the workplace supervisor for this placement."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serializer = WorkplaceEndorseSerializer(
+            log,
+            data=request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer.save()
+        return Response(
+            {
+                "detail": f"Log {log.status}.",
+                "status": log.status,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class WeeklyLogAssessView(APIView):
+    
+    permission_classes = [IsAuthenticated, IsActiveAccount, IsAcademicSupervisor]
+
+    def post(self, request, pk):
+        try:
+            log = WeeklyLogs.objects.get(pk=pk)
+        except WeeklyLogs.DoesNotExist:
+            return Response(
+                {"detail": "Weekly log not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if log.placement.academic_supervisor != request.user:
+            return Response(
+                {"detail": "You are not the academic supervisor for this placement."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serializer = AcademicAssessSerializer(
+            log,
+            data=request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer.save()
+        return Response(
+            {
+                "detail": "Log assessed successfully.",
+                "status": log.status,
+                "grade":  str(log.academic_grade),
             },
             status=status.HTTP_200_OK,
         )
@@ -283,7 +358,7 @@ class PendingLogsView(APIView):
     
     permission_classes = [IsAuthenticated, IsActiveAccount]
 
-def get(self, request):
+    def get(self, request):
         user = request.user
 
         if user.role == "workplace_supervisor":
