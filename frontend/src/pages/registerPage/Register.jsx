@@ -30,7 +30,7 @@ export default function Register() {
     }
 
     setError("");
-    alert("Registration Successful");
+    alert("Registration Successful🎉");
   };
 
   return(
