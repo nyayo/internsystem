@@ -43,8 +43,8 @@ function LoginPage() {
             Login
         </button>
 
-        <p> className="login-footer"
-            Don't have an account? <a> href="/registerSign up</a>
+        <p className="login-footer">
+            Don't have an account? <a href="/register">Sign up</a>
         </p>
 
     </div>
