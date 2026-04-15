@@ -48,7 +48,7 @@ function LoginPage() {
             Login
         </button>
 
-        <div classNme="login-links">
+        <div className="login-links">
             <a href="#">Forgot Password?</a>
         </div>
         </form>

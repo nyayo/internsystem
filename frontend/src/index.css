@@ -1,7 +1,18 @@
 body {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serifArial, sans-serif;
   background: #acabca;
+  color: #333;
 
 
 }
