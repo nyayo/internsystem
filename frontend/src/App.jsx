@@ -1,9 +1,12 @@
-import Register from "./pages/registerPage/Register";
-import LoginPage from "./pages/login/LoginPage";
+import RegisterPage from "./pages/auth/register/RegisterPage";
+import LoginPage from "./pages/auth/login/LoginPage";
+import './App.css';
+
+
 function App() {
   return (
-    // <Register />
-    <LoginPage />
+    <RegisterPage />
+    // <LoginPage />
   );
 
 }
