@@ -1,5 +1,5 @@
 import React from "react";
-import './sideBar.css'
+import './Sidebar.css'
 
 export default function SideBar({ activeLink, onLinkClick, pendingCount, onClose, isOpen }) {
   const menuItems = [
