@@ -92,7 +92,7 @@ aside .sidebar a:last-child {
 }
 
 aside .sidebar a.active {
-  background: var(--color-light);
+  background: #4f46e5;
   color: var(--color-primary);
   margin-left: 0;
 }
@@ -110,7 +110,11 @@ aside .sidebar a.active span {
 }
 
 aside .sidebar a:hover {
-  color: var(--color-primary);
+  background: #eef2ff;
+  color: #4f46e5;
+  cursor: pointer;
+  transform: translateX(5PX);
+  transition: ALL 0.3s ease;
 }
 
 aside .sidebar .message-count {
