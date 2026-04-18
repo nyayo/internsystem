@@ -1,14 +1,16 @@
+import {Link} from "react-router-dom";
 import React from "react";
 import './Sidebar.css'
 
+
 export default function SideBar({ activeLink, onLinkClick, pendingCount, onClose, isOpen }) {
   const menuItems = [
-    { id: 'dashboard', icon: 'grid_view', label: 'Dashboard' },
-    { id: 'pending', icon: 'pending_actions', label: 'Pending Approvals', count: pendingCount },
-    { id: 'active', icon: 'work_outline', label: 'Active Internships' },
-    { id: 'students', icon: 'people_outline', label: 'Students' },
-    { id: 'supervisors', icon: 'badge', label: 'Supervisors' },
-    { id: 'criteria', icon: 'fact_check', label: 'Evaluation Criteria' },
+    { key: 'dashboard', label: 'Dashboard', path: "/admin"},
+    { key: 'pending', label: 'Pending Approvals', path: "/pending" },
+    { key: 'active', label: 'Active Internships', path:"/internships" },
+    { key: 'students', label: 'Students', path: "/students"},
+    { key: 'supervisors', label: 'Supervisors', path:"./supervisors" },
+    { key: 'evaluation', label: 'Evaluation Criteria', path:"/evaluation" },
     // { id: 'progress', icon: 'trending_up', label: 'Progress Tracking' },
     // { id: 'reports', icon: 'assessment', label: 'Reports' },
     // { id: 'settings', icon: 'settings', label: 'Settings' },
