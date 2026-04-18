@@ -6,11 +6,11 @@ import './Sidebar.css'
 export default function SideBar({ activeLink, onLinkClick, pendingCount, onClose, isOpen }) {
   const menuItems = [
     { key: 'dashboard', label: 'Dashboard', path: "/admin"},
-    { key: 'pending', label: 'Pending Approvals', path: "/pending" },
-    { key: 'active', label: 'Active Internships', path:"/internships" },
-    { key: 'students', label: 'Students', path: "/students"},
-    { key: 'supervisors', label: 'Supervisors', path:"./supervisors" },
-    { key: 'evaluation', label: 'Evaluation Criteria', path:"/evaluation" },
+    { key: 'pending', label: 'Pending Approvals', path: "/admin/pending" },
+    { key: 'active', label: 'Active Internships', path:"/admin/internships" },
+    { key: 'students', label: 'Students', path: "/admin/students"},
+    { key: 'supervisors', label: 'Supervisors', path:"./admin/supervisors" },
+    { key: 'evaluation', label: 'Evaluation Criteria', path:"/admin/evaluation" },
     // { id: 'progress', icon: 'trending_up', label: 'Progress Tracking' },
     // { id: 'reports', icon: 'assessment', label: 'Reports' },
     // { id: 'settings', icon: 'settings', label: 'Settings' },
@@ -34,7 +34,7 @@ export default function SideBar({ activeLink, onLinkClick, pendingCount, onClose
       <div className="sidebar">
         {menuItems.map(item => (
           <a 
-            key={item.id}
+            key={item.key}
             href="#" 
             className={activeLink === item.id ? 'active' : ''}
             onClick={(e) => {
