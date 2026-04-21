@@ -1,4 +1,12 @@
-// Minimal student dashboard data for testing
+// import {
+//   formatDateRange as formatDateRangeValue,
+//   formatDateValue,
+// } from "../utils/dateUtils";
+import { loadJSON, removeStorageItem, saveJSON } from "../services/storageService";
+
+// Student Dashboard Data - Mock data for the student portal
+
+// Current logged-in student (would come from auth context in production)
 export const currentStudent = {
   id: 1,
   firstName: 'Sarah',
