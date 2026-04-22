@@ -34,6 +34,9 @@ export default function CalendarWidget({ startDate, endDate }) {
     } else if (dateStr === endDate) {
       type = 'end';
     }
+    const isToday = date.toDateString() === today.toDateString();
+    calendarData.push({ day, type, isToday, date });
+  }
 
 
 
