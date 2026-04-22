@@ -17,4 +17,8 @@ export default function CalendarWidget({ startDate, endDate }) {
 
    const calendarData = [];
 
+   for (let i = 0; i < startingDayOfWeek; i++) {
+    calendarData.push({ day: null, type: 'empty' });
+  }
+
   
