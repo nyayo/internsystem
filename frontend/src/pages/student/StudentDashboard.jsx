@@ -36,7 +36,7 @@ const StudentDashboard = () => {
 //     : 0;
 
   return (
-    <div className="dashboard">
+    <div className="student-dashboard">
       <StudentSideBar />
       <StudentRightPanel student={currentStudent} />
     </div>
