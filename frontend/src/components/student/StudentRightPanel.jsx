@@ -1,7 +1,10 @@
 import React from "react";
+import { useTheme } from "../../context/ThemeContext";
 import "./StudentRightPanel.css";
 
 export default function StudentRightPanel({ student }) {
+    const { isDarkMode, toggleTheme } = useTheme();
+
     return (
     <div className="student-right-panel">
       <div className="theme-toggle-section">
