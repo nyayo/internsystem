@@ -84,6 +84,25 @@ export default function CalendarWidget({ startDate, endDate }) {
           ))}
         </div>
       </div>
+
+       <div className="calendar-legend">
+        <div className="legend-item">
+          <span className="dot start"></span>
+          <span>Start</span>
+        </div>
+        <div className="legend-item">
+          <span className="dot internship"></span>
+          <span>Active</span>
+        </div>
+        <div className="legend-item">
+          <span className="dot end"></span>
+          <span>End</span>
+        </div>
+        <div className="legend-item">
+          <span className="dot today"></span>
+          <span>Today</span>
+        </div>
+      </div>
   
   
 
