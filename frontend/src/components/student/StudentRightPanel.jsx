@@ -1,6 +1,7 @@
 import React from "react";
-import { useTheme } from "../../context/ThemeContext";
 import "./StudentRightPanel.css";
+import { useTheme } from "../../context/ThemeContext";
+
 
 export default function StudentRightPanel({ student, placement }) {
     const { isDarkMode, toggleTheme } = useTheme();

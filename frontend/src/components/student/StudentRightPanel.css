@@ -1,0 +1,298 @@
+.student-right-panel {
+  height: max-content;
+  position: sticky;
+  margin-top: 1.4rem;
+}
+
+.student-right-panel .theme-toggler {
+  background: var(--color-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 2.5rem;
+  width: 5.1rem;
+  border-radius: var(--border-radius-1);
+}
+
+.student-right-panel .theme-toggler span {
+  font-size: 1.2rem;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.student-right-panel .theme-toggler span:hover {
+  background: var(--color-primary)/20;
+}
+
+.student-right-panel .theme-toggler span.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  text-align: right;
+  border-radius: var(--border-radius-1);
+}
+
+/* Theme Toggle */
+.student-right-panel .theme-toggle-section {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.student-right-panel .theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--border-radius-1);
+  background: var(--color-white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--box-shadow);
+}
+
+.student-right-panel .theme-btn.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.student-right-panel .theme-btn.active span {
+  color: white;
+}
+
+.student-right-panel .theme-btn span {
+  font-size: 1.2rem;
+  color: var(--color-dark);
+}
+
+/* Profile Card */
+.student-right-panel .profile-card {
+  background: var(--color-white);
+  border-radius: var(--card-border-radius);
+  padding: var(--card-padding);
+  box-shadow: var(--box-shadow);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.student-right-panel .profile-photo {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1rem;
+}
+
+.student-right-panel .profile-photo img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-primary);
+}
+
+.student-right-panel .profile-photo .status-dot {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid var(--color-white);
+}
+
+.student-right-panel .profile-photo .status-dot.success {
+  background: var(--color-success);
+}
+
+.student-right-panel .profile-photo .status-dot.warning {
+  background: var(--color-warning);
+}
+
+.student-right-panel .profile-photo .status-dot.danger {
+  background: var(--color-danger);
+}
+
+.student-right-panel .profile-photo .status-dot.primary {
+  background: var(--color-primary);
+}
+
+.student-right-panel .profile-photo .status-dot.muted {
+  background: var(--color-info-dark);
+}
+
+.student-right-panel .profile-info {
+  margin-bottom: 1.5rem;
+}
+
+.student-right-panel .student-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  margin-bottom: 0.25rem;
+}
+
+.student-right-panel .student-number {
+  font-size: 0.85rem;
+  color: var(--color-info-dark);
+  margin-bottom: 0.75rem;
+}
+
+.student-right-panel .placement-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.student-right-panel .placement-status span.material-icons-sharp {
+  font-size: 0.9rem;
+}
+
+.student-right-panel .placement-status.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+}
+
+.student-right-panel .placement-status.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-warning);
+}
+
+.student-right-panel .placement-status.danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-danger);
+}
+
+.student-right-panel .placement-status.primary {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--color-primary);
+}
+
+.student-right-panel .placement-status.muted {
+  background: var(--color-info-light);
+  color: var(--color-info-dark);
+}
+
+/* Profile Details */
+.student-right-panel .profile-details {
+  text-align: left;
+  border-top: 1px solid var(--color-info-light);
+  padding-top: 1rem;
+}
+
+.student-right-panel .detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+}
+
+.student-right-panel .detail-item span.material-icons-sharp {
+  font-size: 1.1rem;
+  color: var(--color-primary);
+  margin-top: 0.1rem;
+}
+
+.student-right-panel .detail-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.student-right-panel .detail-text .label {
+  font-size: 0.7rem;
+  color: var(--color-info-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.student-right-panel .detail-text .value {
+  font-size: 0.85rem;
+  color: var(--color-dark);
+  font-weight: 500;
+}
+
+.student-right-panel .detail-text .value.email {
+  font-size: 0.75rem;
+  word-break: break-all;
+}
+
+/* Quick Actions */
+.student-right-panel .quick-actions {
+  background: var(--color-white);
+  border-radius: var(--card-border-radius);
+  padding: var(--card-padding);
+  box-shadow: var(--box-shadow);
+}
+
+.student-right-panel .quick-actions h4 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  margin-bottom: 1rem;
+}
+
+.student-right-panel .action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.student-right-panel .action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-light);
+  border-radius: var(--border-radius-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  color: var(--color-dark);
+  font-weight: 500;
+}
+
+.student-right-panel .action-btn:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.student-right-panel .action-btn:hover span.material-icons-sharp {
+  color: white;
+}
+
+.student-right-panel .action-btn span.material-icons-sharp {
+  font-size: 1.2rem;
+  color: var(--color-primary);
+  transition: color 0.2s ease;
+}
+
+/* Mobile responsive */
+@media screen and (max-width: 1200px) {
+  .student-right-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    position: static;
+  }
+  
+  .student-right-panel .theme-toggle-section {
+    grid-column: 1 / -1;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .student-right-panel {
+    grid-template-columns: 1fr;
+  }
+}
