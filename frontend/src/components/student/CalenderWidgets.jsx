@@ -29,6 +29,12 @@ export default function CalendarWidget({ startDate, endDate }) {
       type = 'internship';
     }
 
+    if (dateStr === startDate) {
+      type = 'start';
+    } else if (dateStr === endDate) {
+      type = 'end';
+    }
+
 
 
 
