@@ -72,6 +72,18 @@ export default function CalendarWidget({ startDate, endDate }) {
             <span key={day} className="day-name">{day}</span>
           ))}
         </div>
+
+         <div className="days">
+          {calendarData.map((item, index) => (
+            <div 
+              key={index} 
+              className={`day-cell ${item.type} ${item.isToday ? 'today' : ''}`}
+            >
+              {item.day}
+            </div>
+          ))}
+        </div>
+      </div>
   
   
 
