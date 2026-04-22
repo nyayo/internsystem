@@ -1,0 +1,155 @@
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  overflow-y: auto;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background: var(--color-white);
+  border-radius: var(--card-border-radius);
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  animation: slideIn 0.3s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal.modal-lg {
+  max-width: 600px;
+}
+
+.modal-overlay.show .modal {
+  transform: translateY(0);
+}
+
+.modal h2 {
+  margin-bottom: 1.5rem;
+  font-family: "Outfit", sans-serif;
+}
+
+.modal h3 {
+  font-size: 0.95rem;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-light);
+}
+
+.modal .form-section {
+  margin-bottom: 1.5rem;
+}
+
+.modal .form-group {
+  margin-bottom: 1rem;
+}
+
+.modal label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.modal label .required {
+  color: var(--color-danger);
+}
+
+.modal input,
+.modal textarea,
+.modal select {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--color-info-light);
+  border-radius: var(--border-radius-1);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+  color: var(--color-dark);
+  background: var(--color-white);
+}
+
+.modal input.readonly {
+  background: var(--color-light);
+  color: var(--color-dark-variant);
+  cursor: not-allowed;
+}
+
+.modal input:focus,
+.modal textarea:focus,
+.modal select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.modal textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.modal .btn-cancel {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--color-info-light);
+  background: transparent;
+  border-radius: var(--border-radius-1);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-family: "DM Sans", sans-serif;
+}
+
+.modal .btn-cancel:hover {
+  background: var(--color-light);
+}
+
+.modal .btn-save {
+  padding: 0.6rem 1.2rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-1);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  font-family: "DM Sans", sans-serif;
+}
+
+.modal .btn-save:hover {
+  background: var(--color-primary-variant);
+}
+
+@media screen and (max-width: 600px) {
+  .modal .form-row {
+    grid-template-columns: 1fr;
+  }
+}

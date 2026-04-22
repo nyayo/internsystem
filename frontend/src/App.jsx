@@ -10,16 +10,17 @@ import './App.css';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/student" element={<StudentDashboard />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/admin/students" element={<Students />} />
-      <Route path="/admin/pending" element={<Pending />} />
-      <Route path="/admin/supervisors" element={<Supervisors />} />
-      <Route path="/" element={<StudentDashboard />} />
-    </Routes>
+    // <Routes>
+    //   <Route path="/register" element={<RegisterPage />} />
+    //   <Route path="/login" element={<LoginPage />} />
+    //   <Route path="/student" element={<StudentDashboard />} />
+    //   <Route path="/admin" element={<AdminDashboard />} />
+    //   <Route path="/admin/students" element={<Students />} />
+    //   <Route path="/admin/pending" element={<Pending />} />
+    //   <Route path="/admin/supervisors" element={<Supervisors />} />
+    //   <Route path="/" element={<StudentDashboard />} />
+    // </Routes>
+    <AdminDashboard />
   );
 }
 
