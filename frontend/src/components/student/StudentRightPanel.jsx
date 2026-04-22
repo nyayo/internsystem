@@ -2,8 +2,35 @@ import React from "react";
 import { useTheme } from "../../context/ThemeContext";
 import "./StudentRightPanel.css";
 
-export default function StudentRightPanel({ student }) {
+export default function StudentRightPanel({ student, placement }) {
     const { isDarkMode, toggleTheme } = useTheme();
+
+    const placementStatus = placement?.status || "none";
+
+    const getStatusInfo = () => {
+    switch (placementStatus) {
+      case "draft":
+        return { label: "Draft", class: "muted", icon: "edit" };
+      case "pending_approval":
+        return {
+          label: "Pending Approval",
+          class: "warning",
+          icon: "hourglass_empty",
+        };
+      case "approved":
+        return { label: "Approved", class: "success", icon: "check_circle" };
+      case "active":
+        return { label: "Active", class: "success", icon: "play_circle" };
+      case "completed":
+        return { label: "Completed", class: "primary", icon: "verified" };
+      case "rejected":
+        return { label: "Rejected", class: "danger", icon: "cancel" };
+      default:
+        return { label: "No Placement", class: "muted", icon: "help_outline" };
+    }
+  };
+
+  const statusInfo = getStatusInfo();
 
     return (
     <div className="student-right-panel">
