@@ -65,6 +65,13 @@ export default function CalendarWidget({ startDate, endDate }) {
           </button>
         </div>
       </div>
+
+      <div className="calendar-grid">
+        <div className="day-names">
+          {dayNames.map(day => (
+            <span key={day} className="day-name">{day}</span>
+          ))}
+        </div>
   
   
 
