@@ -79,7 +79,7 @@ export default function CriteriaModal({ criteria, onClose, onSave }) {
               name="description" 
               value={formData.description}
               onChange={handleChange}
-              placeholder="Describe what this creria evaluates..."
+              placeholder="Describe what this criteria evaluates..."
             />
           </div>
           <div className="form-row">
