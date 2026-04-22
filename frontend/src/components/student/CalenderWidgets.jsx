@@ -20,5 +20,10 @@ export default function CalendarWidget({ startDate, endDate }) {
    for (let i = 0; i < startingDayOfWeek; i++) {
     calendarData.push({ day: null, type: 'empty' });
   }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    const dateStr = date.toISOString().split('T')[0];
+    let type = 'normal';
+
 
   
