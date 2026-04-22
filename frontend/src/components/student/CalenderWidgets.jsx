@@ -49,6 +49,9 @@ export default function CalendarWidget({ startDate, endDate }) {
   const nextMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
+  return (
+    <div className="calendar-widget">
+      <div className="calendar-header"></div>
   
   
 
