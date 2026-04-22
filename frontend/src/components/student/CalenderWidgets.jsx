@@ -15,4 +15,6 @@ export default function CalendarWidget({ startDate, endDate }) {
   const startingDayOfWeek = firstDay.getDay();
   const daysInMonth = lastDay.getDate();
 
+   const calendarData = [];
+
   
