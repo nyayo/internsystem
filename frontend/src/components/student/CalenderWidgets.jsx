@@ -51,7 +51,20 @@ export default function CalendarWidget({ startDate, endDate }) {
   };
   return (
     <div className="calendar-widget">
-      <div className="calendar-header"></div>
+      <div className="calendar-header">
+        <h4>Internship Calendar</h4>
+        <div className="calendar-nav">
+          <button onClick={prevMonth} className="nav-btn">
+            <span className="material-icons-sharp">chevron_left</span>
+          </button>
+          <span className="current-month">
+            {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+          </span>
+          <button onClick={nextMonth} className="nav-btn">
+            <span className="material-icons-sharp">chevron_right</span>
+          </button>
+        </div>
+      </div>
   
   
 
