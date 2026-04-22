@@ -25,5 +25,10 @@ export default function CalendarWidget({ startDate, endDate }) {
     const dateStr = date.toISOString().split('T')[0];
     let type = 'normal';
 
+    if (date >= internshipStart && date <= internshipEnd) {
+      type = 'internship';
+    }
+
+
 
   
