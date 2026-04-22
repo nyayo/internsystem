@@ -37,6 +37,11 @@ export default function CalendarWidget({ startDate, endDate }) {
     const isToday = date.toDateString() === today.toDateString();
     calendarData.push({ day, type, isToday, date });
   }
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
 
 
 
