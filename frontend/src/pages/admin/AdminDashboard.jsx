@@ -2,7 +2,7 @@ import { useState } from "react";
 import Sidebar from "../../components/admin/Sidebar"
 import MainPanel from "../../components/admin/MainPanel";
 import RightPanel from "../../components/admin/RightPanel";
-
+import { useAdmin, AdminProvider } from "../../context/AdminContext";
 
 const DashboardContent = () => {
   const [activeLink, setActiveLink] = useState("dashboard");
