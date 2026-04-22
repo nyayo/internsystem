@@ -2,8 +2,8 @@ import { Route, Routes } from "react-router-dom";
 import RegisterPage from "./pages/auth/register/RegisterPage";
 import LoginPage from "./pages/auth/login/LoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import Students from "./pages/admin/Students";
-import Pending from "./pages/admin/Pending";
+// import Students from "./pages/admin/Students";
+// import Pending from "./pages/admin/Pending";
 import Supervisors from "./pages/admin/Supervisors";
 import StudentDashboard from "./pages/student/studentDashboard";
 import './App.css';
@@ -20,7 +20,8 @@ function App() {
     //   <Route path="/admin/supervisors" element={<Supervisors />} />
     //   <Route path="/" element={<StudentDashboard />} />
     // </Routes>
-    <AdminDashboard />
+    <StudentDashboard />
+    // <AdminDashboard />
   );
 }
 
