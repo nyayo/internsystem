@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "logs",
     "placements",
     "evaluations",
+    "django_celery_results"
 ]
 
 MIDDLEWARE = [
@@ -137,6 +138,14 @@ REST_FRAMEWORK = {
     ),
 }
 
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_RESULT_BACKEND = 'django-db'   
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Africa/Kampala'
+
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
@@ -146,6 +155,8 @@ SIMPLE_JWT = {
     "SIGNING_KEY": SECRET_KEY,
     "AUTH_HEADER_TYPES": ("Bearer",)
 }
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_RESULT_BACKEND ='redis://localhost:6379/1'
 
 # Frontend URL for email links
 FRONTEND_URL = "http://localhost"
