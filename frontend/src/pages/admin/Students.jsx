@@ -1,3 +1,7 @@
+import React, { useState, useMemo } from 'react';
+import './StudentsPage.css';
+import Pagination from '../../components/Pagination';
+
 export default function StudentsPage({ students }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -295,3 +299,16 @@ return (
             )}
           </tbody>
         </table>
+         {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredStudents.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={setItemsPerPage}
+        />
+      </div>
+    </div>
+  );
+}
