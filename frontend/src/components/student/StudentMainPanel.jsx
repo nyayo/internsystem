@@ -94,4 +94,11 @@ export default function StudentMainPanel({
               <h2>My Placement</h2>
               <p className="subtitle">View and manage your internship placement</p>
             </div>
+            {hasActivePlacement && (
+            <div className="placement-details-card">
+              <div className="placement-header">
+                <div className="org-info">
+                  <h3>{placement.organisationName}</h3>
+                  <span className="department">{placement.department}</span>
+                </div>
   
