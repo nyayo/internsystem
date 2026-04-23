@@ -85,4 +85,13 @@ export default function StudentMainPanel({
               </button>
             )}
           </div>
+
+          {/* Placement Page */}
+      {activeLink === 'placement' && (
+        <div className="page-section">
+          <div className="section-header">
+            <div>
+              <h2>My Placement</h2>
+              <p className="subtitle">View and manage your internship placement</p>
+            </div>
   
