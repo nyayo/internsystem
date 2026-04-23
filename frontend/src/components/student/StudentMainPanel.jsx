@@ -70,7 +70,7 @@ export default function StudentMainPanel({
           )}
         </>
       )}
-      /* Weekly Logs Page */}
+      {/* Weekly Logs Page */}
       {activeLink === 'logs' && (
         <div className="page-section">
           <div className="section-header">
@@ -174,16 +174,12 @@ export default function StudentMainPanel({
           )}
         </div>
       )}
-
-                activeLink === 'evaluations' && (
+/* Evaluations Page*/
+             {activeLink === 'evaluations' && (
         <div className="page-section">
           <div className="section-header">
-            <div>
-              <h2>Evaluations</h2>
-              <p className="subtitle">View supervisor evaluations and feedback</p>
             </div>
-          </div>
-          
+            
           <div className="empty-state">
             <span className="material-icons-sharp">assessment</span>
             <h3>No Evaluations Yet</h3>
