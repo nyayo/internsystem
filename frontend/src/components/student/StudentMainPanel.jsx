@@ -78,4 +78,11 @@ export default function StudentMainPanel({
               <h2>Weekly Logs</h2>
               <p className="subtitle">Document your weekly activities and progress</p>
             </div>
+            {hasActivePlacement && (
+              <button className="btn-primary" onClick={onNewLog}>
+                <span className="material-icons-sharp">add</span>
+                New Log Entry
+              </button>
+            )}
+          </div>
   
