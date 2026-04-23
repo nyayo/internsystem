@@ -70,4 +70,12 @@ export default function StudentMainPanel({
           )}
         </>
       )}
+      /* Weekly Logs Page */}
+      {activeLink === 'logs' && (
+        <div className="page-section">
+          <div className="section-header">
+            <div>
+              <h2>Weekly Logs</h2>
+              <p className="subtitle">Document your weekly activities and progress</p>
+            </div>
   
