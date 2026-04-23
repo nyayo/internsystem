@@ -14,7 +14,7 @@ import {
 // import QuickActions from "../../components/QuickActions";
 import StudentSideBar from "../../components/student/StudentSideBar";
 import StudentRightPanel from "../../components/student/StudentRightPanel";
-
+import CalendarWidget from "../../components/student/CalenderWidget";
 
 const StudentDashboard = () => {
 //   const progress = studentPlacement
