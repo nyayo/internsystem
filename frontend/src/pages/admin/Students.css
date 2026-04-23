@@ -1,0 +1,65 @@
+.students-page,
+.supervisors-page,
+.internships-page,
+.criteria-page {
+  padding: 0;
+}
+
+/* Common Page Styles - reused across all admin pages */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.header-content h1 {
+  font-family: "Outfit", sans-serif;
+  font-size: 1.8rem;
+  margin-bottom: 0.3rem;
+}
+
+.header-content .subtitle {
+  color: var(--color-dark-variant);
+  font-size: 0.9rem;
+}
+
+.header-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-primary);
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: var(--border-radius-2);
+  font-size: 0.85rem;
+}
+
+.stat-badge.secondary {
+  background: var(--color-success);
+}
+
+.stat-badge.tertiary {
+  background: var(--color-warning);
+}
+
+.stat-badge .material-icons-sharp {
+  font-size: 1.2rem;
+}
+
+.stat-badge .stat-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.stat-badge .stat-label {
+  opacity: 0.9;
+}
+
