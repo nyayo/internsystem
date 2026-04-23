@@ -54,6 +54,14 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
               key={index} 
               className={`milestone ${milestone.completed ? 'completed' : ''}`}
               style={{ left: `${(milestone.week / totalWeeks) * 100}%` }}
-            ></div>
+               <div className="milestone-dot">
+                <span className="material-icons-sharp">{milestone.icon}</span>
+              </div>
+              <span className="milestone-label">{milestone.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+            
         
   
