@@ -232,3 +232,66 @@ return (
           )}
         </div>
       )}
+{/* Results Info */}
+      <div className="results-info">
+        Showing {paginatedStudents.length} of {filteredStudents.length} students
+      </div>
+
+      {/* Table */}
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Student No.</th>
+              <th>Programme</th>
+              <th>Year</th>
+              <th>Contact</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedStudents.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="no-results">
+                  <span className="material-icons-sharp">search_off</span>
+                  <p>No students found</p>
+                  {(searchTerm || hasActiveFilters) && (
+                    <button onClick={clearFilters}>Clear filters</button>
+                  )}
+                </td>
+              </tr>
+            ) : (
+              paginatedStudents.map(student => (
+                <tr key={student.id}>
+                  <td className="name-cell">
+                    <div className="name-info">
+                      <span className="full-name">{student.firstName} {student.lastName}</span>
+                      <span className="email">{student.email}</span>
+                    </div>
+                  </td>
+                  <td className="student-number">{student.studentNumber}</td>
+                  <td>
+                    <div className="programme-info">
+                      <span className="programme">{student.programme}</span>
+                      <span className="faculty">{student.faculty}</span>
+                    </div>
+                  </td>
+                  <td className="year-cell">Year {student.yearOfStudy}</td>
+                  <td className="contact-cell">{student.phone}</td>
+                  <td>
+                    <span className={`status-badge ${getStatusClass(student.accountStatus)}`}>
+                      {accountStatusChoices.find(s => s.value === student.accountStatus)?.label || student.accountStatus}
+                    </span>
+                  </td>
+                  <td>
+                    <button className="btn-action">
+                      <span className="material-icons-sharp">visibility</span>
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
