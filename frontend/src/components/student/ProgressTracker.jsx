@@ -54,7 +54,8 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
               key={index} 
               className={`milestone ${milestone.completed ? 'completed' : ''}`}
               style={{ left: `${(milestone.week / totalWeeks) * 100}%` }}
-               <div className="milestone-dot">
+            >
+              <div className="milestone-dot">
                 <span className="material-icons-sharp">{milestone.icon}</span>
               </div>
               <span className="milestone-label">{milestone.label}</span>
@@ -62,7 +63,7 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
           ))}
         </div>
       </div>
-      /* Stats Cards */}
+     { /* Stats Cards */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon logs">
@@ -93,7 +94,7 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
             <span className="stat-label">Pending Review</span>
           </div>
         </div>
-        logsStats.requiresAction > 0 && (
+        {logsStats.requiresAction > 0 && (
           <div className="stat-card alert">
             <div className="stat-icon action">
               <span className="material-icons-sharp">warning</span>
@@ -106,7 +107,7 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
         )}
       </div>
     </div>
-  );{
+  );
 }
 
             
