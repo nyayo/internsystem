@@ -1,11 +1,8 @@
 .students-page,
 .supervisors-page,
-.internships-page,
-.criteria-page {
-  padding: 0;
-}
 
-/* Common Page Styles - reused across all admin pages */
+
+/* Common Page Styles*/
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -62,4 +59,84 @@
 .stat-badge .stat-label {
   opacity: 0.9;
 }
+
+/* Data Table Styles */
+.table-container {
+  background: var(--color-white);
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table thead {
+  background: var(--color-light);
+}
+
+.data-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--color-dark-variant);
+  border-bottom: 1px solid var(--color-info-light);
+}
+
+.data-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-info-light);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+  background: var(--color-light);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Cell Styles */
+.name-cell .name-info,
+.programme-info,
+.org-info,
+.supervisor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.name-info .full-name,
+.org-info .org-name,
+.supervisor-info .supervisor-name {
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.name-info .email,
+.programme-info .faculty,
+.org-info .org-type,
+.supervisor-info .supervisor-role {
+  font-size: 0.8rem;
+  color: var(--color-dark-variant);
+}
+
+.student-number {
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.year-cell {
+  font-weight: 500;
+}
+
+.contact-cell {
+  font-size: 0.85rem;
+  color: var(--color-dark-variant);
+}
+
 
