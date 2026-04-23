@@ -17,4 +17,12 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
   const totalWeeks = useMemo(() => {
     return getTotalWeeks(placement.startDate, placement.endDate);
   }, [placement.startDate, placement.endDate]);
+  const logsStats = useMemo(() => {
+    const submitted = weeklyLogs.filter(log => log.status !== 'draft').length;
+    const assessed = weeklyLogs.filter(log => ['assessed', 'closed'].includes(log.status)).length;
+    const pending = weeklyLogs.filter(log => ['submitted', 'under_review', 'endorsed'].includes(log.status)).length;
+    const requiresAction = weeklyLogs.filter(log => log.status === 'resubmit').length;
+    
+    return { submitted, assessed, pending, requiresAction };
+  }, [weeklyLogs]);
   
