@@ -1,0 +1,126 @@
+aside {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+aside .top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.4rem;
+}
+
+aside .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+aside .logo .logo-icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-variant)
+  );
+  border-radius: var(--border-radius-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+aside .logo .logo-icon span {
+  color: var(--color-white);
+  font-size: 1.3rem;
+}
+
+aside .logo h2 {
+  font-family: "Outfit", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+aside .close {
+  display: none;
+}
+
+aside .sidebar {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  top: 3rem;
+  padding: 0 1.5;
+}
+
+aside h3 {
+  font-weight: 500;
+}
+
+aside .sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+
+  margin-left: 2rem;
+  color: var(--color-info-dark);
+  font-weight: 500;
+  position: relative;
+  height: 3.7rem;
+  border-radius: 8px;
+}
+
+aside{
+  padding-left: 10px;
+  width: 220px;
+  background: #f8f9ff;
+}
+
+aside .sidebar a span {
+  font-size: 1.6rem;
+  transition: all 300ms ease;
+}
+
+aside .sidebar a:last-child {
+  position: absolute;
+  bottom: 2rem;
+  width: 100%;
+}
+
+aside .sidebar a.active {
+  background: #4f46e5;
+  color: var(--color-primary);
+  margin-left: 0;
+}
+
+aside .sidebar a.active:before {
+  content: "";
+  width: 6px;
+  height: 100%;
+  background: var(--color-primary);
+}
+
+aside .sidebar a.active span {
+  color: var(--color-primary);
+  margin-left: calc(1rem - 3px);
+}
+
+aside .sidebar a:hover {
+  background: #eef2ff;
+  color: #4f46e5;
+  cursor: pointer;
+  transform: translateX(5PX);
+  transition: ALL 0.3s ease;
+}
+
+aside .sidebar .message-count {
+  background: var(--color-danger);
+  color: var(--color-white);
+  padding: 2px 10px;
+  font-size: 11px;
+  border-radius: var(--border-radius-1);
+}
