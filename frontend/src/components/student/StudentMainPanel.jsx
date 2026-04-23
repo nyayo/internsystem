@@ -56,4 +56,18 @@ export default function StudentMainPanel({
               </div>
             </div>
           )}
+          {(hasNoPlacement || hasDraftPlacement) && (
+            <div className="status-card no-placement">
+              <span className="material-icons-sharp">add_business</span>
+              <div className="status-content">
+                <h3>Submit Your Placement Application</h3>
+                <p>You haven't submitted an internship placement application yet. Start by providing details about your internship organisation.</p>
+                <button className="btn-primary" onClick={onOpenPlacement}>
+                  {hasDraftPlacement ? 'Continue Application' : 'Apply Now'}
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
   
