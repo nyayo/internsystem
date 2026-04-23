@@ -32,4 +32,9 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
   ];
   
   return (
+    <div className="progress-tracker">
+      <div className="tracker-header">
+        <h3>Internship Progress</h3>
+        <span className="week-indicator">Week {currentWeek} of {totalWeeks}</span>
+      </div>
   
