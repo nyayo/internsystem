@@ -93,6 +93,22 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
             <span className="stat-label">Pending Review</span>
           </div>
         </div>
+        logsStats.requiresAction > 0 && (
+          <div className="stat-card alert">
+            <div className="stat-icon action">
+              <span className="material-icons-sharp">warning</span>
+            </div>
+            <div className="stat-info">
+              <span className="stat-value">{logsStats.requiresAction}</span>
+              <span className="stat-label">Needs Resubmission</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );{
+}
+
             
         
   
