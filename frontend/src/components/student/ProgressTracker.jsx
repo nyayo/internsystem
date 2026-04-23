@@ -47,5 +47,13 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
           </div>
           <span className="progress-percentage">{progress}%</span>
         </div>
+        {/* Milestones */}
+        <div className="milestones">
+          {milestones.map((milestone, index) => (
+            <div 
+              key={index} 
+              className={`milestone ${milestone.completed ? 'completed' : ''}`}
+              style={{ left: `${(milestone.week / totalWeeks) * 100}%` }}
+            ></div>
         
   
