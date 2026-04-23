@@ -138,5 +138,112 @@
   font-size: 0.85rem;
   color: var(--color-dark-variant);
 }
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--border-radius-1);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.status-badge.warning {
+  background: rgba(255, 191, 0, 0.15);
+  color: #b8860b;
+}
+
+.status-badge.danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.status-badge.muted {
+  background: var(--color-light);
+  color: var(--color-dark-variant);
+}
+
+.status-badge.info {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--color-primary);
+}
+
+/* Action Buttons */
+.btn-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-info-light);
+  background: var(--color-white);
+  border-radius: var(--border-radius-1);
+  cursor: pointer;
+  color: var(--color-dark-variant);
+  transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.btn-action .material-icons-sharp {
+  font-size: 1.1rem;
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 3rem 1rem !important;
+  color: var(--color-dark-variant);
+}
+
+.no-results .material-icons-sharp {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+.no-results p {
+  margin-bottom: 1rem;
+}
+
+.no-results button {
+  padding: 0.5rem 1rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-1);
+  cursor: pointer;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Responsive */
+@media screen and (max-width: 1200px) {
+  .data-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+  }
+  
+  .filter-panel {
+    flex-direction: column;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+}
 
 
