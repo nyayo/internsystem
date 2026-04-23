@@ -37,4 +37,9 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
         <h3>Internship Progress</h3>
         <span className="week-indicator">Week {currentWeek} of {totalWeeks}</span>
       </div>
+      <div className="progress-section">
+        <div className="progress-bar-container">
+          <div className="progress-bar">
+            <div 
+              className="progress-fill" 
   
