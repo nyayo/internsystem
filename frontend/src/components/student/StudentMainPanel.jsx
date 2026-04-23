@@ -101,4 +101,20 @@ export default function StudentMainPanel({
                   <h3>{placement.organisationName}</h3>
                   <span className="department">{placement.department}</span>
                 </div>
+                activeLink === 'evaluations' && (
+        <div className="page-section">
+          <div className="section-header">
+            <div>
+              <h2>Evaluations</h2>
+              <p className="subtitle">View supervisor evaluations and feedback</p>
+            </div>
+          </div>
+          
+          <div className="empty-state">
+            <span className="material-icons-sharp">assessment</span>
+            <h3>No Evaluations Yet</h3>
+            <p>Evaluations will appear here once your supervisors submit their assessments.</p>
+          </div>
+        </div>
+      )}
   
