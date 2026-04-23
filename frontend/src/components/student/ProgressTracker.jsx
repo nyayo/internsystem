@@ -42,4 +42,10 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
           <div className="progress-bar">
             <div 
               className="progress-fill" 
+              style={{ width: `${Math.min(progress, 100)}%` }}
+            ></div>
+          </div>
+          <span className="progress-percentage">{progress}%</span>
+        </div>
+        
   
