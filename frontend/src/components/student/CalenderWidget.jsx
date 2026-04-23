@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './CalendarWidget.css';
 export default function CalendarWidget({ startDate, endDate }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -49,6 +49,11 @@ export default function CalendarWidget({ startDate, endDate }) {
   const nextMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
+
+  const goToToday = () => {
+    setCurrentMonth(new Date());
+  };
+
   return (
     <div className="calendar-widget">
       <div className="calendar-header">
