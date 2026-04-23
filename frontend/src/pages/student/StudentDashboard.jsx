@@ -39,6 +39,11 @@ const StudentDashboard = () => {
     <div className="student-dashboard">
       <StudentSideBar />
       <StudentRightPanel student={currentStudent} />
+      <div className="calendar-container">
+        <CalendarWidget startDate={studentPlacement?.startDate} endDate={studentPlacement?.endDate} />
+      </div>
+      <ProgressTracker />
+      <ProgressTracker placement={studentPlacement} weeklyLogs={studentWeeklyLogs} />
     </div>
   );
 };
