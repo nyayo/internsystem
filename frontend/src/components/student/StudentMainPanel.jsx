@@ -117,4 +117,24 @@ export default function StudentMainPanel({
           </div>
         </div>
       )}
+            {/* Settings Page */}
+      {activeLink === 'settings' && (
+        <div className="page-section">
+          <div className="section-header">
+            <div>
+              <h2>Settings</h2>
+              <p className="subtitle">Manage your account preferences</p>
+            </div>
+          </div>
+          
+          <div className="settings-card">
+            <h4>Profile Information</h4>
+            <p>Your profile information is managed by the university. Contact the administrator for updates.</p>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+}
+
   
