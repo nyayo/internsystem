@@ -17,4 +17,14 @@ export default function StudentMainPanel({
   const hasPendingPlacement = placement && placement.status === 'pending_approval';
   const hasDraftPlacement = placement && placement.status === 'draft';
   const hasNoPlacement = !placement || placement.status === 'rejected';
+  return (
+    <main className="student-main-panel">
+      {/* Welcome Banner - Always shown on dashboard */}
+      {activeLink === 'dashboard' && (
+        <>
+          <WelcomeBanner 
+            student={student} 
+            placement={placement}
+            onOpenPlacement={onOpenPlacement}
+          />
   
