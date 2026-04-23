@@ -25,4 +25,11 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
     
     return { submitted, assessed, pending, requiresAction };
   }, [weeklyLogs]);
+  const milestones = [
+    { week: 1, label: 'Start', icon: 'flag', completed: currentWeek >= 1 },
+    { week: Math.ceil(totalWeeks / 2), label: 'Midterm', icon: 'hourglass_bottom', completed: currentWeek >= Math.ceil(totalWeeks / 2) },
+    { week: totalWeeks, label: 'End', icon: 'emoji_events', completed: currentWeek >= totalWeeks },
+  ];
+  
+  return (
   
