@@ -15,7 +15,7 @@ import {
 import StudentSideBar from "../../components/student/StudentSideBar";
 import StudentRightPanel from "../../components/student/StudentRightPanel";
 import CalendarWidget from "../../components/student/CalenderWidget";
-
+import ProgressTracker from "../../components/student/ProgressTracker";
 const StudentDashboard = () => {
 //   const progress = studentPlacement
 //     ? calculateInternshipProgress(
