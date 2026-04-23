@@ -85,6 +85,25 @@ export default function StudentMainPanel({
               </button>
             )}
           </div>
+          </div>
+          
+          {hasActivePlacement ? (
+            <WeeklyLogsTable 
+              weeklyLogs={weeklyLogs}
+              placement={placement}
+              onNewLog={onNewLog}
+              onEditLog={onEditLog}
+              showTitle={false}
+            />
+          ) : (
+            <div className="empty-state">
+              <span className="material-icons-sharp">edit_note</span>
+              <h3>No Active Placement</h3>
+              <p>You need an approved placement before you can submit weekly logs.</p>
+            </div>
+          )}
+        </div>
+      )}
 
           {/* Placement Page */}
       {activeLink === 'placement' && (
