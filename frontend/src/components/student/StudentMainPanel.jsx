@@ -127,6 +127,45 @@ export default function StudentMainPanel({
                   <h3>{placement.organisationName}</h3>
                   <span className="department">{placement.department}</span>
                 </div>
+                <span className={`status-badge ${placement.status}`}>
+                  {placement.status === 'active' ? 'Active' : 
+                   placement.status === 'approved' ? 'Approved' : 'Completed'}
+                </span>
+              </div>
+              
+              <div className="placement-grid">
+                <div className="info-group">
+                  <label>Location</label>
+                  <p>{placement.organisationDistrict}</p>
+                </div>
+                <div className="info-group">
+                  <label>Duration</label>
+                  <p>{placement.startDate} to {placement.endDate}</p>
+                </div>
+                <div className="info-group">
+                  <label>Workplace Supervisor</label>
+                  <p>{placement.workplaceSupervisor?.name}</p>
+                </div>
+                <div className="info-group">
+                  <label>Academic Supervisor</label>
+                  <p>{placement.academicSupervisor?.name}</p>
+                </div>
+              </div>
+            </div>
+          )}
+           {hasPendingPlacement && (
+            <div className="status-card pending">
+              <span className="material-icons-sharp">hourglass_top</span>
+              <div className="status-content">
+                <h3>Application Under Review</h3>
+                <p>Your placement application is currently being reviewed.</p>
+                <button className="btn-secondary" onClick={onOpenPlacement}>
+                  View Application
+                </button>
+              </div>
+            </div>
+          )}
+
                 activeLink === 'evaluations' && (
         <div className="page-section">
           <div className="section-header">
