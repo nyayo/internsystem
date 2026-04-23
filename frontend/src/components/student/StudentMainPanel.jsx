@@ -165,6 +165,15 @@ export default function StudentMainPanel({
               </div>
             </div>
           )}
+          {hasNoPlacement && (
+            <div className="empty-state">
+              <span className="material-icons-sharp">work</span>
+              <h3>No Placement Application</h3>
+              <p>Start your internship journey by submitting a placement application.</p>
+            </div>
+          )}
+        </div>
+      )}
 
                 activeLink === 'evaluations' && (
         <div className="page-section">
