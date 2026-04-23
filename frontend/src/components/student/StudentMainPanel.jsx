@@ -27,4 +27,21 @@ export default function StudentMainPanel({
             placement={placement}
             onOpenPlacement={onOpenPlacement}
           />
+          {hasActivePlacement && (
+            <>
+              <ProgressTracker 
+                placement={placement}
+                weeklyLogs={weeklyLogs}
+              />
+              
+              <WeeklyLogsTable 
+                weeklyLogs={weeklyLogs}
+                placement={placement}
+                onNewLog={onNewLog}
+                onEditLog={onEditLog}
+                showTitle
+                limit={5}
+              />
+            </>
+          )}
   
