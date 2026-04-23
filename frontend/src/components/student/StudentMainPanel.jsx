@@ -85,7 +85,7 @@ export default function StudentMainPanel({
               </button>
             )}
           </div>
-          </div>
+          
           
           {hasActivePlacement ? (
             <WeeklyLogsTable 
@@ -113,6 +113,13 @@ export default function StudentMainPanel({
               <h2>My Placement</h2>
               <p className="subtitle">View and manage your internship placement</p>
             </div>
+             {(hasNoPlacement || hasDraftPlacement) && (
+              <button className="btn-primary" onClick={onOpenPlacement}>
+                <span className="material-icons-sharp">add</span>
+                {hasDraftPlacement ? 'Continue Application' : 'Apply Now'}
+              </button>
+            )}
+          </div>
             {hasActivePlacement && (
             <div className="placement-details-card">
               <div className="placement-header">
