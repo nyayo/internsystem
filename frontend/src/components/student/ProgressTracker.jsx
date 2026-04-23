@@ -62,6 +62,37 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
           ))}
         </div>
       </div>
+      /* Stats Cards */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-icon logs">
+            <span className="material-icons-sharp">edit_note</span>
+          </div>
+          <div className="stat-info">
+            <span className="stat-value">{logsStats.submitted}</span>
+            <span className="stat-label">Logs Submitted</span>
+          </div>
+        </div>
+        
+        <div className="stat-card">
+          <div className="stat-icon assessed">
+            <span className="material-icons-sharp">grading</span>
+          </div>
+          <div className="stat-info">
+            <span className="stat-value">{logsStats.assessed}</span>
+            <span className="stat-label">Logs Assessed</span>
+          </div>
+        </div>
+        
+        <div className="stat-card">
+          <div className="stat-icon pending">
+            <span className="material-icons-sharp">pending_actions</span>
+          </div>
+          <div className="stat-info">
+            <span className="stat-value">{logsStats.pending}</span>
+            <span className="stat-label">Pending Review</span>
+          </div>
+        </div>
             
         
   
