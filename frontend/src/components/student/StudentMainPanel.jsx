@@ -44,4 +44,16 @@ export default function StudentMainPanel({
               />
             </>
           )}
+          {hasPendingPlacement && (
+            <div className="status-card pending">
+              <span className="material-icons-sharp">hourglass_top</span>
+              <div className="status-content">
+                <h3>Placement Under Review</h3>
+                <p>Your placement application is currently being reviewed by the internship administrator. You will be notified once a decision is made.</p>
+                <button className="btn-secondary" onClick={onOpenPlacement}>
+                  View Application
+                </button>
+              </div>
+            </div>
+          )}
   
