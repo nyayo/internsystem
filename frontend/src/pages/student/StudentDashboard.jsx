@@ -2,9 +2,9 @@ import {
   currentStudent,
   studentPlacement,
   studentWeeklyLogs,
-  calculateInternshipProgress,
-  getCurrentWeekNumber,
-  getTotalWeeks,
+  //calculateInternshipProgress,
+  //getCurrentWeekNumber,
+ // getTotalWeeks,
 } from "../../data/studentDashboardData";
 
 // import StudentCard from "../../components/StudentCard";
@@ -16,13 +16,15 @@ import StudentSideBar from "../../components/student/StudentSideBar";
 import StudentRightPanel from "../../components/student/StudentRightPanel";
 import CalendarWidget from "../../components/student/CalenderWidget";
 import ProgressTracker from "../../components/student/ProgressTracker";
+import StudentMainPanel from '../../components/student/StudentMainPanel';
+
 const StudentDashboard = () => {
-//   const progress = studentPlacement
-//     ? calculateInternshipProgress(
-//         studentPlacement.startDate,
-//         studentPlacement.endDate
-//       )
-//     : 0;
+  // const progress = studentPlacement
+  //   ? calculateInternshipProgress(
+  //       studentPlacement.startDate,
+  //       studentPlacement.endDate
+  //     )
+  //   : 0;
 
 //   const currentWeek = studentPlacement
 //     ? getCurrentWeekNumber(studentPlacement.startDate)
@@ -44,6 +46,17 @@ const StudentDashboard = () => {
       </div>
       <ProgressTracker />
       <ProgressTracker placement={studentPlacement} weeklyLogs={studentWeeklyLogs} />
+      <div className="StudentMainPanel-container">
+        <StudentMainPanel
+          activeLink="dashboard"
+          student={currentStudent}
+          placement={studentPlacement}
+          weeklyLogs={studentWeeklyLogs}
+          onNewLog={() => {}}
+          onEditLog={() => {}}
+          onOpenPlacement={() => {}}
+        />
+      </div>
     </div>
   );
 };
