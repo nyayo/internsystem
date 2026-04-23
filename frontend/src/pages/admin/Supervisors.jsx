@@ -56,7 +56,23 @@ export default function SupervisorsPage({ workplaceSupervisors, academicSupervis
 
   const hasActiveFilters = filters.role || filters.accountStatus;
 
-  
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'active': return 'success';
+      case 'registered': return 'warning';
+      case 'suspended': return 'danger';
+      case 'deactivated': return 'muted';
+      default: return '';
+    }
+  };
+
+  const getRoleLabel = (role) => {
+    return role === 'workplace_supervisor' ? 'Workplace' : 'Academic';
+  };
+
+  const getRoleClass = (role) => {
+    return role === 'workplace_supervisor' ? 'info' : 'success';
+  };
 
   return (
     <div className="supervisors-page">
