@@ -62,3 +62,12 @@ const getScoreColor = (score, max) => {
   if (percentage >= 40) return 'var(--color-warning)';
   return 'var(--color-danger)';
 };
+return (
+  <div className="student-modal-overlay" onClick={onClose}>
+    <div className="student-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+      <div className="modal-header">
+        <h2>{readOnly ? 'View Evaluation' : evaluation.evaluationTypeDisplay}</h2>
+        <button className="close-btn" onClick={onClose}>
+          <span className="material-icons-sharp">close</span>
+        </button>
+      </div>
