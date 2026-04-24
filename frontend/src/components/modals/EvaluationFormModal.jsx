@@ -153,3 +153,11 @@ return (
     onChange={(e) => setOverallRemarks(e.target.value)}
   />
 </div>
+{(evaluation.status === 'submitted' || evaluation.status === 'acknowledged') && (
+  <div>
+    <p>{evaluation.acknowledgementNotes}</p>
+    <small>
+      Acknowledged by {evaluation.acknowledgedBy}
+    </small>
+  </div>
+)}
