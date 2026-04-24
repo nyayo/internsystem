@@ -55,3 +55,10 @@ const handleSubmit = (e) => {
   }
   onSubmit(evaluation.id, scores, overallRemarks);
 };
+const getScoreColor = (score, max) => {
+  const percentage = (score / max) * 100;
+  if (percentage >= 80) return 'var(--color-success)';
+  if (percentage >= 60) return 'var(--color-primary)';
+  if (percentage >= 40) return 'var(--color-warning)';
+  return 'var(--color-danger)';
+};
