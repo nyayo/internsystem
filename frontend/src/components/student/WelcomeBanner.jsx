@@ -13,5 +13,18 @@ export default function WelcomeBanner({ student, placement }) {
   };
   
   return (
-    <div className="welcome-banner">
-      <div className="welcome-content"></div>
+    <div> className="welcome-banner">
+      <div>className="welcome-content">
+        <div className="greeting">
+          <h1>{getGreeting()}, {student.firstName}!</h1>
+          {hasActivePlacement ? (
+            <p className="welcome-subtitle">
+              Welcome back to your internship dashboard. Keep up the great work!
+            </p>
+          ) : (
+            <p className="welcome-subtitle">
+              Ready to start your internship journey? Submit your placement application today.
+            </p>
+          )}
+        </div>
+      
