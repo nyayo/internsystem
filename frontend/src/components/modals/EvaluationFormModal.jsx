@@ -40,3 +40,6 @@ const getMaxPossibleScore = () => {
 const allScoresFilled = () => {
   return scores.every(s => s.scoreAwarded !== null && s.scoreAwarded >= 0);
 };
+const handleSaveDraft = () => {
+  onSaveDraft(evaluation.id, scores, overallRemarks);
+};
