@@ -27,3 +27,26 @@ const getOverallPercentage = () => {
           <span className="material-icons-sharp">close</span>
         </button>
       </div>
+      <div className="modal-body">
+  <div style={{
+    background: 'var(--color-light)',
+    borderRadius: '8px',
+    padding: '1rem',
+    marginBottom: '1.5rem',
+  }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div>
+        <h3 style={{ fontWeight: '600', marginBottom: '0.25rem' }}>
+          {evaluation.studentName}
+        </h3>
+        <p style={{ fontSize: '0.85rem', color: 'var(--color-info-dark)' }}>
+          {evaluation.programme}
+        </p>
+      </div>
+      <div style={{ textAlign: 'right' }}>
+        <div>
+          {evaluation.evaluationTypeDisplay}
+        </div>
+      </div>
+    </div>
+  </div>
