@@ -30,3 +30,10 @@ const handleCommentChange = (criteriaId, value) => {
     s.criteriaId === criteriaId ? { ...s, comment: value } : s
   ));
 };
+const getTotalScore = () => {
+  return scores.reduce((sum, s) => sum + (s.scoreAwarded || 0), 0);
+};
+
+const getMaxPossibleScore = () => {
+  return scores.reduce((sum, s) => sum + s.maxScore, 0);
+};
