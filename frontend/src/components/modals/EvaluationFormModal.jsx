@@ -100,3 +100,14 @@ return (
             </p>
           </div>
         </div>
+        <form>
+  <table style={{ width: '100%' }}>
+    <thead>
+      <tr>
+        <th>Criterion</th>
+        <th>Max</th>
+        <th>Score</th>
+        <th>Comment</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
