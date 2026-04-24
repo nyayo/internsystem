@@ -18,3 +18,12 @@ const getScoreColor = (score, max) => {
 const getOverallPercentage = () => {
     return ((evaluation.totalScore / evaluation.maxPossibleScore) * 100).toFixed(1);
   };
+  return (
+  <div className="student-modal-overlay" onClick={onClose}>
+    <div className="student-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+      <div className="modal-header">
+        <h2>{readOnly ? 'View Evaluation' : 'Review & Acknowledge Evaluation'}</h2>
+        <button className="close-btn" onClick={onClose}>
+          <span className="material-icons-sharp">close</span>
+        </button>
+      </div>
