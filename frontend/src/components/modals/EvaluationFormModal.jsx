@@ -166,3 +166,10 @@ return (
   <button type="button" onClick={handleSaveDraft}>Save Draft</button>
   <button type="submit">Submit</button>
 </div>
+    </div>
+  </div>
+);
+
+};
+
+export default EvaluationFormModal;
