@@ -58,8 +58,17 @@ const StudentDashboard = () => {
           <div className="WeeklyLogs-container">
             <WeeklyLogs logs={studentWeeklyLogs} />
           </div>
-          <
+          <div className="QuickActions-container">
+            <QuickActions />
+          </div>
+          <div className="ProgressCard-container">
+            <ProgressCard progress={progress} currentWeek={currentWeek} totalWeeks={totalWeeks} />
+          </div>
+          div className="PlacementCard-container">
+            <PlacementCard placement={studentPlacement} />
         />
+        </div>
+
       </div>
     </div>
   );
