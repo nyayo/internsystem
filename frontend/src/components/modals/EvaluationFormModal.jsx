@@ -25,3 +25,8 @@ const handleScoreChange = (criteriaId, value) => {
     s.criteriaId === criteriaId ? { ...s, scoreAwarded: numValue } : s
   ));
 };
+const handleCommentChange = (criteriaId, value) => {
+  setScores(prev => prev.map(s => 
+    s.criteriaId === criteriaId ? { ...s, comment: value } : s
+  ));
+};
