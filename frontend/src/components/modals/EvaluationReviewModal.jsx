@@ -3,3 +3,4 @@ import { formatDateTime } from '../../data/supervisorData';
 import './StudentFormStyles.css';
 
 const EvaluationReviewModal = ({ evaluation, onClose, onAcknowledge, readOnly = false }) => {
+    const [acknowledgementNotes, setAcknowledgementNotes] = useState(evaluation.acknowledgementNotes || '');
