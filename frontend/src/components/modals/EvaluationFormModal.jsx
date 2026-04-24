@@ -71,3 +71,32 @@ return (
           <span className="material-icons-sharp">close</span>
         </button>
       </div>
+      return (
+  <div className="student-modal-overlay" onClick={onClose}>
+    <div className="student-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+      <div className="modal-header">
+        <h2>{readOnly ? 'View Evaluation' : evaluation.evaluationTypeDisplay}</h2>
+        <button className="close-btn" onClick={onClose}>
+          <span className="material-icons-sharp">close</span>
+        </button>
+      </div>
+
+      <div className="modal-body">
+        <div style={{
+          background: 'var(--color-light)',
+          borderRadius: '8px',
+          padding: '1rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <div>
+            <h3 style={{ fontWeight: '600', marginBottom: '0.25rem' }}>
+              {evaluation.studentName}
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-info-dark)' }}>
+              {evaluation.programme}
+            </p>
+          </div>
+        </div>
