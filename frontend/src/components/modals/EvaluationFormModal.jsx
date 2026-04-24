@@ -161,3 +161,8 @@ return (
     </small>
   </div>
 )}
+<div>
+  <button type="button" onClick={onClose}>Cancel</button>
+  <button type="button" onClick={handleSaveDraft}>Save Draft</button>
+  <button type="submit">Submit</button>
+</div>
