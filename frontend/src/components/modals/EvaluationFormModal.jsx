@@ -17,3 +17,5 @@ const EvaluationFormModal = ({ evaluation, criteria, onClose, onSaveDraft, onSub
       comment: '',
     }));
 };
+const [scores, setScores] = useState(getInitialScores);
+const [overallRemarks, setOverallRemarks] = useState(evaluation.overallRemarks || '');
