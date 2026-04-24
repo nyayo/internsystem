@@ -55,6 +55,10 @@ const StudentDashboard = () => {
           onNewLog={() => {}}
           onEditLog={() => {}}
           onOpenPlacement={() => {}}
+          <div className="WeeklyLogs-container">
+            <WeeklyLogs logs={studentWeeklyLogs} />
+          </div>
+          <
         />
       </div>
     </div>
