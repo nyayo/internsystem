@@ -66,6 +66,14 @@ const StudentDashboard = () => {
           </div>
           div className="PlacementCard-container">
             <PlacementCard placement={studentPlacement} />
+            <div className="StudentCard-container">
+              <StudentCard student={currentStudent} />
+            </div>
+            <div WelcomeBanner-container">
+              <WelcomeBanner student={currentStudent} placement={studentPlacement} />
+            </div>
+          <div CalendarWidget-container">
+            <CalendarWidget startDate={studentPlacement?.startDate} endDate={studentPlacement?.endDate} />
         />
         </div>
 
