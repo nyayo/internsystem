@@ -1,6 +1,24 @@
 import React, { useState } from 'react';
 import React from 'react';
 import './StudentFormStyles.css';
+import React, { useState } from 'react';
+
+const EvaluationFormModal = ({ evaluation, criteria, onClose }) => {
+
+  const getInitialScores = () => {
+    return criteria.map(c => ({
+      criteriaId: c.id,
+      scoreAwarded: null,
+      comment: '',
+      maxScore: c.maxScore
+    }));
+  };
+
+  const [scores, setScores] = useState(() => getInitialScores());
+  const [overallRemarks, setOverallRemarks] = useState('');
+
+  return <div>...</div>;
+};
 
   
 
