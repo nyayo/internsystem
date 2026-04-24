@@ -19,3 +19,9 @@ const EvaluationFormModal = ({ evaluation, criteria, onClose, onSaveDraft, onSub
 };
 const [scores, setScores] = useState(getInitialScores);
 const [overallRemarks, setOverallRemarks] = useState(evaluation.overallRemarks || '');
+const handleScoreChange = (criteriaId, value) => {
+  const numValue = value === '' ? null : Math.min(Number(value), 20);
+  setScores(prev => prev.map(s => 
+    s.criteriaId === criteriaId ? { ...s, scoreAwarded: numValue } : s
+  ));
+};
