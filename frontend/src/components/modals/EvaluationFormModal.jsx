@@ -43,3 +43,15 @@ const allScoresFilled = () => {
 const handleSaveDraft = () => {
   onSaveDraft(evaluation.id, scores, overallRemarks);
 };
+const handleSubmit = (e) => {
+  e.preventDefault();
+  if (!allScoresFilled()) {
+    alert('Please fill in all scores before submitting.');
+    return;
+  }
+  if (!overallRemarks.trim()) {
+    alert('Please provide overall remarks.');
+    return;
+  }
+  onSubmit(evaluation.id, scores, overallRemarks);
+};
