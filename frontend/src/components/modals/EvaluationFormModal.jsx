@@ -135,3 +135,14 @@ return (
     </td>
   </tr>
 ))}
+</tbody>
+<tfoot>
+  <tr>
+    <td>Total</td>
+    <td>{getMaxPossibleScore()}</td>
+    <td>{getTotalScore()}</td>
+    <td></td>
+  </tr>
+</tfoot>
+</table>
+</form>
