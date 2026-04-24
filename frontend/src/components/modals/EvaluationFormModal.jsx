@@ -37,3 +37,6 @@ const getTotalScore = () => {
 const getMaxPossibleScore = () => {
   return scores.reduce((sum, s) => sum + s.maxScore, 0);
 };
+const allScoresFilled = () => {
+  return scores.every(s => s.scoreAwarded !== null && s.scoreAwarded >= 0);
+};
