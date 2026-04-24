@@ -15,3 +15,6 @@ const getScoreColor = (score, max) => {
   if (percentage >= 40) return 'var(--color-warning)';
   return 'var(--color-danger)';
 };
+const getOverallPercentage = () => {
+    return ((evaluation.totalScore / evaluation.maxPossibleScore) * 100).toFixed(1);
+  };
