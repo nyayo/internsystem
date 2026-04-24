@@ -19,24 +19,6 @@ import ProgressTracker from "../../components/student/ProgressTracker";
 import StudentMainPanel from '../../components/student/StudentMainPanel';
 
 const StudentDashboard = () => {
-   const progress = studentPlacement
-    ? calculateInternshipProgress(
-        studentPlacement.startDate,
-        studentPlacement.endDate
-       )
-     : 0;
-
-  const currentWeek = studentPlacement
-    ? getCurrentWeekNumber(studentPlacement.startDate)
-    : 0;
-
-  const totalWeeks = studentPlacement
-     ? getTotalWeeks(
-         studentPlacement.startDate,
-        studentPlacement.endDate
-      )
-    : 0;
-
   return (
     <div className="student-dashboard">
       <StudentSideBar />
@@ -55,28 +37,7 @@ const StudentDashboard = () => {
           onNewLog={() => {}}
           onEditLog={() => {}}
           onOpenPlacement={() => {}}
-          <div className="WeeklyLogs-container">
-            <WeeklyLogs logs={studentWeeklyLogs} />
-          </div>
-          <div className="QuickActions-container">
-            <QuickActions />
-          </div>
-          <div className="ProgressCard-container">
-            <ProgressCard progress={progress} currentWeek={currentWeek} totalWeeks={totalWeeks} />
-          </div>
-          div className="PlacementCard-container">
-            <PlacementCard placement={studentPlacement} />
-            <div className="StudentCard-container">
-              <StudentCard student={currentStudent} />
-            </div>
-            <div WelcomeBanner-container">
-              <WelcomeBanner student={currentStudent} placement={studentPlacement} />
-            </div>
-          <div CalendarWidget-container">
-            <CalendarWidget startDate={studentPlacement?.startDate} endDate={studentPlacement?.endDate} />
         />
-        </div>
-
       </div>
     </div>
   );
