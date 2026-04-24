@@ -111,3 +111,27 @@ return (
       </tr>
     </thead>
     <tbody></tbody>
+    {scores.map((score) => (
+  <tr key={score.criteriaId}>
+    <td>{score.criteriaTitle}</td>
+    <td>{score.maxScore}</td>
+    <td>
+      <input
+        type="number"
+        value={score.scoreAwarded ?? ''}
+        onChange={(e) =>
+          handleScoreChange(score.criteriaId, e.target.value)
+        }
+      />
+    </td>
+    <td>
+      <input
+        type="text"
+        value={score.comment}
+        onChange={(e) =>
+          handleCommentChange(score.criteriaId, e.target.value)
+        }
+      />
+    </td>
+  </tr>
+))}
