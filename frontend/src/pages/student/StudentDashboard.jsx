@@ -19,23 +19,23 @@ import ProgressTracker from "../../components/student/ProgressTracker";
 import StudentMainPanel from '../../components/student/StudentMainPanel';
 
 const StudentDashboard = () => {
-  // const progress = studentPlacement
-  //   ? calculateInternshipProgress(
-  //       studentPlacement.startDate,
-  //       studentPlacement.endDate
-  //     )
-  //   : 0;
+   const progress = studentPlacement
+    ? calculateInternshipProgress(
+        studentPlacement.startDate,
+        studentPlacement.endDate
+       )
+     : 0;
 
-//   const currentWeek = studentPlacement
-//     ? getCurrentWeekNumber(studentPlacement.startDate)
-//     : 0;
+  const currentWeek = studentPlacement
+    ? getCurrentWeekNumber(studentPlacement.startDate)
+    : 0;
 
-//   const totalWeeks = studentPlacement
-//     ? getTotalWeeks(
-//         studentPlacement.startDate,
-//         studentPlacement.endDate
-//       )
-//     : 0;
+  const totalWeeks = studentPlacement
+     ? getTotalWeeks(
+         studentPlacement.startDate,
+        studentPlacement.endDate
+      )
+    : 0;
 
   return (
     <div className="student-dashboard">
