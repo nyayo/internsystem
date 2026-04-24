@@ -146,3 +146,10 @@ return (
 </tfoot>
 </table>
 </form>
+<div>
+  <label>Overall Remarks</label>
+  <textarea
+    value={overallRemarks}
+    onChange={(e) => setOverallRemarks(e.target.value)}
+  />
+</div>
