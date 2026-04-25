@@ -101,3 +101,6 @@ const getOverallPercentage = () => {
     </div>
   </div>
 )}
+<div>
+  <button onClick={onClose}>Cancel</button>
+</div>
