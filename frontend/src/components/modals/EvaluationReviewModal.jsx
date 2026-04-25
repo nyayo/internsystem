@@ -86,3 +86,10 @@ const getOverallPercentage = () => {
     Submitted on {formatDateTime(evaluation.submittedAt)}
   </div>
 </div>
+<form onSubmit={handleSubmit}>
+  <textarea
+    value={acknowledgementNotes}
+    onChange={(e) => setAcknowledgementNotes(e.target.value)}
+  />
+  <button type="submit">Acknowledge</button>
+</form>
