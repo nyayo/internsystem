@@ -59,3 +59,12 @@ const getOverallPercentage = () => {
     {getOverallPercentage()}%
   </div>
 </div>
+<table>
+  <thead>
+    <tr>
+      <th>Criterion</th>
+      <th>Score</th>
+      <th>Comment</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
