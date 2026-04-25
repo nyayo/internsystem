@@ -4,7 +4,7 @@ import {
   getCurrentWeekNumber, 
   getTotalWeeks
 } from '../../data/studentDashboardData';
-import './ProgressTracker.csss';
+import './ProgressTracker.css';
 export default function ProgressTracker({ placement, weeklyLogs }) {
   const progress = useMemo(() => {
     return calculateInternshipProgress(placement.startDate, placement.endDate);
