@@ -1,0 +1,27 @@
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--color-white);
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius-2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  z-index: 1001;
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+}
+
+.notification.show {
+  transform: translateX(0);
+}
+
+.notification.success span:first-child {
+  color: var(--color-success);
+}
+
+.notification.danger span:first-child {
+  color: var(--color-danger);
+}
