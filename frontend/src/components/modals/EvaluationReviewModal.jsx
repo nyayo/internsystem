@@ -79,3 +79,10 @@ const getOverallPercentage = () => {
     <td>{score.comment || '—'}</td>
   </tr>
 ))}
+<div>
+  <h3>Workplace Supervisor Remarks</h3>
+  <div>{evaluation.overallRemarks}</div>
+  <div>
+    Submitted on {formatDateTime(evaluation.submittedAt)}
+  </div>
+</div>
