@@ -93,3 +93,11 @@ const getOverallPercentage = () => {
   />
   <button type="submit">Acknowledge</button>
 </form>
+{evaluation.acknowledgementNotes && (
+  <div>
+    <div>{evaluation.acknowledgementNotes}</div>
+    <div>
+      Acknowledged by {evaluation.acknowledgedBy}
+    </div>
+  </div>
+)}
