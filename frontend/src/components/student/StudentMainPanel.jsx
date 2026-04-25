@@ -13,10 +13,11 @@ export default function StudentMainPanel({
   onEditLog,
   onOpenPlacement 
 }) {
-    const hasActivePlacement = placement && ['approved', 'active', 'completed'].includes(placement.status);
+  const hasActivePlacement = placement && ['approved', 'active', 'completed'].includes(placement.status);
   const hasPendingPlacement = placement && placement.status === 'pending_approval';
   const hasDraftPlacement = placement && placement.status === 'draft';
   const hasNoPlacement = !placement || placement.status === 'rejected';
+  
   return (
     <main className="student-main-panel">
       {/* Welcome Banner - Always shown on dashboard */}
@@ -27,6 +28,7 @@ export default function StudentMainPanel({
             placement={placement}
             onOpenPlacement={onOpenPlacement}
           />
+          
           {hasActivePlacement && (
             <>
               <ProgressTracker 
@@ -44,6 +46,7 @@ export default function StudentMainPanel({
               />
             </>
           )}
+          
           {hasPendingPlacement && (
             <div className="status-card pending">
               <span className="material-icons-sharp">hourglass_top</span>
@@ -56,6 +59,7 @@ export default function StudentMainPanel({
               </div>
             </div>
           )}
+          
           {(hasNoPlacement || hasDraftPlacement) && (
             <div className="status-card no-placement">
               <span className="material-icons-sharp">add_business</span>
@@ -70,6 +74,7 @@ export default function StudentMainPanel({
           )}
         </>
       )}
+      
       {/* Weekly Logs Page */}
       {activeLink === 'logs' && (
         <div className="page-section">
@@ -85,7 +90,6 @@ export default function StudentMainPanel({
               </button>
             )}
           </div>
-          
           
           {hasActivePlacement ? (
             <WeeklyLogsTable 
@@ -104,8 +108,8 @@ export default function StudentMainPanel({
           )}
         </div>
       )}
-
-          {/* Placement Page */}
+      
+      {/* Placement Page */}
       {activeLink === 'placement' && (
         <div className="page-section">
           <div className="section-header">
@@ -113,14 +117,15 @@ export default function StudentMainPanel({
               <h2>My Placement</h2>
               <p className="subtitle">View and manage your internship placement</p>
             </div>
-             {(hasNoPlacement || hasDraftPlacement) && (
+            {(hasNoPlacement || hasDraftPlacement) && (
               <button className="btn-primary" onClick={onOpenPlacement}>
                 <span className="material-icons-sharp">add</span>
                 {hasDraftPlacement ? 'Continue Application' : 'Apply Now'}
               </button>
             )}
           </div>
-            {hasActivePlacement && (
+          
+          {hasActivePlacement && (
             <div className="placement-details-card">
               <div className="placement-header">
                 <div className="org-info">
@@ -153,7 +158,8 @@ export default function StudentMainPanel({
               </div>
             </div>
           )}
-           {hasPendingPlacement && (
+          
+          {hasPendingPlacement && (
             <div className="status-card pending">
               <span className="material-icons-sharp">hourglass_top</span>
               <div className="status-content">
@@ -165,6 +171,7 @@ export default function StudentMainPanel({
               </div>
             </div>
           )}
+          
           {hasNoPlacement && (
             <div className="empty-state">
               <span className="material-icons-sharp">work</span>
@@ -174,12 +181,17 @@ export default function StudentMainPanel({
           )}
         </div>
       )}
-/* Evaluations Page*/
-             {activeLink === 'evaluations' && (
+      
+      {/* Evaluations Page */}
+      {activeLink === 'evaluations' && (
         <div className="page-section">
           <div className="section-header">
+            <div>
+              <h2>Evaluations</h2>
+              <p className="subtitle">View supervisor evaluations and feedback</p>
             </div>
-            
+          </div>
+          
           <div className="empty-state">
             <span className="material-icons-sharp">assessment</span>
             <h3>No Evaluations Yet</h3>
@@ -187,7 +199,8 @@ export default function StudentMainPanel({
           </div>
         </div>
       )}
-            {/* Settings Page */}
+      
+      {/* Settings Page */}
       {activeLink === 'settings' && (
         <div className="page-section">
           <div className="section-header">
@@ -206,5 +219,3 @@ export default function StudentMainPanel({
     </main>
   );
 }
-
-  
