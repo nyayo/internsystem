@@ -140,7 +140,3 @@ export default function CalendarWidget({ startDate, endDate }) {
       </button>
     </div>
   );
-
-
-
-  
