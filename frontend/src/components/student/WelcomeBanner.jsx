@@ -13,8 +13,8 @@ export default function WelcomeBanner({ student, placement }) {
   };
   
   return (
-    <div> className="welcome-banner">
-      <div>className="welcome-content">
+    <div className="welcome-banner">
+      <div className="welcome-content">
         <div className="greeting">
           <h1>{getGreeting()}, {student.firstName}!</h1>
           {hasActivePlacement ? (
@@ -27,4 +27,31 @@ export default function WelcomeBanner({ student, placement }) {
             </p>
           )}
         </div>
+        
+        {hasActivePlacement && (
+          <div className="placement-summary">
+            <div className="org-badge">
+              <span className="material-icons-sharp">business</span>
+              <div>
+                <span className="org-name">{placement.organisationName}</span>
+                <span className="org-dept">{placement.department}</span>
+              </div>
+            </div>
+            <div className="date-badge">
+              <span className="material-icons-sharp">date_range</span>
+              <span>{formatDate(placement.startDate)} - {formatDate(placement.endDate)}</span>
+            </div>
+          </div>
+        )}
+      </div>
       
+      <div className="welcome-illustration">
+        <div className="illustration-circle">
+          <span className="material-icons-sharp">
+            {hasActivePlacement ? 'trending_up' : 'rocket_launch'}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
