@@ -114,7 +114,9 @@ p {
   .container {
     width: 100%;
     grid-template-columns: 1fr;
-  } aside {
+  }
+
+  aside {
     position: fixed;
     left: 0;
     background: var(--color-white);
