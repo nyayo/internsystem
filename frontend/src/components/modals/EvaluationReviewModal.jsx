@@ -104,3 +104,10 @@ const getOverallPercentage = () => {
 <div>
   <button onClick={onClose}>Cancel</button>
 </div>
+    </div>
+  </div>
+);
+
+};
+
+export default EvaluationReviewModal;
