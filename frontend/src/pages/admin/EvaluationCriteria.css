@@ -89,3 +89,43 @@
   color: var(--color-primary);
 }
 
+/* Active Internships Duration */
+.duration-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.85rem;
+}
+
+.duration-weeks {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+/* Supervisors Cell */
+.supervisors-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.supervisors-cell .wp-sup,
+.supervisors-cell .ac-sup {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.supervisors-cell .material-icons-sharp {
+  font-size: 0.9rem;
+  color: var(--color-dark-variant);
+}
+
+.supervisors-cell .wp-sup .material-icons-sharp {
+  color: var(--color-primary);
+}
+
+.supervisors-cell .ac-sup .material-icons-sharp {
+  color: var(--color-success);
+}
