@@ -68,3 +68,14 @@ const getOverallPercentage = () => {
     </tr>
   </thead>
   <tbody></tbody>
+  {evaluation.scores.map((score) => (
+  <tr key={score.criteriaId}>
+    <td>{score.criteriaTitle}</td>
+    <td>
+      <span>
+        {score.scoreAwarded}/{score.maxScore}
+      </span>
+    </td>
+    <td>{score.comment || '—'}</td>
+  </tr>
+))}
