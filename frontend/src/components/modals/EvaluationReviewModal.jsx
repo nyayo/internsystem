@@ -50,3 +50,12 @@ const getOverallPercentage = () => {
       </div>
     </div>
   </div>
+  <div>
+  <div>Total Score</div>
+  <div>
+    {evaluation.totalScore} / {evaluation.maxPossibleScore}
+  </div>
+  <div>
+    {getOverallPercentage()}%
+  </div>
+</div>
