@@ -77,3 +77,10 @@ return (
     <div>{log.studentRemarks}</div>
   </div>
 )}
+<div>
+  <h3>Workplace Supervisor Endorsement</h3>
+  <div>{log.workplaceComment}</div>
+  <div>
+    Endorsed by {log.workplaceEndorsedBy} on {formatDateTime(log.workplaceEndorsedAt)}
+  </div>
+</div>
