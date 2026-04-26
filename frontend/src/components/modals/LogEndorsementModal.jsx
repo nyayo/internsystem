@@ -72,3 +72,12 @@ return (
     <div>{log.studentRemarks}</div>
   </div>
 )}
+<div style={{
+  fontSize: '0.8rem',
+  color: 'var(--color-info-dark)',
+  marginTop: '0.5rem',
+  paddingTop: '0.5rem',
+  borderTop: '1px solid var(--color-info-light)'
+}}>
+  Submitted: {formatDateTime(log.submittedAt)}
+</div>
