@@ -315,6 +315,17 @@ class ResendVerificationView(APIView):
         return Response(response_msg, status=status.HTTP_200_OK)
 
 
+
+@extend_schema(
+    operation_id="auth_forgot_password",
+    request=inline_serializer("ForgotPasswordRequest", fields={
+        "email": drf_serializers.EmailField(),
+    }),
+    responses={
+        200: OpenApiResponse(description="Reset email sent (always, to prevent enumeration)."),
+        400: OpenApiResponse(description="Email field missing."),
+    }
+)
 class ForgotPasswordView(APIView):
     """
     POST /accounts/auth/forgot-password/
