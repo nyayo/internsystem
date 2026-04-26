@@ -182,7 +182,13 @@ class LogoutView(APIView):
                 status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail': 'Successfully logged out.'},
                         status=status.HTTP_205_RESET_CONTENT)
-        
+ 
+ 
+@extend_schema(
+    operation_id="auth_me",
+    request=None,
+    responses={200: UserProfileSerializer}
+)       
 class MeView(APIView):
     """
     GET /accounts/auth/me/
@@ -194,6 +200,12 @@ class MeView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+
+@extend_schema(
+    operation_id="auth_user_list",
+    request=None,
+    responses={200: UserProfileSerializer(many=True)}
+)
 class UserListView(APIView):
     """
     GET /api/auth/users/?role=student
