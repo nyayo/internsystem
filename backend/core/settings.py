@@ -164,6 +164,16 @@ SIMPLE_JWT = {
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
 CELERY_RESULT_BACKEND ='redis://localhost:6379/1'
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "InternHub API",
+    "DESCRIPTION": "API documentation for the InternHub application, which manages internships logging, placements, evaluations, and user accounts.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "FIELD_MAPPING": {
+        "django.contrib.gis.db.models.PointField": "rest_framework.serializers.JSONField",
+    },
+}
+
 # Frontend URL for email links
 FRONTEND_URL = "http://localhost"
 
