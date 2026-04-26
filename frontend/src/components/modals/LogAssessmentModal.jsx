@@ -30,4 +30,24 @@ return (
                 <button className="close-btn" onClick={onClose}>
                     <span className="material-icons-sharp">close</span>
                 </button>
-            </div>  
+            </div> 
+            <div className="modal-body">
+  <div style={{
+    background: 'var(--color-light)',
+    borderRadius: '8px',
+    padding: '1rem',
+    marginBottom: '1.5rem',
+  }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div>
+        <h3>{log.studentName}</h3>
+        <p>{log.programme}</p>
+      </div>
+      <div>
+        <div>Week {log.weekNumber}</div>
+        <div>
+          {formatDate(log.weekStartDate)} - {formatDate(log.weekEndDate)}
+        </div>
+      </div>
+    </div>
+  </div> 
