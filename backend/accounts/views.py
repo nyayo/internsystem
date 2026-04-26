@@ -151,7 +151,16 @@ class LoginView(APIView):
             },
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    operation_id="auth_logout",
+    request=inline_serializer("LogoutRequest", fields={
+        "refresh": drf_serializers.CharField(),
+    }),
+    responses={
+        205: OpenApiResponse(description="Successfully logged out."),
+        400: OpenApiResponse(description="Invalid or missing refresh token."),
+    }
+)
 class LogoutView(APIView):
     """
     POST /accounts/auth/logout/
