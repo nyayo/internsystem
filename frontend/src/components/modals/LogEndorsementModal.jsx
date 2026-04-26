@@ -121,3 +121,10 @@ return (
     padding: 1rem;
   }
 `}</style>
+    </div>
+  </div>
+);
+
+};
+
+export default LogEndorsementModal;
