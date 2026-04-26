@@ -223,6 +223,19 @@ class UserListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+
+@extend_schema(
+    operation_id="auth_change_password",
+    request=inline_serializer("ChangePasswordRequest", fields={
+        "current_password": drf_serializers.CharField(),
+        "new_password":     drf_serializers.CharField(),
+        "new_password2":    drf_serializers.CharField(),
+    }),
+    responses={
+        200: OpenApiResponse(description="Password changed successfully."),
+        400: OpenApiResponse(description="Validation error."),
+    }
+)
 class ChangePasswordView(APIView):
     """
     POST /accounts/auth/change-password/
@@ -262,7 +275,16 @@ class ChangePasswordView(APIView):
             status=status.HTTP_200_OK)
 
 
-
+@extend_schema(
+    operation_id="auth_resend_verification",
+    request=inline_serializer("ResendVerificationRequest", fields={
+        "email": drf_serializers.EmailField(),
+    }),
+    responses={
+        200: OpenApiResponse(description="Verification email sent (always, to prevent enumeration)."),
+        400: OpenApiResponse(description="Email field missing."),
+    }
+)
 class ResendVerificationView(APIView):
     """
     POST /accounts/auth/resend-verification/
