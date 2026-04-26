@@ -8,3 +8,14 @@ const LogEndorsementModal = ({ log, onClose, onEndorse, readOnly = false }) => {
   e.preventDefault();
   onEndorse(log.id, comment);
 };
+return (
+  <div className="student-modal-overlay" onClick={onClose}>
+    <div className="student-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-header">
+        <h2>
+          {readOnly ? 'View Weekly Log' : 'Review & Endorse Log'}
+        </h2>
+        <button className="close-btn" onClick={onClose}>
+          <span className="material-icons-sharp">close</span>
+        </button>
+      </div>
