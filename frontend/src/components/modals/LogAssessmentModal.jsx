@@ -107,3 +107,4 @@ return (
     </div>
   </div>
 )}
+<button onClick={onClose}>Cancel</button>
