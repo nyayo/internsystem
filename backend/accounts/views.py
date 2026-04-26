@@ -103,7 +103,25 @@ class VerifyEmailView(APIView):
             {'detail': 'Email verified successfully. You can now log in.'},
             status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    operation_id="auth_login",
+    request=LoginSerializer,
+    responses={
+        200: inline_serializer("LoginResponse", fields={
+            "access":  drf_serializers.CharField(),
+            "refresh": drf_serializers.CharField(),
+            "user": inline_serializer("LoginUserDetail", fields={
+                "id":             drf_serializers.IntegerField(),
+                "email":          drf_serializers.EmailField(),
+                "full_name":      drf_serializers.CharField(),
+                "role":           drf_serializers.CharField(),
+                "account_status": drf_serializers.CharField(),
+                "student_number": drf_serializers.CharField(),
+            }),
+        }),
+        400: OpenApiResponse(description="Invalid credentials."),
+    }
+)
 class LoginView(APIView):
     """
     POST /accounts/auth/login/
