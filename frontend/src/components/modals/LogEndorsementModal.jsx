@@ -19,3 +19,30 @@ return (
           <span className="material-icons-sharp">close</span>
         </button>
       </div>
+      <div className="modal-body">
+  <div style={{
+    background: 'var(--color-light)',
+    borderRadius: '8px',
+    padding: '1rem',
+    marginBottom: '1.5rem',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }}>
+    <div>
+      <h3 style={{ fontWeight: '600', marginBottom: '0.25rem' }}>
+        {log.studentName}
+      </h3>
+      <p style={{ fontSize: '0.85rem', color: 'var(--color-info-dark)' }}>
+        {log.programme}
+      </p>
+    </div>
+    <div style={{ textAlign: 'right' }}>
+      <div>
+        Week {log.weekNumber}
+      </div>
+      <div>
+        {formatDate(log.weekStartDate)} - {formatDate(log.weekEndDate)}
+      </div>
+    </div>
+  </div>
