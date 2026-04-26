@@ -305,4 +305,4 @@ class ResetPasswordView(APIView):
         user.save()
         return Response(
             {'detail': 'Password reset successfully. You can now log in.'},
-            status=status.HTTP_200_OK)
+            status=status.HTTP_200_Ok)
