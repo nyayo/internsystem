@@ -51,3 +51,29 @@ return (
       </div>
     </div>
   </div> 
+  <div>
+  <h3>Activities Performed</h3>
+  <div>{log.activitiesPerformed}</div>
+</div>
+
+<div>
+  <h3>Skills Gained</h3>
+  <div>{log.skillsGained}</div>
+</div>
+
+<div>
+  <h3>Challenges Faced</h3>
+  <div>{log.challengesFaced}</div>
+</div>
+
+<div>
+  <h3>Supervisor Interactions</h3>
+  <div>{log.supervisorInteractions}</div>
+</div>
+
+{log.studentRemarks && (
+  <div>
+    <h3>Student Remarks</h3>
+    <div>{log.studentRemarks}</div>
+  </div>
+)}
