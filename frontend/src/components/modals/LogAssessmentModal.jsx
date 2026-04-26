@@ -108,14 +108,9 @@ return (
   </div>
 )}
 <button onClick={onClose}>Cancel</button>
-<style>{`
-  .log-content {
-    background: var(--color-light);
-    padding: 1rem;
-  }
-`}</style>
+            </div>
+        </div>
     </div>
-  </div>
 );
 
 };
