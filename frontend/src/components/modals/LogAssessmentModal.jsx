@@ -98,3 +98,12 @@ return (
 
   <button type="submit">Submit</button>
 </form>
+{log.academicComment && (
+  <div>
+    <div>{log.academicComment}</div>
+    <div>{log.academicGrade}%</div>
+    <div>
+      Assessed on {formatDateTime(log.academicAssessedAt)}
+    </div>
+  </div>
+)}
