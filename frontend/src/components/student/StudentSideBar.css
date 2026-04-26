@@ -1,0 +1,167 @@
+.student-sidebar {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.student-sidebar .sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.4rem;
+}
+
+.student-sidebar .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.student-sidebar .logo .logo-icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-variant)
+  );
+  border-radius: var(--border-radius-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.student-sidebar .logo .logo-icon span {
+  color: var(--color-white);
+  font-size: 1.3rem;
+}
+
+.student-sidebar .logo h2 {
+  font-family: "Outfit", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.student-sidebar .menu-toggle {
+  display: none;
+  background: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--border-radius-1);
+  color: var(--color-dark);
+}
+
+.student-sidebar .menu-toggle:hover {
+  background: var(--color-light);
+}
+
+/* Navigation */
+.student-sidebar .sidebar-nav {
+    margin-top: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  height: 86vh;
+  position: relative;
+  top: 3rem;
+}
+
+.student-sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 2rem;
+  color: var(--color-info-dark);
+  font-weight: 500;
+  position: relative;
+  height: 3.7rem;
+}
+
+.student-sidebar .nav-link:hover {
+  color: var(--color-primary);
+}
+
+.student-sidebar .nav-link span.material-icons-sharp:hover {
+  color: var(--color-primary);
+}
+
+.student-sidebar .nav-link:last-child {
+  position: absolute;
+  bottom: 2rem;
+  width: 100%;
+}
+
+.student-sidebar .nav-link.active {
+  background: var(--color-light);
+  color: var(--color-primary);
+  margin-left: 0;
+}
+
+.student-sidebar .nav-link.active:before {
+  content: "";
+  width: 6px;
+  height: 100%;
+  background: var(--color-primary);
+}
+
+.student-sidebar .nav-link.active span {
+  color: var(--color-primary);
+  margin-left: calc(1rem - 3px);
+}
+
+.student-sidebar .nav-link span.material-icons-sharp {
+  font-size: 1.4rem;
+  color: var(--color-info-dark);
+  transition: color 0.2s ease;
+}
+
+.student-sidebar .nav-link:hover {
+  color: var(--color-primary);
+}
+
+.student-sidebar .nav-link .badge {
+  margin-left: auto;
+  padding: 0.15rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.student-sidebar .nav-link .badge.danger {
+  background: var(--color-danger);
+  color: white;
+}
+
+/* Mobile styles */
+/* @media screen and (max-width: 1200px) {
+  .student-sidebar {
+    position: fixed;
+    left: -300px;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    border-radius: 0;
+    z-index: 1000;
+    padding-top: 1rem;
+  }
+  
+  .student-sidebar.open {
+    left: 0;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.3);
+  }
+  
+  .student-sidebar .menu-toggle {
+    display: flex;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    background: var(--color-white);
+    box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius-1);
+  }
+  
+  .student-sidebar.open .menu-toggle {
+    left: auto;
+    right: 1rem;
+  }
+} */

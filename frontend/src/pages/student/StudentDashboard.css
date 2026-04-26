@@ -1,0 +1,25 @@
+.student-dashboard {
+    display: grid;
+  width: 96%;
+  margin: 0 auto;
+  font-size: 0.88rem;
+  gap: 1.8rem;
+  grid-template-columns: 14rem auto 23rem;
+}
+
+/* Mobile responsive */
+@media screen and (max-width: 1200px) {
+  .student-dashboard {
+    grid-template-columns: 1fr;
+    width: 94%;
+    gap: 1rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .student-dashboard {
+    width: 100%;
+    padding: 0 1rem;
+    gap: 1.5rem;
+  }
+}
