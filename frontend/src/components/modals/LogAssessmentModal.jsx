@@ -84,3 +84,17 @@ return (
     Endorsed by {log.workplaceEndorsedBy} on {formatDateTime(log.workplaceEndorsedAt)}
   </div>
 </div>
+<form onSubmit={handleSubmit}>
+  <input
+    type="number"
+    value={grade}
+    onChange={(e) => setGrade(e.target.value)}
+  />
+
+  <textarea
+    value={comment}
+    onChange={(e) => setComment(e.target.value)}
+  />
+
+  <button type="submit">Submit</button>
+</form>
