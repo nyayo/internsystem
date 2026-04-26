@@ -18,7 +18,19 @@ from accounts.tokens import (
 )
 from accounts.emails import send_verification_email, send_password_reset_email
 
-
+@extend_schema(
+    operation_id="auth_register",
+    request=UserRegistrationSerializer,
+    responses={
+        201: inline_serializer("RegisterResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "email":  drf_serializers.EmailField(),
+            "role":   drf_serializers.CharField(),
+            "token":  drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation errors"),
+    }
+)
 class RegisterView(APIView):
     """
     POST /accounts/auth/register/
@@ -43,7 +55,16 @@ class RegisterView(APIView):
             'token': token
         }, status=status.HTTP_201_CREATED)
 
-
+@extend_schema(
+    operation_id="auth_verify_email",
+    request=inline_serializer("VerifyEmailRequest", fields={
+        "token": drf_serializers.CharField(),
+    }),
+    responses={
+        200: OpenApiResponse(description="Email verified successfully."),
+        400: OpenApiResponse(description="Invalid or expired token."),
+    }
+)
 class VerifyEmailView(APIView):
     """
     POST /accounts/auth/verify-email/
