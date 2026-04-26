@@ -19,3 +19,15 @@ const getGradeColor = (grade) => {
   if (grade >= 40) return 'var(--color-warning)';
   return 'var(--color-danger)';
 };
+
+return (
+    <div className="student-modal-overlay" onClick={onClose}> 
+        <div className="student-modal" onClick={(e) => e.stopPropagation()} >
+            <div className="modal-header">
+                <h2>{readOnly ? 'View Weekly Log' : 'Assess & Grade Log'}
+        
+                </h2>
+                <button className="close-btn" onClick={onClose}>
+                    <span className="material-icons-sharp">close</span>
+                </button>
+            </div>  
