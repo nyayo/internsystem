@@ -356,6 +356,18 @@ class ForgotPasswordView(APIView):
         return Response(response_msg, status=status.HTTP_200_OK)
 
 
+@extend_schema(
+    operation_id="auth_reset_password",
+    request=inline_serializer("ResetPasswordRequest", fields={
+        "token":         drf_serializers.CharField(),
+        "new_password":  drf_serializers.CharField(),
+        "new_password2": drf_serializers.CharField(),
+    }),
+    responses={
+        200: OpenApiResponse(description="Password reset successfully."),
+        400: OpenApiResponse(description="Invalid token or validation error."),
+    }
+)
 class ResetPasswordView(APIView):
     """
     POST /accounts/auth/reset-password/
