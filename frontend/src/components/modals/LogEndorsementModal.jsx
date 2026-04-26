@@ -93,3 +93,11 @@ return (
 
   <button type="submit">Endorse Log</button>
 </form>
+{log.workplaceComment && (
+  <div>
+    <div>{log.workplaceComment}</div>
+    <div>
+      Endorsed: {formatDateTime(log.workplaceEndorsedAt)}
+    </div>
+  </div>
+)}
