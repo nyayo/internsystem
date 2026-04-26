@@ -13,3 +13,9 @@ const handleSubmit = (e) => {
   }
   onAssess(log.id, Number(grade), comment);
 };
+const getGradeColor = (grade) => {
+  if (grade >= 80) return 'var(--color-success)';
+  if (grade >= 60) return 'var(--color-primary)';
+  if (grade >= 40) return 'var(--color-warning)';
+  return 'var(--color-danger)';
+};
