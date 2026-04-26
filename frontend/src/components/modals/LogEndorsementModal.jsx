@@ -81,3 +81,15 @@ return (
 }}>
   Submitted: {formatDateTime(log.submittedAt)}
 </div>
+<form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
+  <div className="form-group">
+    <label>Your Endorsement Comment *</label>
+    <textarea
+      value={comment}
+      onChange={(e) => setComment(e.target.value)}
+      rows={4}
+    />
+  </div>
+
+  <button type="submit">Endorse Log</button>
+</form>
