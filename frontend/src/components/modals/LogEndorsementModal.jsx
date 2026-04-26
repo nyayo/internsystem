@@ -101,3 +101,14 @@ return (
     </div>
   </div>
 )}
+{log.academicComment && (
+  <div>
+    <div>{log.academicComment}</div>
+
+    {log.academicGrade && (
+      <div>
+        Grade: {log.academicGrade}%
+      </div>
+    )}
+  </div>
+)}
