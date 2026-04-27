@@ -9,8 +9,7 @@ import { validatePlacementApplication } from '../../services/studentFormService'
 import './StudentFormStyles.css';
 
 export default function PlacementApplicationModal({ placement, onClose, onSubmit }) {
-}
-const { placementDraft, savePlacementDraft, clearPlacementDraft } = useStudent();
+  const { placementDraft, savePlacementDraft, clearPlacementDraft } = useStudent();
 
 const getInitialData = () => {
   if (placement && placement.status !== 'draft') return placement;
@@ -80,63 +79,61 @@ return (
         <h2>Placement Application</h2>
       </div>
 
-      <form onSubmit={handleSubmit}></form>
-      <section>
-  <h3>Organisation Details</h3>
+      <form onSubmit={handleSubmit}>
+        <section>
+          <h3>Organisation Details</h3>
+          <input
+            value={formData.organisationName}
+            onChange={(e) => handleChange('organisationName', e.target.value)}
+          />
+        </section>
+        <section>
+          <h3>Supervisor</h3>
+          <input
+            value={formData.wpSupervisorName}
+            onChange={(e) => handleChange('wpSupervisorName', e.target.value)}
+          />
+        </section>
+        <section>
+          <input
+            type="date"
+            value={formData.startDate}
+            onChange={(e) => handleChange('startDate', e.target.value)}
+          />
+        </section>
+        <section>
+          <select
+            value={formData.remunerationType}
+            onChange={(e) => handleChange('remunerationType', e.target.value)}
+          >
+            {remunerationTypes.map(type => (
+              <option key={type.value} value={type.value}>{type.label}</option>
+            ))}
+          </select>
+        </section>
+        <section>
+          <input
+            type="file"
+            onChange={(e) => handleChange('requestLetter', e.target.files[0])}
+          />
+        </section>
 
-  <input
-    value={formData.organisationName}
-    onChange={(e) => handleChange('organisationName', e.target.value)}
-  />
-</section>
-<section>
-  <h3>Supervisor</h3>
+        {!isViewOnly && (
+          <div>
+            <button type="button" onClick={handleSaveDraft}>
+              Save Draft
+            </button>
+            <button type="submit">
+              Submit
+            </button>
+          </div>
+        )}
 
-  <input
-    value={formData.wpSupervisorName}
-    onChange={(e) => handleChange('wpSupervisorName', e.target.value)}
-  />
-</section>
-<section>
-  <input
-    type="date"
-    value={formData.startDate}
-    onChange={(e) => handleChange('startDate', e.target.value)}
-  />
-</section>
-<section>
-  <select
-    value={formData.remunerationType}
-    onChange={(e) => handleChange('remunerationType', e.target.value)}
-  >
-    {remunerationTypes.map(type => (
-      <option key={type.value} value={type.value}>{type.label}</option>
-    ))}
-  </select>
-</section>
-<section>
-  <input
-    type="file"
-    onChange={(e) => handleChange('requestLetter', e.target.files[0])}
-  />
-</section>
-{!isViewOnly && (
-  <div>
-    <button type="button" onClick={handleSaveDraft}>
-      Save Draft
-    </button>
-    <button type="submit">
-      Submit
-    </button>
-  </div>
-)}
-
-{isViewOnly && (
-  <div>
-    <button onClick={onClose}>Close</button>
-  </div>
-)}
-
+        {isViewOnly && (
+          <div>
+            <button onClick={onClose}>Close</button>
+          </div>
+        )}
       </form>
     </div>
   </div>
