@@ -198,6 +198,21 @@ class WeeklyLogDetailView(APIView):
             )
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @extend_schema(
+    operation_id="logs_submit",
+    request=None,
+    responses={
+        200: inline_serializer("LogSubmitResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Weekly log not found."),
+    },
+)
+
+
 
 class WeeklyLogSubmitView(APIView):
    
