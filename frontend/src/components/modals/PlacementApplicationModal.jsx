@@ -40,3 +40,12 @@ const getInitialData = () => {
 const [formData, setFormData] = useState(getInitialData);
 const [errors, setErrors] = useState({});
 const [isDirty, setIsDirty] = useState(false);
+useEffect(() => {
+  if (!isDirty) return;
+
+  const timeout = setTimeout(() => {
+    savePlacementDraft(formData);
+  }, 1000);
+
+  return () => clearTimeout(timeout);
+}, [formData, isDirty, savePlacementDraft]);
