@@ -120,3 +120,25 @@ return (
     onChange={(e) => handleChange('requestLetter', e.target.files[0])}
   />
 </section>
+{!isViewOnly && (
+  <div>
+    <button type="button" onClick={handleSaveDraft}>
+      Save Draft
+    </button>
+    <button type="submit">
+      Submit
+    </button>
+  </div>
+)}
+
+{isViewOnly && (
+  <div>
+    <button onClick={onClose}>Close</button>
+  </div>
+)}
+
+      </form>
+    </div>
+  </div>
+);
+}
