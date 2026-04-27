@@ -225,16 +225,16 @@ export default function MainPanel({
 
       {/* Student Details Modal */}
       {selectedStudent && (
-        <PlacementDetailsModal
-          student={selectedStudent}
-          onClose={() => setSelectedStudent(null)}
-          onSave={handleSaveStudent}
-        />
-        // <StudentDetailsModal
+        // <PlacementDetailsModal
         //   student={selectedStudent}
         //   onClose={() => setSelectedStudent(null)}
         //   onSave={handleSaveStudent}
         // />
+        <StudentDetailsModal
+          student={selectedStudent}
+          onClose={() => setSelectedStudent(null)}
+          onSave={handleSaveStudent}
+        />
       )}
 
       {/* Criteria Modal */}

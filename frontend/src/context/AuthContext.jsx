@@ -37,6 +37,35 @@ const DEFAULT_AUTH_USERS = createDefaultAuthUsers({
   currentAcademicSupervisor,
 });
 
+function normalizeApiUser(raw = {}) {
+   const user = toSessionUser(raw);
+   return {
+     ...user,
+     role: user.role ?? user.user_type ?? "",
+     firstName: user.firstName ?? user.first_name,
+     lastName: user.lastName ?? user.last_name,
+     fullName:
+       user.fullName ??
+       user.full_name ??
+       [user.firstName ?? user.first_name, user.lastName ?? user.last_name]
+         .filter(Boolean)
+         .join(" "),
+     phone: user.phone ?? user.phone_number,
+     studentNumber: user.studentNumber ?? user.student_number,
+     accountStatus: user.accountStatus ?? user.account_status,
+     organization: user.organization ?? user.organisation_name,
+     position: user.position ?? user.job_title,
+     title: user.title ?? user.job_title,
+   };
+ }
+
+ function hydrateRoleUser(apiUser) {
+   const normalized = normalizeApiUser(apiUser);
+   if (!normalized.role) throw new Error("Login response is missing a user role.");
+   const fallback = ROLE_DEFAULTS[normalized.role] ?? {};
+   return { ...fallback, ...normalized };
+ }
+
 function createSessionUserFromApiLogin(apiLoginResponse) {
   const payload =
     apiLoginResponse && typeof apiLoginResponse === "object"
