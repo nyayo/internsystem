@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import './StudentsPage.css';
 import Pagination from '../../components/Pagination';
 import { accountStatusChoices } from '../../data/dashboardData';
-// import usePagination from '../../hooks/usePagination';
+import usePagination from '../../hooks/usePagination';
 
 export default function SupervisorsPage({ workplaceSupervisors, academicSupervisors }) {
   const [searchTerm, setSearchTerm] = useState('');

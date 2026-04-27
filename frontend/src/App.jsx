@@ -66,7 +66,8 @@ function App() {
         <Route path="/" element={<DefaultRedirect />} />
         <Route path="*" element={<DefaultRedirect />} />
       </Routes> */}
-      <Dashboard />
+      {/* <Dashboard /> */}
+      <StudentDashboard />
       <Notification />
     </>
   );
