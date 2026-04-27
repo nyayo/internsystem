@@ -22,7 +22,19 @@ const StudentContext = createContext(null);
 export function StudentProvider({ children }) {
   const { user } = useAuth();
 
-  const student = useMemo(() => buildStudentProfile(currentStudent, user), [user]);
+  const student = useMemo(() => {
+   if (user?.role !== "student") return null;
+ 
+   return {
+     ...user,
+     firstName: user.firstName ?? user.first_name ?? currentStudent.firstName,
+     lastName: user.lastName ?? user.last_name ?? currentStudent.lastName,
+     studentNumber: user.studentNumber ?? user.student_number ?? currentStudent.studentNumber,
+     phone: user.phone ?? user.phone_number ?? currentStudent.phone,
+     yearOfStudy: user.yearOfStudy ?? user.year_of_study ?? currentStudent.yearOfStudy,
+     accountStatus: user.accountStatus ?? user.account_status ?? currentStudent.accountStatus,
+   };
+ }, [user]);
   const [placement, setPlacement] = useState(studentPlacement);
   const [weeklyLogs, setWeeklyLogs] = useState(studentWeeklyLogs);
 
