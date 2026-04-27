@@ -97,3 +97,10 @@ return (
     onChange={(e) => handleChange('wpSupervisorName', e.target.value)}
   />
 </section>
+<section>
+  <input
+    type="date"
+    value={formData.startDate}
+    onChange={(e) => handleChange('startDate', e.target.value)}
+  />
+</section>
