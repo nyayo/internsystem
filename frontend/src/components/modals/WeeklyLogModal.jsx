@@ -73,3 +73,11 @@ const handleSaveDraft = () => {
   onClose();
 };
 const isViewOnly = placement && !['draft', 'rejected'].includes(placement.status);
+return (
+  <div className="student-modal-overlay" onClick={onClose}>
+    <div className="student-form-modal" onClick={e => e.stopPropagation()}>
+      <div className="modal-header">
+        <h2>Placement Application</h2>
+      </div>
+
+      <form onSubmit={handleSubmit}></form>
