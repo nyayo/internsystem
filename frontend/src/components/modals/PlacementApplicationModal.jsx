@@ -49,3 +49,11 @@ useEffect(() => {
 
   return () => clearTimeout(timeout);
 }, [formData, isDirty, savePlacementDraft]);
+const handleChange = (field, value) => {
+  setFormData(prev => ({ ...prev, [field]: value }));
+  setIsDirty(true);
+
+  if (errors[field]) {
+    setErrors(prev => ({ ...prev, [field]: null }));
+  }
+};
