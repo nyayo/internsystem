@@ -89,3 +89,11 @@ return (
     onChange={(e) => handleChange('organisationName', e.target.value)}
   />
 </section>
+<section>
+  <h3>Supervisor</h3>
+
+  <input
+    value={formData.wpSupervisorName}
+    onChange={(e) => handleChange('wpSupervisorName', e.target.value)}
+  />
+</section>
