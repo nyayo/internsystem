@@ -104,3 +104,13 @@ return (
     onChange={(e) => handleChange('startDate', e.target.value)}
   />
 </section>
+<section>
+  <select
+    value={formData.remunerationType}
+    onChange={(e) => handleChange('remunerationType', e.target.value)}
+  >
+    {remunerationTypes.map(type => (
+      <option key={type.value} value={type.value}>{type.label}</option>
+    ))}
+  </select>
+</section>
