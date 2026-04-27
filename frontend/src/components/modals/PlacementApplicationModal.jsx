@@ -131,17 +131,22 @@ return (
   />
 </section>
 <section>
-  <h3>Internship Period</h3>
+  <h3>Remuneration</h3>
+
+  <select
+    value={formData.remunerationType}
+    onChange={(e) => handleChange('remunerationType', e.target.value)}
+  >
+    {remunerationTypes.map(type => (
+      <option key={type.value} value={type.value}>
+        {type.label}
+      </option>
+    ))}
+  </select>
 
   <input
-    type="date"
-    value={formData.startDate}
-    onChange={(e) => handleChange('startDate', e.target.value)}
-  />
-
-  <input
-    type="date"
-    value={formData.endDate}
-    onChange={(e) => handleChange('endDate', e.target.value)}
+    type="number"
+    value={formData.placementFee}
+    onChange={(e) => handleChange('placementFee', e.target.value)}
   />
 </section>
