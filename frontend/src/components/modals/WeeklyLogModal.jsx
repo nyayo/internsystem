@@ -81,3 +81,11 @@ return (
       </div>
 
       <form onSubmit={handleSubmit}></form>
+      <section>
+  <h3>Organisation Details</h3>
+
+  <input
+    value={formData.organisationName}
+    onChange={(e) => handleChange('organisationName', e.target.value)}
+  />
+</section>
