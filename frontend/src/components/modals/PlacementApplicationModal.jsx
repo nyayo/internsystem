@@ -150,3 +150,16 @@ return (
     onChange={(e) => handleChange('placementFee', e.target.value)}
   />
 </section>
+<section>
+  <h3>Documents</h3>
+
+  <input
+    type="file"
+    onChange={(e) => handleChange('requestLetter', e.target.files[0])}
+  />
+
+  <input
+    type="file"
+    onChange={(e) => handleChange('acceptanceLetter', e.target.files[0])}
+  />
+</section>
