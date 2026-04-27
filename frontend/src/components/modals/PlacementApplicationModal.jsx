@@ -37,3 +37,6 @@ const getInitialData = () => {
     acceptanceLetter: null,
   };
 };
+const [formData, setFormData] = useState(getInitialData);
+const [errors, setErrors] = useState({});
+const [isDirty, setIsDirty] = useState(false);
