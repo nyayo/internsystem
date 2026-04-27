@@ -4,6 +4,8 @@ from rest_framework.response     import Response
 from rest_framework.permissions  import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens     import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
+from rest_framework import serializers as drf_serializers
 
 from accounts.models import CustomUser
 from accounts.permissions import IsActiveAccount, IsStudent, IsWorkplaceSupervisor, IsAcademicSupervisor, IsInternshipAdministrator
@@ -16,7 +18,19 @@ from accounts.tokens import (
 )
 from accounts.emails import send_verification_email, send_password_reset_email
 
-
+@extend_schema(
+    operation_id="auth_register",
+    request=UserRegistrationSerializer,
+    responses={
+        201: inline_serializer("RegisterResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "email":  drf_serializers.EmailField(),
+            "role":   drf_serializers.CharField(),
+            "token":  drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation errors"),
+    }
+)
 class RegisterView(APIView):
     """
     POST /accounts/auth/register/
@@ -41,7 +55,16 @@ class RegisterView(APIView):
             'token': token
         }, status=status.HTTP_201_CREATED)
 
-
+@extend_schema(
+    operation_id="auth_verify_email",
+    request=inline_serializer("VerifyEmailRequest", fields={
+        "token": drf_serializers.CharField(),
+    }),
+    responses={
+        200: OpenApiResponse(description="Email verified successfully."),
+        400: OpenApiResponse(description="Invalid or expired token."),
+    }
+)
 class VerifyEmailView(APIView):
     """
     POST /accounts/auth/verify-email/
@@ -80,7 +103,25 @@ class VerifyEmailView(APIView):
             {'detail': 'Email verified successfully. You can now log in.'},
             status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    operation_id="auth_login",
+    request=LoginSerializer,
+    responses={
+        200: inline_serializer("LoginResponse", fields={
+            "access":  drf_serializers.CharField(),
+            "refresh": drf_serializers.CharField(),
+            "user": inline_serializer("LoginUserDetail", fields={
+                "id":             drf_serializers.IntegerField(),
+                "email":          drf_serializers.EmailField(),
+                "full_name":      drf_serializers.CharField(),
+                "role":           drf_serializers.CharField(),
+                "account_status": drf_serializers.CharField(),
+                "student_number": drf_serializers.CharField(),
+            }),
+        }),
+        400: OpenApiResponse(description="Invalid credentials."),
+    }
+)
 class LoginView(APIView):
     """
     POST /accounts/auth/login/
@@ -110,7 +151,16 @@ class LoginView(APIView):
             },
         }, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    operation_id="auth_logout",
+    request=inline_serializer("LogoutRequest", fields={
+        "refresh": drf_serializers.CharField(),
+    }),
+    responses={
+        205: OpenApiResponse(description="Successfully logged out."),
+        400: OpenApiResponse(description="Invalid or missing refresh token."),
+    }
+)
 class LogoutView(APIView):
     """
     POST /accounts/auth/logout/
@@ -132,7 +182,13 @@ class LogoutView(APIView):
                 status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail': 'Successfully logged out.'},
                         status=status.HTTP_205_RESET_CONTENT)
-        
+ 
+ 
+@extend_schema(
+    operation_id="auth_me",
+    request=None,
+    responses={200: UserProfileSerializer}
+)       
 class MeView(APIView):
     """
     GET /accounts/auth/me/
@@ -144,6 +200,12 @@ class MeView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+
+@extend_schema(
+    operation_id="auth_user_list",
+    request=None,
+    responses={200: UserProfileSerializer(many=True)}
+)
 class UserListView(APIView):
     """
     GET /api/auth/users/?role=student
@@ -161,6 +223,19 @@ class UserListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+
+@extend_schema(
+    operation_id="auth_change_password",
+    request=inline_serializer("ChangePasswordRequest", fields={
+        "current_password": drf_serializers.CharField(),
+        "new_password":     drf_serializers.CharField(),
+        "new_password2":    drf_serializers.CharField(),
+    }),
+    responses={
+        200: OpenApiResponse(description="Password changed successfully."),
+        400: OpenApiResponse(description="Validation error."),
+    }
+)
 class ChangePasswordView(APIView):
     """
     POST /accounts/auth/change-password/
@@ -200,7 +275,16 @@ class ChangePasswordView(APIView):
             status=status.HTTP_200_OK)
 
 
-
+@extend_schema(
+    operation_id="auth_resend_verification",
+    request=inline_serializer("ResendVerificationRequest", fields={
+        "email": drf_serializers.EmailField(),
+    }),
+    responses={
+        200: OpenApiResponse(description="Verification email sent (always, to prevent enumeration)."),
+        400: OpenApiResponse(description="Email field missing."),
+    }
+)
 class ResendVerificationView(APIView):
     """
     POST /accounts/auth/resend-verification/
@@ -231,6 +315,17 @@ class ResendVerificationView(APIView):
         return Response(response_msg, status=status.HTTP_200_OK)
 
 
+
+@extend_schema(
+    operation_id="auth_forgot_password",
+    request=inline_serializer("ForgotPasswordRequest", fields={
+        "email": drf_serializers.EmailField(),
+    }),
+    responses={
+        200: OpenApiResponse(description="Reset email sent (always, to prevent enumeration)."),
+        400: OpenApiResponse(description="Email field missing."),
+    }
+)
 class ForgotPasswordView(APIView):
     """
     POST /accounts/auth/forgot-password/
@@ -261,6 +356,18 @@ class ForgotPasswordView(APIView):
         return Response(response_msg, status=status.HTTP_200_OK)
 
 
+@extend_schema(
+    operation_id="auth_reset_password",
+    request=inline_serializer("ResetPasswordRequest", fields={
+        "token":         drf_serializers.CharField(),
+        "new_password":  drf_serializers.CharField(),
+        "new_password2": drf_serializers.CharField(),
+    }),
+    responses={
+        200: OpenApiResponse(description="Password reset successfully."),
+        400: OpenApiResponse(description="Invalid token or validation error."),
+    }
+)
 class ResetPasswordView(APIView):
     """
     POST /accounts/auth/reset-password/
@@ -305,4 +412,4 @@ class ResetPasswordView(APIView):
         user.save()
         return Response(
             {'detail': 'Password reset successfully. You can now log in.'},
-            status=status.HTTP_200_OK)
+            status=status.HTTP_200_Ok)

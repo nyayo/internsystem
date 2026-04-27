@@ -1,16 +1,14 @@
-import {Link} from "react-router-dom";
 import React from "react";
-import './Sidebar.css'
-
+import './sideBar.css'
 
 export default function SideBar({ activeLink, onLinkClick, pendingCount, onClose, isOpen }) {
   const menuItems = [
-    { key: 'dashboard', label: 'Dashboard', path: "/admin"},
-    { key: 'pending', label: 'Pending Approvals', path: "/admin/pending" },
-    { key: 'active', label: 'Active Internships', path:"/admin/internships" },
-    { key: 'students', label: 'Students', path: "/admin/students"},
-    { key: 'supervisors', label: 'Supervisors', path:"./admin/supervisors" },
-    { key: 'evaluation', label: 'Evaluation Criteria', path:"/admin/evaluation" },
+    { id: 'dashboard', icon: 'grid_view', label: 'Dashboard' },
+    { id: 'pending', icon: 'pending_actions', label: 'Pending Approvals', count: pendingCount },
+    { id: 'active', icon: 'work_outline', label: 'Active Internships' },
+    { id: 'students', icon: 'people_outline', label: 'Students' },
+    { id: 'supervisors', icon: 'badge', label: 'Supervisors' },
+    { id: 'criteria', icon: 'fact_check', label: 'Evaluation Criteria' },
     // { id: 'progress', icon: 'trending_up', label: 'Progress Tracking' },
     // { id: 'reports', icon: 'assessment', label: 'Reports' },
     // { id: 'settings', icon: 'settings', label: 'Settings' },
@@ -34,7 +32,7 @@ export default function SideBar({ activeLink, onLinkClick, pendingCount, onClose
       <div className="sidebar">
         {menuItems.map(item => (
           <a 
-            key={item.key}
+            key={item.id}
             href="#" 
             className={activeLink === item.id ? 'active' : ''}
             onClick={(e) => {

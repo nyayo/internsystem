@@ -6,7 +6,7 @@ import {
   REGISTRATION_FIELDS_BY_ROLE,
   getRegistrationFieldsForRole,
 } from "../../../auth/authConfig";
-// import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 
 const ALL_ROLE_FIELD_NAMES = [
   ...new Set(
@@ -29,13 +29,47 @@ const buildInitialState = () =>
     },
   );
 
+function getErrorMessage(error, fallbackMessage) {
+  const responseData = error?.response?.data;
+
+  if (typeof responseData === "string" && responseData.trim()) {
+    return responseData.trim();
+  }
+
+  if (responseData && typeof responseData === "object") {
+    if (typeof responseData.detail === "string" && responseData.detail.trim()) {
+      return responseData.detail.trim();
+    }
+
+    for (const value of Object.values(responseData)) {
+      if (Array.isArray(value) && value.length > 0) {
+        const firstItem = value[0];
+        if (typeof firstItem === "string" && firstItem.trim()) {
+          return firstItem.trim();
+        }
+      }
+
+      if (typeof value === "string" && value.trim()) {
+        return value.trim();
+      }
+    }
+  }
+
+  if (typeof error?.message === "string" && error.message.trim()) {
+    return error.message.trim();
+  }
+
+  return fallbackMessage;
+}
+
 export default function RegisterPage() {
   const navigate = useNavigate();
-  // const { register } = useAuth();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     ...buildInitialState(),
   });
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (event) => {
     setFormData({
@@ -44,7 +78,7 @@ export default function RegisterPage() {
     });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -61,22 +95,35 @@ export default function RegisterPage() {
       {
         role: formData.role,
         password: formData.password,
+        password2: formData.confirmPassword,
       },
     );
 
+    setIsSubmitting(true);
+
     try {
-      register(registrationPayload);
+      const registerResponse = await register(registrationPayload);
+      console.log(registerResponse)
       setError("");
-      navigate("/login", {
+      navigate("/register/check-email", {
         replace: true,
         state: {
-          registered: true,
-          email: formData.email,
-          role: formData.role,
+          detail:
+            registerResponse?.detail ??
+            "Account created. Please check your email to verify your account.",
+          email: registerResponse?.email ?? formData.email,
+          role: registerResponse?.role ?? formData.role,
         },
       });
     } catch (registrationError) {
-      setError(registrationError.message);
+      setError(
+        getErrorMessage(
+          registrationError,
+          "Registration failed. Please try again.",
+        ),
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -180,8 +227,8 @@ export default function RegisterPage() {
             required
           />
 
-          <button className="auth-btn" type="submit">
-            Register
+          <button className="auth-btn" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Creating account..." : "Register"}
           </button>
         </form>
 

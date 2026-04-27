@@ -19,10 +19,10 @@ class CustomUser(AbstractUser):
         ("deactivated", "Deactivated"),
     )
 
-    phone_number = models.CharField(max_length=20, blank=True, default="")
+    phone_number = models.CharField(max_length=20, blank=True)
     role = models.CharField(max_length=30, choices=ROLES)
     gender = models.CharField(max_length=20, blank=True, choices=GENDER)
-    district = models.CharField(max_length=100, blank=True, default="")
+    district = models.CharField(max_length=100, blank=True)
     profile_photo = models.ImageField(
         upload_to="profile_photos/", blank=True,
     )
@@ -30,12 +30,12 @@ class CustomUser(AbstractUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
-    student_number = models.CharField(max_length=50, blank=True, unique=True, default="")
-    year_of_study = models.CharField(max_length=20, blank=True, default="")
-    university = models.CharField(max_length=200, blank=True, default="")
-    programme = models.CharField(max_length=200, blank=True, default="")
-    job_title = models.CharField(max_length=200, blank=True, default="")
-    organisation_name = models.CharField(max_length=200, blank=True, default="")
+    student_number = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    year_of_study = models.CharField(max_length=20, blank=True, null=True)
+    university = models.CharField(max_length=200, blank=True, null=True)
+    programme = models.CharField(max_length=200, blank=True, null=True)
+    job_title = models.CharField(max_length=200, blank=True, null=True)
+    organisation_name = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return f"{self.get_full_name()} ({self.get_role_display()})"

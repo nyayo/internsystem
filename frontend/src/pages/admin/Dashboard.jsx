@@ -1,8 +1,16 @@
-import { useState } from "react";
-import Sidebar from "../../components/admin/Sidebar"
+import React, { useState } from "react";
+
+import "./Dashboard.css";
+import SideBar from "../../components/admin/SideBar";
 import MainPanel from "../../components/admin/MainPanel";
 import RightPanel from "../../components/admin/RightPanel";
+import PendingApprovals from "./PendingApprovals";
+import StudentsPage from "./StudentsPage";
+import ActiveInternshipsPage from "./ActiveInternshipsPage";
+import SupervisorsPage from "./SupervisorsPage";
+import EvaluationCriteriaPage from "./EvaluationCriteriaPage";
 import { useAdmin, AdminProvider } from "../../context/AdminContext";
+
 
 const DashboardContent = () => {
   const [activeLink, setActiveLink] = useState("dashboard");
@@ -70,7 +78,7 @@ const DashboardContent = () => {
 
   return (
     <div className="container">
-      <Sidebar
+      <SideBar
         activeLink={activeLink}
         onLinkClick={setActiveLink}
         pendingCount={pendingCount}
@@ -84,13 +92,10 @@ const DashboardContent = () => {
 }
 
 
-
-function AdminDashboard(){
-    return (
+export default function Dashboard() {
+  return (
     <AdminProvider>
       <DashboardContent />
     </AdminProvider>
   );
 }
-
-export default AdminDashboard
