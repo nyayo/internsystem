@@ -97,89 +97,89 @@ return (
         <div>Draft saved automatically</div>
       )}
 
-      <form onSubmit={handleSubmit}></form>
-      <section>
-  <h3>Organisation Details</h3>
+      <form onSubmit={handleSubmit}>
+        <section>
+          <h3>Organisation Details</h3>
 
-  <input
-    value={formData.organisationName}
-    onChange={(e) => handleChange('organisationName', e.target.value)}
-  />
+          <input
+            value={formData.organisationName}
+            onChange={(e) => handleChange('organisationName', e.target.value)}
+          />
 
-  <select
-    value={formData.organisationType}
-    onChange={(e) => handleChange('organisationType', e.target.value)}
-  >
-    {organisationTypes.map(type => (
-      <option key={type.value} value={type.value}>
-        {type.label}
-      </option>
-    ))}
-  </select>
-</section>
-<section>
-  <h3>Workplace Supervisor</h3>
+          <select
+            value={formData.organisationType}
+            onChange={(e) => handleChange('organisationType', e.target.value)}
+          >
+            {organisationTypes.map(type => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </section>
+        <section>
+          <h3>Workplace Supervisor</h3>
 
-  <input
-    value={formData.wpSupervisorName}
-    onChange={(e) => handleChange('wpSupervisorName', e.target.value)}
-  />
+          <input
+            value={formData.wpSupervisorName}
+            onChange={(e) => handleChange('wpSupervisorName', e.target.value)}
+          />
 
-  <input
-    value={formData.wpSupervisorEmail}
-    onChange={(e) => handleChange('wpSupervisorEmail', e.target.value)}
-  />
-</section>
-<section>
-  <h3>Remuneration</h3>
+          <input
+            value={formData.wpSupervisorEmail}
+            onChange={(e) => handleChange('wpSupervisorEmail', e.target.value)}
+          />
+        </section>
+        <section>
+          <h3>Remuneration</h3>
 
-  <select
-    value={formData.remunerationType}
-    onChange={(e) => handleChange('remunerationType', e.target.value)}
-  >
-    {remunerationTypes.map(type => (
-      <option key={type.value} value={type.value}>
-        {type.label}
-      </option>
-    ))}
-  </select>
+          <select
+            value={formData.remunerationType}
+            onChange={(e) => handleChange('remunerationType', e.target.value)}
+          >
+            {remunerationTypes.map(type => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
 
-  <input
-    type="number"
-    value={formData.placementFee}
-    onChange={(e) => handleChange('placementFee', e.target.value)}
-  />
-</section>
-<section>
-  <h3>Documents</h3>
+          <input
+            type="number"
+            value={formData.placementFee}
+            onChange={(e) => handleChange('placementFee', e.target.value)}
+          />
+        </section>
+        <section>
+          <h3>Documents</h3>
 
-  <input
-    type="file"
-    onChange={(e) => handleChange('requestLetter', e.target.files[0])}
-  />
+          <input
+            type="file"
+            onChange={(e) => handleChange('requestLetter', e.target.files[0])}
+          />
 
-  <input
-    type="file"
-    onChange={(e) => handleChange('acceptanceLetter', e.target.files[0])}
-  />
-</section>
-{!isViewOnly && (
-  <div>
-    <button type="button" onClick={handleSaveDraft}>
-      Save Draft
-    </button>
-    <button type="submit">
-      Submit
-    </button>
-  </div>
-)}
+          <input
+            type="file"
+            onChange={(e) => handleChange('acceptanceLetter', e.target.files[0])}
+          />
+        </section>
 
-{isViewOnly && (
-  <div>
-    <button onClick={onClose}>Close</button>
-  </div>
-)}
+        {!isViewOnly && (
+          <div>
+            <button type="button" onClick={handleSaveDraft}>
+              Save Draft
+            </button>
+            <button type="submit">
+              Submit
+            </button>
+          </div>
+        )}
 
+        {isViewOnly && (
+          <div>
+            <button onClick={onClose}>Close</button>
+          </div>
+        )}
       </form>
     </div>
   </div>
