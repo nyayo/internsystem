@@ -130,3 +130,18 @@ return (
     onChange={(e) => handleChange('wpSupervisorEmail', e.target.value)}
   />
 </section>
+<section>
+  <h3>Internship Period</h3>
+
+  <input
+    type="date"
+    value={formData.startDate}
+    onChange={(e) => handleChange('startDate', e.target.value)}
+  />
+
+  <input
+    type="date"
+    value={formData.endDate}
+    onChange={(e) => handleChange('endDate', e.target.value)}
+  />
+</section>
