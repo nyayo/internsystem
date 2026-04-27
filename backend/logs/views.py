@@ -142,6 +142,14 @@ class WeeklyLogListCreateView(APIView):
 class WeeklyLogDetailView(APIView):
    
     permission_classes = [IsAuthenticated, IsActiveAccount]
+    @extend_schema(
+        operation_id="logs_detail",
+        responses={
+            200: WeeklyLogDetailSerializer,
+            403: OpenApiResponse(description="Not linked to this placement."),
+            404: OpenApiResponse(description="Weekly log not found."),
+        },
+    )
 
     def get(self, request, pk):
         log, err = get_log_or_404(pk, request.user)
@@ -149,6 +157,17 @@ class WeeklyLogDetailView(APIView):
             return err
         serializer = WeeklyLogDetailSerializer(log)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @extend_schema(
+        operation_id="logs_partial_update",
+        request=WeeklyLogDetailSerializer,
+        responses={
+            200: WeeklyLogDetailSerializer,
+            400: OpenApiResponse(description="Log not editable or validation error."),
+            403: OpenApiResponse(description="Only the student can edit a log."),
+            404: OpenApiResponse(description="Weekly log not found."),
+        },
+    )
 
     def patch(self, request, pk):
         log, err = get_log_or_404(pk, request.user)
