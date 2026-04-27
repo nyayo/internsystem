@@ -55,3 +55,16 @@ const handleChange = (field, value) => {
     setErrors(prev => ({ ...prev, [field]: null }));
   }
 };
+const validate = () => {
+  const newErrors = validatePlacementApplication(formData);
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+  if (!validate()) return;
+
+  onSubmit(formData);
+  clearPlacementDraft();
+};
