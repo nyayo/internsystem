@@ -114,3 +114,9 @@ return (
     ))}
   </select>
 </section>
+<section>
+  <input
+    type="file"
+    onChange={(e) => handleChange('requestLetter', e.target.files[0])}
+  />
+</section>
