@@ -2,6 +2,9 @@ from rest_framework          import status
 from rest_framework.views    import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer, OpenApiParameter
+from rest_framework import serializers as drf_serializers
+
 
 from .models import WeeklyLogs
 from placements.models import InternshipPlacement
@@ -78,6 +81,16 @@ def get_log_or_404(pk, user):
 class WeeklyLogListCreateView(APIView):
     permission_classes = [IsAuthenticated, IsActiveAccount]
 
+    @extend_schema(
+        operation_id="logs_list",
+        parameters=[
+            OpenApiParameter("placement", int, description="Filter by placement ID"),
+            OpenApiParameter("status", str, description="Filter by log status"),
+            OpenApiParameter("week", int, description="Filter by week number"),
+        ],
+        responses={200: WeeklyLogListSerializer(many=True)},
+    )
+
     def get(self, request):
         queryset = get_log_queryset(request.user)
 
@@ -94,6 +107,17 @@ class WeeklyLogListCreateView(APIView):
 
         serializer = WeeklyLogListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    @extend_schema(
+        operation_id="logs_create",
+        request=WeeklyLogDetailSerializer,
+        responses={
+            201: WeeklyLogDetailSerializer,
+            400: OpenApiResponse(description="Validation errors."),
+            403: OpenApiResponse(description="Only students can create weekly logs."),
+        },
+    )
     
 
     def post(self, request):
