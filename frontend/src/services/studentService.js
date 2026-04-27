@@ -1,12 +1,3 @@
-export function buildStudentProfile(currentStudent, authenticatedUser) {
-  if (authenticatedUser && authenticatedUser.role === "student") {
-    return {
-      ...currentStudent,
-      ...authenticatedUser,
-    };
-  }
-  return currentStudent;
-}
 
 function nowIso() {
   return new Date().toISOString();

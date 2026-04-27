@@ -82,16 +82,8 @@ export default function StudentRightPanel({ student, placement }) {
           <div className="detail-item">
             <span className="material-icons-sharp">business</span>
             <div className="detail-text">
-              <span className="label">Faculty</span>
-              <span className="value">{student.faculty}</span>
-            </div>
-          </div>
-
-          <div className="detail-item">
-            <span className="material-icons-sharp">apartment</span>
-            <div className="detail-text">
-              <span className="label">Department</span>
-              <span className="value">{student.department}</span>
+              <span className="label">Univsersity</span>
+              <span className="value">{student.university}</span>
             </div>
           </div>
 

@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import {
-  currentStudent,
   studentPlacement,
   studentWeeklyLogs,
   DRAFT_KEYS,
@@ -11,7 +10,6 @@ import {
 } from "../data/studentDashboardData";
 import { useAuth } from "./AuthContext";
 import {
-  buildStudentProfile,
   createPlacementRecord,
   getLogStats,
   upsertWeeklyLog,
@@ -21,18 +19,29 @@ const StudentContext = createContext(null);
 
 export function StudentProvider({ children }) {
   const { user } = useAuth();
+  console.log(user)
 
   const student = useMemo(() => {
    if (user?.role !== "student") return null;
+
+   const year = user.yearOfStudy ?? user.year_of_study;
  
-   return {
-     ...user,
-     firstName: user.firstName ?? user.first_name ?? currentStudent.firstName,
-     lastName: user.lastName ?? user.last_name ?? currentStudent.lastName,
-     studentNumber: user.studentNumber ?? user.student_number ?? currentStudent.studentNumber,
-     phone: user.phone ?? user.phone_number ?? currentStudent.phone,
-     yearOfStudy: user.yearOfStudy ?? user.year_of_study ?? currentStudent.yearOfStudy,
-     accountStatus: user.accountStatus ?? user.account_status ?? currentStudent.accountStatus,
+    return {
+     id: user.id,
+     email: user.email,
+     fullName: user.fullName ?? user.full_name,
+     firstName: user.firstName ?? user.first_name,
+     lastName: user.lastName ?? user.last_name,
+     profilePhoto: user.profilePhoto ?? user.profile_photo,
+     phone: user.phone ?? user.phone_number,
+     gender: user.gender,
+     district: user.district,
+     accountStatus: user.accountStatus ?? user.account_status,
+     dateJoined: user.dateJoined ?? user.date_joined,
+     studentNumber: user.studentNumber ?? user.student_number,
+     programme: user.programme,
+     yearOfStudy: Number.isNaN(Number(year)) ? year : Number(year), // API sends string
+     university: user.university,
    };
  }, [user]);
   const [placement, setPlacement] = useState(studentPlacement);

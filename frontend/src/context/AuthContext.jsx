@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import { getRoleHomePath } from "../auth/authConfig";
-import { currentStudent } from "../data/studentDashboardData";
 import {
   currentAcademicSupervisor,
   currentWorkplaceSupervisor,
@@ -32,7 +31,6 @@ const REGISTER_SUCCESS_MESSAGE =
   "Account created. Please check your email to verify your account.";
 
 const DEFAULT_AUTH_USERS = createDefaultAuthUsers({
-  currentStudent,
   currentWorkplaceSupervisor,
   currentAcademicSupervisor,
 });
@@ -216,36 +214,27 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async (credentials) => {
-      const loginWithLocalFallback = () => {
-        const fallbackSessionUser = getLoggedInUser(
-          credentials,
-          registeredUsers,
-        );
-        setUser(fallbackSessionUser);
-        return fallbackSessionUser;
-      };
+      // const loginWithLocalFallback = () => {
+      //   const fallbackSessionUser = getLoggedInUser(
+      //     credentials,
+      //     registeredUsers,
+      //   );
+      //   setUser(fallbackSessionUser);
+      //   return fallbackSessionUser;
+      // };
 
-      if (!IS_API_LOGIN_ENABLED) {
-        return loginWithLocalFallback();
-      }
+      // if (!IS_API_LOGIN_ENABLED) {
+      //   return loginWithLocalFallback();
+      // }
 
       try {
         const apiLoginResponse = await authApi.login(credentials);
         const baseSession = createSessionUserFromApiLogin(apiLoginResponse);
-        let apiCurrentUser = null;
+        saveSessionUser(baseSession);
 
-        try {
-          apiCurrentUser = await authApi.getCurrentUser();
-        } catch {
-          // keep baseSession when /me is unavailable
-        }
-
-        const hydrated = hydrateRoleUser(apiCurrentUser ?? baseSession);
-        const sessionUser = {
-          ...hydrated,
-          token: baseSession.token,
-          refreshToken: baseSession.refreshToken,
-        };
+        const apiCurrentUser = await authApi.getCurrentUser();
+        const sessionUser = normalizeApiUser(apiCurrentUser);
+      
         setUser(sessionUser);
         return sessionUser;
       } catch (error) {
