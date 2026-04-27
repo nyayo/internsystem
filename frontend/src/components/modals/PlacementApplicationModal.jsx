@@ -73,3 +73,7 @@ const handleSubmit = (e) => {
   onSubmit(formData);
   clearPlacementDraft();
 };
+const handleSaveDraft = () => {
+  savePlacementDraft(formData);
+  onClose();
+};
