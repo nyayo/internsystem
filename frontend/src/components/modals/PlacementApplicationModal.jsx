@@ -78,3 +78,23 @@ const handleSaveDraft = () => {
   onClose();
 };
 const isViewOnly = placement && !['draft', 'rejected'].includes(placement.status);
+return (
+  <div className="student-modal-overlay" onClick={onClose}>
+    <div className="student-form-modal" onClick={e => e.stopPropagation()}>
+      <div className="modal-header">
+        <div>
+          <h2>Placement Application</h2>
+          <p>
+            {isViewOnly
+              ? 'View your placement details'
+              : 'Submit your internship placement details'}
+          </p>
+        </div>
+        <button onClick={onClose}>close</button>
+      </div>
+
+      {placementDraft && !isViewOnly && (
+        <div>Draft saved automatically</div>
+      )}
+
+      <form onSubmit={handleSubmit}></form>
