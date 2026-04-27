@@ -112,7 +112,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'phone_number', 'role', 'gender', 'district',
             'account_status', 'date_joined',
             'student_number', 'programme', 'year_of_study',
-            'university', 'faculty', 'department',
+            'university',
             'job_title', 'organisation_name',
         ]
         read_only_fields = fields
