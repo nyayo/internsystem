@@ -98,3 +98,22 @@ return (
       )}
 
       <form onSubmit={handleSubmit}></form>
+      <section>
+  <h3>Organisation Details</h3>
+
+  <input
+    value={formData.organisationName}
+    onChange={(e) => handleChange('organisationName', e.target.value)}
+  />
+
+  <select
+    value={formData.organisationType}
+    onChange={(e) => handleChange('organisationType', e.target.value)}
+  >
+    {organisationTypes.map(type => (
+      <option key={type.value} value={type.value}>
+        {type.label}
+      </option>
+    ))}
+  </select>
+</section>
