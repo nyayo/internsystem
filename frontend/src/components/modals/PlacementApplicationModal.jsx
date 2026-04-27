@@ -117,3 +117,16 @@ return (
     ))}
   </select>
 </section>
+<section>
+  <h3>Workplace Supervisor</h3>
+
+  <input
+    value={formData.wpSupervisorName}
+    onChange={(e) => handleChange('wpSupervisorName', e.target.value)}
+  />
+
+  <input
+    value={formData.wpSupervisorEmail}
+    onChange={(e) => handleChange('wpSupervisorEmail', e.target.value)}
+  />
+</section>
