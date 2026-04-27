@@ -72,3 +72,4 @@ const handleSaveDraft = () => {
   savePlacementDraft(formData);
   onClose();
 };
+const isViewOnly = placement && !['draft', 'rejected'].includes(placement.status);
