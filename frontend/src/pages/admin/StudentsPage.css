@@ -1,8 +1,11 @@
 .students-page,
 .supervisors-page,
+.internships-page,
+.criteria-page {
+  padding: 0;
+}
 
-
-/* Common Page Styles*/
+/* Common Page Styles - reused across all admin pages */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -138,6 +141,7 @@
   font-size: 0.85rem;
   color: var(--color-dark-variant);
 }
+
 /* Status Badges */
 .status-badge {
   display: inline-block;
@@ -245,5 +249,3 @@
     width: 100%;
   }
 }
-
-
