@@ -14,7 +14,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 function App() {
   return (
     <>
-      <Routes>
+      {/* <Routes>
         <Route
           path="/login"
           element={
@@ -31,6 +31,24 @@ function App() {
             </PublicOnlyRoute>
           }
         />
+         <Route
+          path="/register/check-email"
+          element={
+            <PublicOnlyRoute>
+              <CheckEmailPage />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route
+          path="/email-confirmed"
+          element={
+            <PublicOnlyRoute>
+              <EmailConfirmedPage />
+            </PublicOnlyRoute>
+          }
+        />
+
         <Route
           path="/student"
           element={
@@ -39,7 +57,7 @@ function App() {
             </RoleRoute>
           }
         />
-        {/* <Route
+        <Route
           path="/supervisor/workplace"
           element={
             <RoleRoute allowedRoles={["workplace_supervisor"]}>
@@ -54,7 +72,7 @@ function App() {
               <AcademicDashboard />
             </RoleRoute>
           }
-        /> */}
+        />
         <Route
           path="/admin"
           element={
@@ -65,8 +83,8 @@ function App() {
         />
         <Route path="/" element={<DefaultRedirect />} />
         <Route path="*" element={<DefaultRedirect />} />
-      </Routes>
-      {/* <Dashboard /> */}
+      </Routes> */}
+      <Dashboard />
       {/* <StudentDashboard /> */}
       <Notification />
     </>
