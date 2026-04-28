@@ -295,7 +295,21 @@ class WeeklyLogEndorseView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
+    
+    @extend_schema(
+    operation_id="logs_assess",
+    request=AcademicAssessSerializer,
+    responses={
+        200: inline_serializer("LogAssessResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+            "grade":  drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        403: OpenApiResponse(description="Not the academic supervisor for this placement."),
+        404: OpenApiResponse(description="Weekly log not found."),
+    },
+)
 
 class WeeklyLogAssessView(APIView):
     
