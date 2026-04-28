@@ -49,6 +49,14 @@ class PlacementListCreateView(APIView):
     
     permission_classes = [IsAuthenticated, IsActiveAccount]
     parser_classes     = [MultiPartParser, FormParser, JSONParser]
+    @extend_schema(
+        operation_id="placements_list",
+        parameters=[
+            OpenApiParameter("status", str, description="Filter by placement status"),
+            OpenApiParameter("cohort", str, description="Filter by intake cohort"),
+        ],
+        responses={200: PlacementListSerializer(many=True)},
+     )
 
     def get(self, request):
         queryset = get_queryset_for_role(request.user)
@@ -62,6 +70,16 @@ class PlacementListCreateView(APIView):
 
         serializer = PlacementListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @extend_schema(
+        operation_id="placements_create",
+        request=PlacementDetailSerializer,
+        responses={
+            201: PlacementDetailSerializer,
+            400: OpenApiResponse(description="Validation errors."),
+            403: OpenApiResponse(description="Only students can create placements."),
+        },
+    )
 
     def post(self, request):
         if request.user.role != "student":
