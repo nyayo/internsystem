@@ -2,10 +2,19 @@ from rest_framework import serializers
 from .models import InternshipPlacement
 
 
+class PlacementStudentSerializer(serializers.Serializer):
+     id = serializers.IntegerField(source="student.id", read_only=True)
+     full_name = serializers.CharField(source="student.get_full_name", read_only=True)
+     student_number = serializers.CharField(source="student.student_number", read_only=True)
+     email = serializers.EmailField(source="student.email", read_only=True)
+     programme = serializers.CharField(source="student.programme", read_only=True)
+
 class PlacementListSerializer(serializers.ModelSerializer):
-    
+    student = PlacementStudentSerializer(read_only=True)
     student_name      = serializers.CharField(source="student.get_full_name", read_only=True)
     student_number    = serializers.CharField(source="student.student_number", read_only=True)
+    student_email   = serializers.CharField(source="student.email", read_only=True)
+    student_programme = serializers.CharField(source="student.programme", read_only=True)
     academic_sup_name = serializers.CharField(
         source="academic_supervisor.get_full_name", read_only=True, default=None
     )
@@ -18,8 +27,11 @@ class PlacementListSerializer(serializers.ModelSerializer):
         model  = InternshipPlacement
         fields = [
             "id",
+            "student",
             "student_name",
             "student_number",
+            "student_email",
+            "student_programme",
             "organisation_name",
             "organisation_type",
             "organisation_district",

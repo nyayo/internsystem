@@ -64,11 +64,39 @@ export async function submitPlacement(placementId) {
   }
 }
 
+export async function getPlacementStats(placementId) {
+  try {
+    const response = await httpClient.get(`${AUTH_BASE_PATH}/stats/`);
+    return responseData(response);
+  } catch (error) {
+    const statusCode = error?.response?.status;
+    if (statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function approvePlacement(placementId, payload) {
+  try {
+    const response = await httpClient.post(`${AUTH_BASE_PATH}/${placementId}/approve/`, payload);
+    return responseData(response);
+  } catch (error) {
+    const statusCode = error?.response?.status;
+    if (statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
 const placementApi = {
   listPlacements,
   createPlacementDraft,
   updatePlacementDraft,
   submitPlacement,
+  getPlacementStats,
+  approvePlacement
 };
 
 export default placementApi;

@@ -1,5 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
 import { useNotification } from "./NotificationContext";
 import { useAuth } from "./AuthContext";
 import {
@@ -15,6 +22,7 @@ import {
   toApplicationRows,
   withCriteriaDisplayValues,
 } from "../services/adminService";
+import placementApi from "../services/placementApi";
 
 const AdminContext = createContext(null);
 
@@ -35,89 +43,177 @@ export const useAdmin = () => {
 
 export const AdminProvider = ({ children }) => {
   const { user } = useAuth();
-  const [placements, setPlacements] = useState(initialPlacements);
-  const [students] = useState(initialStudents);
-  const [criteria, setCriteria] = useState(withCriteriaDisplayValues(initialEvaluationCriteria));
+  const [placements, setPlacements] = useState([]);
+  const [students] = useState([]);
+  const [criteria, setCriteria] = useState([]);
+  const [workplaceSupervisors, setWorkplaceSupervisors] = useState([]);
+  const [academicSupervisors, setAcademicSupervisors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { showNotification } = useNotification();
-  const adminUser = useMemo(() => getDefaultAdminUser(user), [user]);
-  const applications = useMemo(() => toApplicationRows(placements), [placements]);
+  const adminUser = useMemo(() => {
+    if (user?.role !== "internship_administrator") return null;
+
+    return {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName ?? user.full_name,
+      firstName: user.firstName ?? user.first_name,
+      lastName: user.lastName ?? user.last_name,
+      profilePhoto: user.profilePhoto ?? user.profile_photo,
+      phone: user.phone ?? user.phone_number,
+      gender: user.gender,
+      district: user.district,
+      accountStatus: user.accountStatus ?? user.account_status,
+      dateJoined: user.dateJoined ?? user.date_joined,
+      university: user.university,
+      jobTitle: user.job_title,
+    };
+  }, [user]);
+  const applications = useMemo(
+    () => toApplicationRows(placements),
+    [placements],
+  );
   const { stats, pendingCount } = useMemo(
     () => buildAdminStats(placements, criteria),
     [placements, criteria],
   );
 
-  const handleUpdatePlacement = useCallback((updatedPlacement) => {
-    setPlacements((previousPlacements) =>
-      previousPlacements.map((placement) =>
-        placement.id === updatedPlacement.id ? updatedPlacement : placement,
-      ),
-    );
+  const normalizePlacement = (p) => ({
+    id: p.id,
+    student: {
+      name: p.student_name ?? "-",
+      regNumber: p.student_number ?? "-",
+      program: p.programme ?? p.student_programme ?? "-",
+      email: p.student_email ?? "-",
+    },
+    organisationName: p.organisation_name,
+    organisationType: p.organisation_type,
+    organisationDistrict: p.organisation_district,
+    organisationAddress: p.organisation_address,
+    department: p.department,
+    startDate: p.start_date,
+    endDate: p.end_date,
+    status: p.status,
+    intakeCohort: p.intake_cohort,
+    remunerationType: p.remuneration_type,
+    requestLetter: p.request_letter,
+    acceptanceLetter: p.acceptance_letter,
+    wpSupervisorName: p.wp_supervisor_name,
+    wpSupervisorEmail: p.wp_supervisor_email,
+    wpSupervisorPhone: p.wp_supervisor_phone,
+    wpSupervisorTitle: p.wp_supervisor_title,
+    workplaceSupervisorName: p.workplace_sup_name,
+    academicSupervisorName: p.academic_sup_name,
+    createdAt: p.created_at ?? null,
+  });
 
-    if (updatedPlacement.status === "approved") {
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const raw = await placementApi.listPlacements();
+        console.log(raw);
+        const rows = Array.isArray(raw) ? raw : (raw?.results ?? []);
+        const normalized = rows.map(normalizePlacement);
+        // console.log(normalized);
+        if (!cancelled) setPlacements(normalized);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleUpdatePlacement = useCallback(
+    async(updatedPlacement) => {
+       const payload = {
+     decision: updatedPlacement.status, // or backend-required key
+     workplace_supervisor: updatedPlacement.workplaceSupervisor || null,
+     academic_supervisor: updatedPlacement.academicSupervisor || null,
+     rejection_reason: updatedPlacement.rejectionReason || "",
+   };
+   const saved = await placementApi.approvePlacement(updatedPlacement.id, payload);
+   const normalized = normalizePlacement(saved);
+   setPlacements(prev => prev.map(p => p.id === normalized.id ? normalized : p));
+
+      if (updatedPlacement.status === "approved") {
+        showNotification(
+          `${updatedPlacement.student.name}'s placement has been approved!`,
+          "success",
+        );
+      } else if (updatedPlacement.status === "rejected") {
+        showNotification(
+          `${updatedPlacement.student.name}'s placement has been rejected.`,
+          "danger",
+        );
+      }
+    },
+    [showNotification],
+  );
+
+  const handleUpdateApplication = useCallback(
+    (updatedApp) => {
+      const decision = toPlacementDecision(updatedApp.status);
+      setPlacements((previousPlacements) =>
+        previousPlacements.map((placement) =>
+          placement.id === updatedApp.id && decision
+            ? { ...placement, status: decision }
+            : placement,
+        ),
+      );
+
+      if (updatedApp.status === "approved") {
+        showNotification(
+          `${updatedApp.studentName}'s internship has been approved!`,
+          "success",
+        );
+      } else if (updatedApp.status === "rejected") {
+        showNotification(
+          `${updatedApp.studentName}'s internship has been rejected.`,
+          "danger",
+        );
+      }
+    },
+    [showNotification],
+  );
+
+  const handleAddCriteria = useCallback(
+    (newCriteria) => {
+      const criteriaWithId = withCriteriaDisplayValues([
+        {
+          ...newCriteria,
+          id: Date.now(),
+          isActive: true,
+        },
+      ])[0];
+      setCriteria((previousCriteria) => [...previousCriteria, criteriaWithId]);
       showNotification(
-        `${updatedPlacement.student.name}'s placement has been approved!`,
+        `Evaluation criteria "${newCriteria.title}" has been created!`,
         "success",
       );
-    } else if (updatedPlacement.status === "rejected") {
-      showNotification(
-        `${updatedPlacement.student.name}'s placement has been rejected.`,
-        "danger",
+    },
+    [showNotification],
+  );
+
+  const handleUpdateCriteria = useCallback(
+    (updatedCriteria) => {
+      const criteriaWithDisplay = withCriteriaDisplayValues([
+        updatedCriteria,
+      ])[0];
+      setCriteria((previousCriteria) =>
+        previousCriteria.map((criterion) =>
+          criterion.id === updatedCriteria.id ? criteriaWithDisplay : criterion,
+        ),
       );
-    }
-  }, [showNotification]);
-
-  const handleUpdateApplication = useCallback((updatedApp) => {
-    const decision = toPlacementDecision(updatedApp.status);
-    setPlacements((previousPlacements) =>
-      previousPlacements.map((placement) =>
-        placement.id === updatedApp.id && decision
-          ? { ...placement, status: decision }
-          : placement,
-      ),
-    );
-
-    if (updatedApp.status === "approved") {
       showNotification(
-        `${updatedApp.studentName}'s internship has been approved!`,
+        `Evaluation criteria "${updatedCriteria.title}" has been updated!`,
         "success",
       );
-    } else if (updatedApp.status === "rejected") {
-      showNotification(
-        `${updatedApp.studentName}'s internship has been rejected.`,
-        "danger",
-      );
-    }
-  }, [showNotification]);
-
-  const handleAddCriteria = useCallback((newCriteria) => {
-    const criteriaWithId = withCriteriaDisplayValues([
-      {
-        ...newCriteria,
-        id: Date.now(),
-        isActive: true,
-      },
-    ])[0];
-    setCriteria((previousCriteria) => [...previousCriteria, criteriaWithId]);
-    showNotification(
-      `Evaluation criteria "${newCriteria.title}" has been created!`,
-      "success",
-    );
-  }, [showNotification]);
-
-  const handleUpdateCriteria = useCallback((updatedCriteria) => {
-    const criteriaWithDisplay = withCriteriaDisplayValues([updatedCriteria])[0];
-    setCriteria((previousCriteria) =>
-      previousCriteria.map((criterion) =>
-        criterion.id === updatedCriteria.id
-          ? criteriaWithDisplay
-          : criterion,
-      ),
-    );
-    showNotification(
-      `Evaluation criteria "${updatedCriteria.title}" has been updated!`,
-      "success",
-    );
-  }, [showNotification]);
+    },
+    [showNotification],
+  );
 
   const value = useMemo(
     () => ({
