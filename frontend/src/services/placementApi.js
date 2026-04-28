@@ -35,9 +35,26 @@ export async function createPlacement(placementPayload = {}) {
   }
 }
 
+export async function updatePlacement(placementId, placementPayload = {}) {
+  try {
+    const response = await httpClient.put(
+      `${AUTH_BASE_PATH}/update/${placementId}/`,
+      placementPayload,
+    );
+    return responseData(response);
+  } catch (error) {
+    const statusCode = error?.response?.status;
+    if (statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
 const placementApi = {
   getMyPlacement,
   createPlacement,
+  updatePlacement,
 };
 
 export default placementApi;
