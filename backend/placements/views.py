@@ -132,6 +132,16 @@ class PlacementDetailView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
         return obj, None
+    
+
+    @extend_schema(
+        operation_id="placements_detail",
+        responses={
+            200: PlacementDetailSerializer,
+            403: OpenApiResponse(description="Not linked to this placement."),
+            404: OpenApiResponse(description="Placement not found."),
+        },
+    )
 
     def get(self, request, pk):
         obj, err = self.get_object(pk, request.user)
@@ -139,7 +149,18 @@ class PlacementDetailView(APIView):
             return err
         serializer = PlacementDetailSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
+    
+    @extend_schema(
+        operation_id="placements_partial_update",
+        request=PlacementDetailSerializer,
+        responses={
+            200: PlacementDetailSerializer,
+            400: OpenApiResponse(description="Not a draft or validation error."),
+            403: OpenApiResponse(description="Only the student can edit a placement."),
+            404: OpenApiResponse(description="Placement not found."),
+        },
+    )
+    
     def patch(self, request, pk):
         obj, err = self.get_object(pk, request.user)
         if err:
@@ -160,6 +181,20 @@ class PlacementDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    @extend_schema(
+    operation_id="placements_submit",
+    request=None,
+    responses={
+        200: inline_serializer("PlacementSubmitResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 
 
