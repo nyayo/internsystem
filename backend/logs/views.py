@@ -390,6 +390,26 @@ class WeeklyLogCloseView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+    
+    @extend_schema(
+    operation_id="logs_placement_summary",
+    request=None,
+    responses={
+        200: inline_serializer("PlacementLogSummaryResponse", fields={
+            "placement_id":  drf_serializers.IntegerField(),
+            "organisation":  drf_serializers.CharField(),
+            "student":       drf_serializers.CharField(),
+            "total_weeks":   drf_serializers.IntegerField(),
+            "submitted":     drf_serializers.IntegerField(),
+            "closed":        drf_serializers.IntegerField(),
+            "average_grade": drf_serializers.FloatField(allow_null=True),
+            "status_counts": drf_serializers.DictField(child=drf_serializers.IntegerField()),
+            "logs":          WeeklyLogListSerializer(many=True),
+        }),
+        403: OpenApiResponse(description="Not linked to this placement."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 
 class PlacementLogSummaryView(APIView):
