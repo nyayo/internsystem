@@ -1,14 +1,14 @@
 import { httpClient } from "./httpClient";
 
-const AUTH_BASE_PATH = "/placement/placement";
+const AUTH_BASE_PATH = "/placements/placements";
 
 function responseData(response) {
   return response.data;
 }
 
-export async function getMyPlacement() {
+export async function listPlacements() {
   try {
-    const response = await httpClient.get(`${AUTH_BASE_PATH}/my-placement`);
+    const response = await httpClient.get(`${AUTH_BASE_PATH}/`);
     return responseData(response);
   } catch (error) {
     const statusCode = error?.response?.status;
@@ -19,10 +19,10 @@ export async function getMyPlacement() {
   }
 }
 
-export async function createPlacement(placementPayload = {}) {
+export async function createPlacementDraft(placementPayload = {}) {
   try {
     const response = await httpClient.post(
-      `${AUTH_BASE_PATH}/create/`,
+      `${AUTH_BASE_PATH}/`,
       placementPayload,
     );
     return responseData(response);
@@ -35,12 +35,25 @@ export async function createPlacement(placementPayload = {}) {
   }
 }
 
-export async function updatePlacement(placementId, placementPayload = {}) {
+export async function updatePlacementDraft(placementId, placementPayload = {}) {
   try {
     const response = await httpClient.put(
-      `${AUTH_BASE_PATH}/update/${placementId}/`,
+      `${AUTH_BASE_PATH}/${placementId}/`,
       placementPayload,
     );
+    return responseData(response);
+  } catch (error) {
+    const statusCode = error?.response?.status;
+    if (statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function submitPlacement(placementId) {
+  try {
+    const response = await httpClient.put(`${AUTH_BASE_PATH}/${placementId}/submit/`);
     return responseData(response);
   } catch (error) {
     const statusCode = error?.response?.status;
@@ -52,9 +65,10 @@ export async function updatePlacement(placementId, placementPayload = {}) {
 }
 
 const placementApi = {
-  getMyPlacement,
-  createPlacement,
-  updatePlacement,
+  listPlacements,
+  createPlacementDraft,
+  updatePlacementDraft,
+  submitPlacement,
 };
 
 export default placementApi;
