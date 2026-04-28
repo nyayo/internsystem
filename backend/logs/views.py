@@ -348,6 +348,19 @@ class WeeklyLogAssessView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+    
+    @extend_schema(
+    operation_id="logs_close",
+    request=None,
+    responses={
+        200: inline_serializer("LogCloseResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Weekly log not found."),
+    },
+)
 
 class WeeklyLogCloseView(APIView):
     
