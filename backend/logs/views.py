@@ -244,6 +244,21 @@ class WeeklyLogSubmitView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+    
+
+    @extend_schema(
+    operation_id="logs_endorse",
+    request=WorkplaceEndorseSerializer,
+    responses={
+        200: inline_serializer("LogEndorseResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        403: OpenApiResponse(description="Not the workplace supervisor for this placement."),
+        404: OpenApiResponse(description="Weekly log not found."),
+    },
+)
 class WeeklyLogEndorseView(APIView):
     
     permission_classes = [IsAuthenticated, IsActiveAccount, IsWorkplaceSupervisor]
