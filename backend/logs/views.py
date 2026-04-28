@@ -472,6 +472,19 @@ class PlacementLogSummaryView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+    
+    @extend_schema(
+    operation_id="logs_pending",
+    request=None,
+    responses={
+        200: inline_serializer("PendingLogsResponse", fields={
+            "count": drf_serializers.IntegerField(),
+            "logs":  WeeklyLogListSerializer(many=True),
+        }),
+        403: OpenApiResponse(description="Pending logs not applicable for your role."),
+    },
+)
+    
 
 
 class PendingLogsView(APIView):
