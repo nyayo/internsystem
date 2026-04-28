@@ -34,7 +34,8 @@ class PlacementListSerializer(serializers.ModelSerializer):
             "request_letter",
             "acceptance_letter",
             "academic_sup_name",
-            "workplace_sup_name",   
+            "workplace_sup_name",
+            "wp_supervisor_name",   
             "wp_supervisor_email",
             "wp_supervisor_phone",
             "wp_supervisor_title",
@@ -52,7 +53,7 @@ class PlacementDetailSerializer(serializers.ModelSerializer):
         source="workplace_supervisor.get_full_name", read_only=True, default=None
     )
     approved_by_name   = serializers.CharField(
-        source="approved_by.get_full_name", read_only=True, default=None
+        source="approval_by.get_full_name", read_only=True, default=None
     )
     duration_weeks = serializers.ReadOnlyField()
 
@@ -94,7 +95,7 @@ class PlacementDetailSerializer(serializers.ModelSerializer):
             "academic_sup_name",
             "workplace_supervisor",
             "workplace_sup_name",
-            "approved_by",
+            "approval_by",
             "approved_by_name",
             "created_at",
             "updated_at",
@@ -103,7 +104,7 @@ class PlacementDetailSerializer(serializers.ModelSerializer):
             "id", "student", "status",
             "rejection_reason", "withdrawal_reason",
             "approval_date", "activated_at", "completed_at",
-            "academic_supervisor", "workplace_supervisor", "approved_by",
+            "academic_supervisor", "workplace_supervisor", "approval_by",
             "created_at", "updated_at",
         ]
 
@@ -174,7 +175,7 @@ class PlacementApprovalSerializer(serializers.ModelSerializer):
         if status == "approved":
             instance.academic_supervisor = validated_data.get("academic_supervisor")
             instance.intake_cohort       = validated_data.get("intake_cohort")
-            instance.approved_by         = self.context["request"].user
+            instance.approval_by         = self.context["request"].user
             instance.approval_date       = timezone.now()
         else:
             instance.rejection_reason = validated_data.get("rejection_reason")

@@ -38,8 +38,8 @@ function StudentDashboardContent() {
     setShowLogModal(true);
   };
   
-  const handlePlacementSubmit = (placementData) => {
-    submitPlacement(placementData);
+  const handlePlacementSubmit = async (placementData) => {
+    await submitPlacement(placementData);
     setShowPlacementModal(false);
     showNotification('Placement application submitted successfully!', 'success');
   };

@@ -5,6 +5,7 @@ import {
   useContext,
   useMemo,
   useState,
+  useEffect,
 } from "react";
 import {
   studentPlacement,
@@ -56,7 +57,7 @@ export function StudentProvider({ children }) {
       university: user.university,
     };
   }, [user]);
-  const [placement, setPlacement] = useState(studentPlacement);
+  const [placement, setPlacement] = useState(null);
   const [weeklyLogs, setWeeklyLogs] = useState(studentWeeklyLogs);
 
   const [placementDraft, setPlacementDraft] = useState(() =>
@@ -65,6 +66,28 @@ export function StudentProvider({ children }) {
   const [weeklyLogDraft, setWeeklyLogDraft] = useState(() =>
     getDraft(DRAFT_KEYS.weeklyLog),
   );
+
+  const [isPlacementLoading, setIsPlacementLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPlacement = async () => {
+      try {
+        const data = await listPlacements();
+        if (cancelled) return;
+
+        setPlacement(Array.isArray(data) ? (data[0] ?? null) : (data ?? null));
+      } finally {
+        if (!cancelled) setIsPlacementLoading(false);
+      }
+    };
+
+    loadPlacement();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const savePlacementDraft = useCallback(
     async (data) => {
@@ -85,6 +108,7 @@ export function StudentProvider({ children }) {
       append("end_date", data.endDate);
       append("intake_cohort", data.intakeCohort);
       append("remuneration_type", data.remunerationType);
+      append("wp_supervisor_name", data.wpSupervisorName);
       append("wp_supervisor_email", data.wpSupervisorEmail);
       append("wp_supervisor_phone", data.wpSupervisorPhone);
       append("wp_supervisor_title", data.wpSupervisorTitle);
@@ -134,13 +158,7 @@ export function StudentProvider({ children }) {
     [savePlacementDraft, clearPlacementDraft],
   );
 
-  const updatePlacement = useCallback((placementData) => {
-    setPlacement((previousPlacement) => ({
-      ...previousPlacement,
-      ...placementData,
-      updatedAt: new Date().toISOString(),
-    }));
-  }, []);
+  const updatePlacement = savePlacementDraft;
 
   const submitWeeklyLog = useCallback(
     (logData) => {

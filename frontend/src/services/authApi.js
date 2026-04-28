@@ -31,9 +31,14 @@ export async function verifyEmail(token = "") {
   );
 }
 
-export async function getCurrentUser() {
-  return responseData(await httpClient.get(`${AUTH_BASE_PATH}/me/`));
-}
+export async function getCurrentUser(token = "") {
+   const clean = String(token).replace(/^Bearer\s+/i, "").trim();
+   const config = clean
+     ? { headers: { Authorization: `Bearer ${clean}` } }
+     : undefined;
+ 
+   return responseData(await httpClient.get("/accounts/auth/me/", config));
+ }
 
 const authApi = {
   login,

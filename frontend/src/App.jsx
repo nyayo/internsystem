@@ -6,6 +6,11 @@ import {
   RoleRoute,
 } from "./components/auth/RouteGuards";
 import LoginPage from "./pages/auth/login/LoginPage";
+import CheckEmailPage from "./pages/auth/verify/CheckEmailPage";
+import VerifyEmailPage from "./pages/auth/verify/VerifyEmailPage";
+import EmailConfirmedPage from "./pages/auth/verify/EmailConfirmedPage";
+// import WorkplaceDashboard from "./pages/supervisor/WorkplaceDashboard";
+// import AcademicDashboard from "./pages/supervisor/AcademicDashboard";
 import RegisterPage from "./pages/auth/register/RegisterPage";
 import Dashboard from "./pages/admin/Dashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -14,7 +19,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 function App() {
   return (
     <>
-      {/* <Routes>
+      <Routes>
         <Route
           path="/login"
           element={
@@ -57,7 +62,7 @@ function App() {
             </RoleRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/supervisor/workplace"
           element={
             <RoleRoute allowedRoles={["workplace_supervisor"]}>
@@ -72,7 +77,7 @@ function App() {
               <AcademicDashboard />
             </RoleRoute>
           }
-        />
+        /> */}
         <Route
           path="/admin"
           element={
@@ -83,8 +88,8 @@ function App() {
         />
         <Route path="/" element={<DefaultRedirect />} />
         <Route path="*" element={<DefaultRedirect />} />
-      </Routes> */}
-      <Dashboard />
+      </Routes>
+      {/* <Dashboard /> */}
       {/* <StudentDashboard /> */}
       <Notification />
     </>

@@ -37,7 +37,7 @@ export async function createPlacementDraft(placementPayload = {}) {
 
 export async function updatePlacementDraft(placementId, placementPayload = {}) {
   try {
-    const response = await httpClient.put(
+    const response = await httpClient.patch(
       `${AUTH_BASE_PATH}/${placementId}/`,
       placementPayload,
     );
@@ -53,7 +53,7 @@ export async function updatePlacementDraft(placementId, placementPayload = {}) {
 
 export async function submitPlacement(placementId) {
   try {
-    const response = await httpClient.put(`${AUTH_BASE_PATH}/${placementId}/submit/`);
+    const response = await httpClient.post(`${AUTH_BASE_PATH}/${placementId}/submit/`);
     return responseData(response);
   } catch (error) {
     const statusCode = error?.response?.status;

@@ -12,27 +12,37 @@ const PUBLIC_AUTH_PATHS = [
 export const API_BASE_URL =
   typeof rawApiBaseUrl === "string" ? rawApiBaseUrl.trim() : "";
 
+function normalizeToken(value) {
+  const t = String(value ?? "").trim();
+  if (!t) return "";
+  return t.toLowerCase().startsWith("bearer ") ? t.slice(7).trim() : t;
+}
+
 function getStoredToken() {
-  if (typeof window === "undefined" || typeof localStorage === "undefined") {
+  if (typeof window === "undefined" || typeof localStorage === "undefined")
     return "";
-  }
 
   const rawSession = localStorage.getItem(AUTH_SESSION_KEY);
-  if (!rawSession) {
-    return "";
-  }
+  if (!rawSession) return "";
 
   try {
     const session = JSON.parse(rawSession);
-    const token = typeof session?.token === "string" ? session.token.trim() : "";
-    if (token) {
-      return token;
-    }
-  } catch {
-    // If the saved value is a plain string token, use it directly.
-  }
 
-  return rawSession.trim();
+    // if session is plain token string
+    if (typeof session === "string") return normalizeToken(session);
+
+    // if session is object
+    if (session && typeof session === "object") {
+      return normalizeToken(
+        session.token ?? session.access ?? session.access_token ?? "",
+      );
+    }
+
+    return "";
+  } catch {
+    // raw plain token only (not JSON)
+    return rawSession.trim().startsWith("{") ? "" : normalizeToken(rawSession);
+  }
 }
 
 function shouldAttachAuthHeader(url) {

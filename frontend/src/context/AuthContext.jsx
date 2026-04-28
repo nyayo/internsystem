@@ -230,18 +230,26 @@ export function AuthProvider({ children }) {
       try {
         const apiLoginResponse = await authApi.login(credentials);
         const baseSession = createSessionUserFromApiLogin(apiLoginResponse);
-        saveSessionUser(baseSession);
 
-        const apiCurrentUser = await authApi.getCurrentUser();
-        const sessionUser = normalizeApiUser(apiCurrentUser);
-      
+        if (!baseSession?.token) {
+          throw new Error("Access token missing from login response.");
+        }
+
+        const apiCurrentUser = await authApi.getCurrentUser(baseSession.token);
+
+        const sessionUser = {
+          ...normalizeApiUser(apiCurrentUser),
+          token: baseSession.token,
+          refreshToken: baseSession.refreshToken,
+        };
+
+        saveSessionUser(sessionUser);
         setUser(sessionUser);
         return sessionUser;
       } catch (error) {
         if (error?.response) {
           throw error;
         }
-        return loginWithLocalFallback();
       }
     },
     [registeredUsers],

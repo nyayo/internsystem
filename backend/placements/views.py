@@ -1,3 +1,5 @@
+from urllib import request
+
 from django.utils import timezone
 
 from rest_framework          import status
@@ -89,41 +91,27 @@ class PlacementDetailView(APIView):
     permission_classes = [IsAuthenticated, IsActiveAccount]
     parser_classes     = [MultiPartParser, FormParser, JSONParser]
 
-    def get_object(self, pk, user):
+    def get_object(self, pk, request):
         try:
             obj = InternshipPlacement.objects.get(pk=pk)
         except InternshipPlacement.DoesNotExist:
-            return None, Response(
-                {"detail": "Placement not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return None, Response({"detail": "Placement not found."}, status=404)
+ 
         perm = IsLinkedToPlacement()
-        if not perm.has_object_permission(None, None, obj):
-           
-            pass
-
-        if not (
-            user == obj.student
-            or user == obj.academic_supervisor
-            or user == obj.workplace_supervisor
-            or user == obj.approved_by
-            or user.role == "internship_administrator"
-        ):
-            return None, Response(
-                {"detail": "You are not linked to this placement."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        if not perm.has_object_permission(request, self, obj):
+            return None, Response({"detail": perm.message}, status=403)
+ 
         return obj, None
 
     def get(self, request, pk):
-        obj, err = self.get_object(pk, request.user)
+        obj, err = self.get_object(pk, request)
         if err:
             return err
         serializer = PlacementDetailSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, pk):
-        obj, err = self.get_object(pk, request.user)
+        obj, err = self.get_object(pk, request)
         if err:
             return err
 
