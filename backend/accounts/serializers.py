@@ -109,7 +109,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model  = CustomUser
         fields = [
             'id', 'email', 'full_name', 'first_name', 'last_name',
-            'phone_number', 'role', 'gender', 'district', 'profile_photo'
+            'phone_number', 'role', 'gender', 'district', 'profile_photo',
             'account_status', 'date_joined',
             'student_number', 'programme', 'year_of_study',
             'university',

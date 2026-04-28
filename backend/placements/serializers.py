@@ -23,6 +23,7 @@ class PlacementListSerializer(serializers.ModelSerializer):
             "organisation_name",
             "organisation_type",
             "organisation_district",
+            "organisation_address",
             "department",
             "start_date",
             "end_date",
@@ -30,8 +31,13 @@ class PlacementListSerializer(serializers.ModelSerializer):
             "status",
             "intake_cohort",
             "remuneration_type",
+            "request_letter",
+            "acceptance_letter",
             "academic_sup_name",
-            "workplace_sup_name",
+            "workplace_sup_name",   
+            "wp_supervisor_email",
+            "wp_supervisor_phone",
+            "wp_supervisor_title",
         ]
 
 

@@ -199,7 +199,7 @@ class WeeklyLogDetailView(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    @extend_schema(
+@extend_schema(
     operation_id="logs_submit",
     request=None,
     responses={
@@ -246,7 +246,7 @@ class WeeklyLogSubmitView(APIView):
         )
     
 
-    @extend_schema(
+@extend_schema(
     operation_id="logs_endorse",
     request=WorkplaceEndorseSerializer,
     responses={
@@ -296,7 +296,7 @@ class WeeklyLogEndorseView(APIView):
             status=status.HTTP_200_OK,
         )
     
-    @extend_schema(
+@extend_schema(
     operation_id="logs_assess",
     request=AcademicAssessSerializer,
     responses={
@@ -349,7 +349,7 @@ class WeeklyLogAssessView(APIView):
             status=status.HTTP_200_OK,
         )
     
-    @extend_schema(
+@extend_schema(
     operation_id="logs_close",
     request=None,
     responses={
@@ -391,7 +391,7 @@ class WeeklyLogCloseView(APIView):
             status=status.HTTP_200_OK,
         )
     
-    @extend_schema(
+@extend_schema(
     operation_id="logs_placement_summary",
     request=None,
     responses={
@@ -473,7 +473,7 @@ class PlacementLogSummaryView(APIView):
             status=status.HTTP_200_OK,
         )
     
-    @extend_schema(
+@extend_schema(
     operation_id="logs_pending",
     request=None,
     responses={
