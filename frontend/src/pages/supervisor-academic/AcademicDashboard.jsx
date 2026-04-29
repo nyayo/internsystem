@@ -4,14 +4,34 @@ import AcademicStudentsTable from "../components/AcademicStudentsTable";
 import AcademicLogsTable from "../components/AcademicLogsTable";
 import AcademicEvaluationsTable from "../components/AcademicEvaluationsTable";
 import RecentActivity from "../components/RecentActivity";
+import { useAcademicDashboard } from "../hooks/useAcademicDashboard";
+
 
 export default function AcademicDashboard() {
+    const {
+    stats,
+    students,
+    logs,
+    evaluations,
+    activity,
+  } = useAcademicDashboard();
   return (
     <div className="dashboard">
       <h2>Academic Supervisor Dashboard</h2>
-       <div className="stats-section"></div>
-      <div className="activity-section"></div>
+       <div className="stats-section">
+        <AcademicStats stats={stats} />
+      </div>
+        
+      
+      <div className="activity-section">
+        <RecentActivity activity={activity} />
+      </div>
+        
+      
       <div className="students-section"></div>
+      <div className="students-table">
+        <AcademicStudentsTable students={students} />
+      </div>    
       <div className="logs-section"></div>
       <div className="evaluations-section"></div>
     </div>
