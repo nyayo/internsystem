@@ -15,7 +15,9 @@ export default function AcademicDashboard() {
     evaluations,
     activity,
     openLog,
-    openEvaluation,   
+    closeLog,
+    openEvaluation,
+    closeEvaluation,   
   } = useAcademicDashboard();
   return (
     <div className="dashboard">
