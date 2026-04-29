@@ -259,7 +259,18 @@ class PlacementApprovalView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
+@extend_schema(
+    operation_id="placements_activate",
+    request=None,
+    responses={
+        200: inline_serializer("PlacementActivateResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Only approved placements can be activated."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 
 class PlacementActivateView(APIView):
@@ -286,6 +297,9 @@ class PlacementActivateView(APIView):
             {"detail": "Placement is now active.", "status": obj.status},
             status=status.HTTP_200_OK,
         )
+    
+    
+
 
 class PlacementWithdrawView(APIView):
    
