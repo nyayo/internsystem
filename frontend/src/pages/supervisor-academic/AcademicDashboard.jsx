@@ -14,6 +14,8 @@ export default function AcademicDashboard() {
     logs,
     evaluations,
     activity,
+    openLog,
+    openEvaluation,   
   } = useAcademicDashboard();
   return (
     <div className="dashboard">
@@ -32,8 +34,13 @@ export default function AcademicDashboard() {
       <div className="students-table">
         <AcademicStudentsTable students={students} />
       </div>    
-      <div className="logs-section"></div>
-      <div className="evaluations-section"></div>
+      <div className="logs-section">
+        <AcademicLogsTable logs={logs} />
+      </div>
+      <div className="evaluations-section">
+        <AcademicEvaluationsTable evaluations={evaluations}
+        onView={openEvaluation} />
+      </div>
     </div>
   );
 }
