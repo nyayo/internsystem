@@ -298,6 +298,19 @@ class PlacementActivateView(APIView):
             status=status.HTTP_200_OK,
         )
     
+    @extend_schema(
+    operation_id="placements_withdraw",
+    request=PlacementWithdrawSerializer,
+    responses={
+        200: inline_serializer("PlacementWithdrawResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        403: OpenApiResponse(description="Not permitted to withdraw this placement."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
     
 
 
