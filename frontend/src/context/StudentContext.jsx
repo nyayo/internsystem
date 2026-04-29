@@ -35,13 +35,13 @@ import {
   assessLog,
   listPendingLogs,
   closeLog,
+  submitLog,
 } from "../services/logsApi";
 
 const StudentContext = createContext(null);
 
 export function StudentProvider({ children }) {
   const { user } = useAuth();
-  console.log(user);
 
   const student = useMemo(() => {
     if (user?.role !== "student") return null;
@@ -107,6 +107,39 @@ export function StudentProvider({ children }) {
     createdAt: p.created_at ?? null,
   });
 
+  const normalizeWeeklyLog = (log) => ({
+    id: log.id,
+    placement: log.placement ?? null,
+    student: {
+      name: log.student_name ?? "-",
+      regNumber: log.student_number ?? "-",
+      organisation: log.organisation ?? "-",
+    },
+    weekNumber: log.week_number,
+    weekStartDate: log.week_start_date ?? null,
+    weekEndDate: log.week_end_date ?? null,
+    activitiesPerformed: log.activities_performed ?? "",
+    skillsGained: log.skills_gained ?? "",
+    challengesFaced: log.challenges_faced ?? "",
+    studentRemarks: log.student_remarks ?? "",
+    status: log.status ?? "draft",
+
+    workplaceComment: log.workplace_remarks ?? null,
+    workplaceEndorsedBy: log.workplace_endorsed_by ?? null,
+    workplaceEndorsedByName: log.workplace_endorsed_by_name ?? null,
+    workplaceEndorsedAt: log.workplace_endorsed_at ?? null,
+
+    academicComment: log.academic_remarks ?? null,
+    academicGrade: log.academic_grade ?? null,
+    academicAssessedBy: log.academic_assessed_by ?? null,
+    academicAssessedByName: log.academic_assessed_by_name ?? null,
+    academicAssessedAt: log.academic_assessed_at ?? null,
+
+    submittedAt: log.submitted_at ?? null,
+    createdAt: log.created_at ?? null,
+    updatedAt: log.updated_at ?? null,
+  });
+
   useEffect(() => {
     let cancelled = false;
 
@@ -124,7 +157,22 @@ export function StudentProvider({ children }) {
       }
     };
 
+    const loadLogs = async () => {
+      try {
+        const data = await listLogs();
+        if (cancelled) return;
+
+        const logs = Array.isArray(data) ? data : data ? [data] : [];
+        const normalized = logs.filter(Boolean).map(normalizeWeeklyLog);
+
+        setWeeklyLogs(normalized);
+      } finally {
+        if (!cancelled) setIsPlacementLoading(false);
+      }
+    };
+
     loadPlacement();
+    loadLogs();
     return () => {
       cancelled = true;
     };
@@ -173,10 +221,45 @@ export function StudentProvider({ children }) {
     [placement?.id],
   );
 
-  const saveWeeklyLogDraft = useCallback((data) => {
-    setWeeklyLogDraft(data);
-    saveDraft(DRAFT_KEYS.weeklyLog, data);
-  }, []);
+  const saveWeeklyLogDraft = useCallback(
+    async (data) => {
+      if (!placement?.id) {
+        throw new Error("No active placement found. Cannot save log.");
+      }
+      const payload = {};
+
+      const append = (key, value) => {
+        if (value !== undefined && value !== null && value !== "") {
+          payload[key] = value;
+        }
+      };
+
+      append("placement", placement.id);
+      append("week_number", data.weekNumber);
+      append("week_start_date", data.weekStartDate);
+      append("week_end_date", data.weekEndDate);
+      append("activities_performed", data.activitiesPerformed);
+      append("skills_gained", data.skillsGained);
+      append("challenges_faced", data.challengesFaced);
+      append("student_remarks", data.studentRemarks);
+
+      const saved = data.id
+        ? await updateLogDraft(data.id, payload)
+        : await createLogDraft(payload);
+
+      const normalized = normalizeWeeklyLog(saved);
+      setWeeklyLogs(
+        (prev) =>
+          prev.some((l) => l.id === normalized.id)
+            ? prev.map((l) => (l.id === normalized.id ? normalized : l)) // update existing
+            : [...prev, normalized], // add new
+      );
+      setWeeklyLogDraft(null);
+      clearDraft(DRAFT_KEYS.weeklyLog);
+      return normalized;
+    },
+    [placement],
+  );
 
   const clearPlacementDraft = useCallback(() => {
     setPlacementDraft(null);
@@ -202,24 +285,17 @@ export function StudentProvider({ children }) {
   const updatePlacement = savePlacementDraft;
 
   const submitWeeklyLog = useCallback(
-    (logData) => {
-      setWeeklyLogs((previousLogs) =>
-        upsertWeeklyLog(previousLogs, logData, "submitted"),
-      );
+    async (logData) => {
+      const saved = await saveWeeklyLogDraft(logData);
+      const submitted = await submitLog(saved.id); // POST /placements/:id/submit/
+      setWeeklyLogs(submitted);
       clearWeeklyLogDraft();
+      return submitted;
     },
-    [clearWeeklyLogDraft],
+    [saveWeeklyLogDraft, clearWeeklyLogDraft],
   );
 
-  const saveWeeklyLogAsDraft = useCallback(
-    (logData) => {
-      setWeeklyLogs((previousLogs) =>
-        upsertWeeklyLog(previousLogs, logData, "draft"),
-      );
-      clearWeeklyLogDraft();
-    },
-    [clearWeeklyLogDraft],
-  );
+  const saveWeeklyLogAsDraft = saveWeeklyLogDraft;
 
   const getLogByWeek = useCallback(
     (weekNumber) => weeklyLogs.find((log) => log.weekNumber === weekNumber),

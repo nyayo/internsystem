@@ -51,7 +51,6 @@ export default function WeeklyLogModal({ log, placement, onClose, onSubmit, onSa
       activitiesPerformed: '',
       skillsGained: '',
       challengesFaced: '',
-      supervisorInteractions: '',
       studentRemarks: '',
     };
   };
@@ -63,15 +62,15 @@ export default function WeeklyLogModal({ log, placement, onClose, onSubmit, onSa
   const isResubmit = log && log.status === 'resubmit';
   
   // Auto-save draft on form changes (debounced)
-  useEffect(() => {
-    if (!isDirty || isViewOnly) return;
+  // useEffect(() => {
+  //   if (!isDirty || isViewOnly) return;
     
-    const timeout = setTimeout(() => {
-      saveWeeklyLogDraft(formData);
-    }, 1000);
+  //   const timeout = setTimeout(() => {
+  //     saveWeeklyLogDraft(formData);
+  //   }, 1000);
     
-    return () => clearTimeout(timeout);
-  }, [formData, isDirty, isViewOnly, saveWeeklyLogDraft]);
+  //   return () => clearTimeout(timeout);
+  // }, [formData, isDirty, isViewOnly, saveWeeklyLogDraft]);
   
   const handleChange = (field, value) => {
     if (field === "weekNumber" && !log) {
@@ -110,6 +109,7 @@ export default function WeeklyLogModal({ log, placement, onClose, onSubmit, onSa
   
   const handleSaveDraft = () => {
     onSaveDraft(formData);
+    console.log(formData)
   };
   
   // Available weeks for selection
@@ -272,7 +272,7 @@ export default function WeeklyLogModal({ log, placement, onClose, onSubmit, onSa
           </section>
           
           {/* Supervisor Interactions */}
-          <section className="form-section">
+          {/* <section className="form-section">
             <h3>
               <span className="material-icons-sharp">groups</span>
               Supervisor Interactions
@@ -290,7 +290,7 @@ export default function WeeklyLogModal({ log, placement, onClose, onSubmit, onSa
               />
               {errors.supervisorInteractions && <span className="error-text">{errors.supervisorInteractions}</span>}
             </div>
-          </section>
+          </section> */}
           
           {/* Additional Remarks */}
           <section className="form-section">
