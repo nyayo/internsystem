@@ -1,6 +1,7 @@
 import React from "react";
 import "./StudentRightPanel.css";
 import { useTheme } from "../../context/ThemeContext";
+import CalendarWidget from "./CalendarWidget";
 
 
 export default function StudentRightPanel({ student, placement }) {
@@ -104,6 +105,14 @@ export default function StudentRightPanel({ student, placement }) {
           </div>
         </div>
       </div>
+
+      {placement &&
+        ["approved", "active", "completed"].includes(placement.status) && (
+          <CalendarWidget
+            startDate={placement.startDate}
+            endDate={placement.endDate}
+          />
+        )}
 
       {/* Quick Actions */}
       <div className="quick-actions">

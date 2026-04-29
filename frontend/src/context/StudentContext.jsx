@@ -27,6 +27,15 @@ import {
   submitPlacement as submitPlacementApi,
   updatePlacementDraft,
 } from "../services/placementApi";
+import {
+  listLogs,
+  createLogDraft,
+  updateLogDraft,
+  endorseLog,
+  assessLog,
+  listPendingLogs,
+  closeLog,
+} from "../services/logsApi";
 
 const StudentContext = createContext(null);
 
@@ -106,7 +115,9 @@ export function StudentProvider({ children }) {
         const data = await listPlacements();
         if (cancelled) return;
 
-        const normalized = normalizePlacement(Array.isArray(data) ? (data[0] ?? null) : (data ?? null));
+        const normalized = normalizePlacement(
+          Array.isArray(data) ? (data[0] ?? null) : (data ?? null),
+        );
         setPlacement(normalized);
       } finally {
         if (!cancelled) setIsPlacementLoading(false);

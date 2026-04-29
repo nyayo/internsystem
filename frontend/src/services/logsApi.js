@@ -34,10 +34,7 @@ export async function listPendingLogs() {
 
 export async function createLogDraft(logPayload = {}) {
   try {
-    const response = await httpClient.post(
-      `${AUTH_BASE_PATH}/`,
-      logPayload,
-    );
+    const response = await httpClient.post(`${AUTH_BASE_PATH}/`, logPayload);
     return responseData(response);
   } catch (error) {
     const statusCode = error?.response?.status;
@@ -66,7 +63,9 @@ export async function updateLogDraft(logId, logPayload = {}) {
 
 export async function submitLog(logId) {
   try {
-    const response = await httpClient.post(`${AUTH_BASE_PATH}/${logId}/submit/`);
+    const response = await httpClient.post(
+      `${AUTH_BASE_PATH}/${logId}/submit/`,
+    );
     return responseData(response);
   } catch (error) {
     const statusCode = error?.response?.status;
@@ -79,7 +78,37 @@ export async function submitLog(logId) {
 
 export async function endorseLog(logId) {
   try {
-    const response = await httpClient.post(`${AUTH_BASE_PATH}/${logId}/endorse/`);
+    const response = await httpClient.post(
+      `${AUTH_BASE_PATH}/${logId}/endorse/`,
+    );
+    return responseData(response);
+  } catch (error) {
+    const statusCode = error?.response?.status;
+    if (statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function assessLog(logId) {
+  try {
+    const response = await httpClient.post(
+      `${AUTH_BASE_PATH}/${logId}/assess/`,
+    );
+    return responseData(response);
+  } catch (error) {
+    const statusCode = error?.response?.status;
+    if (statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function closeLog(logId) {
+  try {
+    const response = await httpClient.post(`${AUTH_BASE_PATH}/${logId}/close/`);
     return responseData(response);
   } catch (error) {
     const statusCode = error?.response?.status;
@@ -92,9 +121,13 @@ export async function endorseLog(logId) {
 
 const logsApi = {
   listLogs,
+  listPendingLogs,
   createLogDraft,
   updateLogDraft,
-  submitLog
+  submitLog,
+  endorseLog,
+  assessLog,
+  closeLog,
 };
 
 export default logsApi;
