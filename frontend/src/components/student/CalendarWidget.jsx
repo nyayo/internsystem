@@ -113,11 +113,19 @@ export default function CalendarWidget({ startDate, endDate }) {
           <span>Today</span>
         </div>
       </div>
+<<<<<<< HEAD
       
+=======
+  
+>>>>>>> c0dce36d57d20c8edda407d43d8616cd98f13479
       <button className="today-btn" onClick={goToToday}>
         <span className="material-icons-sharp">today</span>
         Go to Today
       </button>
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c0dce36d57d20c8edda407d43d8616cd98f13479

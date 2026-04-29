@@ -2,12 +2,35 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import { LOGIN_ROLE_OPTIONS } from "../../../auth/authConfig";
-// import { useAuth } from "../../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
+
+function getErrorMessage(error, fallbackMessage) {
+  const responseData = error?.response?.data;
+
+  if (typeof responseData === "string" && responseData.trim()) {
+    return responseData.trim();
+  }
+
+  if (responseData && typeof responseData === "object") {
+    if (typeof responseData.detail === "string" && responseData.detail.trim()) {
+      return responseData.detail.trim();
+    }
+    if (typeof responseData.message === "string" && responseData.message.trim()) {
+      return responseData.message.trim();
+    }
+  }
+
+  if (typeof error?.message === "string" && error.message.trim()) {
+    return error.message.trim();
+  }
+
+  return fallbackMessage;
+}
 
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  // const { login, getRoleHomePath } = useAuth();
+  const { login, getRoleHomePath } = useAuth();
   const registrationState = location.state ?? {};
 
   const [role, setRole] = useState(registrationState.role ?? "student");
@@ -25,10 +48,11 @@ function LoginPage() {
 
     try {
       const sessionUser = await login({ role, email, password });
+      console.log(sessionUser)
       setError("");
       navigate(getRoleHomePath(sessionUser.role), { replace: true });
     } catch (loginError) {
-      setError(loginError.message);
+      setError(getErrorMessage(loginError, "Login failed. Please try again."));
     }
   };
 
@@ -40,6 +64,16 @@ function LoginPage() {
         <p className="auth-subtitle">Sign in to continue</p>
         {registrationState.registered && (
           <p className="auth-success">Registration successful. You can now sign in.</p>
+        )}
+        {registrationState.awaitingVerification && (
+          <p className="auth-success">
+            Account created. Check your email and verify your account before signing in.
+          </p>
+        )}
+        {registrationState.emailVerified && (
+          <p className="auth-success">
+            Email verified successfully. You can now sign in.
+          </p>
         )}
 
         {error && (

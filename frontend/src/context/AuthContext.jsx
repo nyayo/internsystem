@@ -27,66 +27,64 @@ import authApi from "../services/authApi";
 import { API_BASE_URL } from "../services/httpClient";
 
 const AuthContext = createContext(null);
-const TOKEN_FIELD_CANDIDATES = [
-  "token",
-  "accessToken",
-  "authToken",
-  "jwt",
-  "sessionToken",
-];
+const IS_API_LOGIN_ENABLED = Boolean(API_BASE_URL);
+const REGISTER_SUCCESS_MESSAGE =
+  "Account created. Please check your email to verify your account.";
 
 const DEFAULT_AUTH_USERS = createDefaultAuthUsers({
   currentStudent,
   currentWorkplaceSupervisor,
   currentAcademicSupervisor,
 });
-const IS_API_LOGIN_ENABLED = Boolean(API_BASE_URL);
-
-function toRecord(value) {
-  if (value && typeof value === "object" && !Array.isArray(value)) {
-    return value;
-  }
-  return null;
-}
-
-function getTokenFromRecord(record) {
-  if (!record) {
-    return "";
-  }
-
-  for (const fieldName of TOKEN_FIELD_CANDIDATES) {
-    const fieldValue = record[fieldName];
-    if (typeof fieldValue === "string" && fieldValue.trim()) {
-      return fieldValue.trim();
-    }
-  }
-
-  return "";
-}
-
-function readApiLoginPayload(apiLoginResponse) {
-  const rootPayload = toRecord(apiLoginResponse) ?? {};
-  const nestedPayload = toRecord(rootPayload.data);
-  const nestedUser = toRecord(nestedPayload?.user) ?? toRecord(rootPayload.user);
-
-  return {
-    userPayload: nestedUser ?? nestedPayload ?? rootPayload,
-    token:
-      getTokenFromRecord(nestedUser) ||
-      getTokenFromRecord(nestedPayload) ||
-      getTokenFromRecord(rootPayload),
-  };
-}
 
 function createSessionUserFromApiLogin(apiLoginResponse) {
-  const { userPayload, token } = readApiLoginPayload(apiLoginResponse);
-  const sessionUser = toSessionUser(userPayload);
-  const userRole =
-    typeof sessionUser.role === "string" && sessionUser.role.trim()
-      ? sessionUser.role.trim()
-      : "";
+  const payload =
+    apiLoginResponse && typeof apiLoginResponse === "object"
+      ? apiLoginResponse
+      : {};
+  const source =
+    payload.data && typeof payload.data === "object" && !Array.isArray(payload.data)
+      ? payload.data
+      : payload;
+  const userPayload =
+    source.user && typeof source.user === "object" && !Array.isArray(source.user)
+      ? source.user
+      : source;
+  const tokenCandidate =
+    typeof source.access === "string"
+      ? source.access
+      : typeof source.token === "string"
+        ? source.token
+        : typeof userPayload?.access === "string"
+          ? userPayload.access
+          : userPayload?.token;
+  const refreshTokenCandidate =
+    typeof source.refresh === "string" ? source.refresh : userPayload?.refresh;
+  const token = typeof tokenCandidate === "string" ? tokenCandidate.trim() : "";
+  const refreshToken =
+    typeof refreshTokenCandidate === "string" ? refreshTokenCandidate.trim() : "";
 
-  if (!userRole) {
+  const sessionUser = toSessionUser(userPayload);
+
+  if (
+    !sessionUser.accountStatus &&
+    typeof sessionUser.account_status === "string"
+  ) {
+    sessionUser.accountStatus = sessionUser.account_status;
+  }
+
+  if (
+    !sessionUser.studentNumber &&
+    typeof sessionUser.student_number === "string"
+  ) {
+    sessionUser.studentNumber = sessionUser.student_number;
+  }
+
+  if (!sessionUser.fullName && typeof sessionUser.full_name === "string") {
+    sessionUser.fullName = sessionUser.full_name;
+  }
+
+  if (!sessionUser.role) {
     throw new Error("Login response is missing a user role.");
   }
 
@@ -94,7 +92,46 @@ function createSessionUserFromApiLogin(apiLoginResponse) {
     sessionUser.token = token;
   }
 
+  if (refreshToken) {
+    sessionUser.refreshToken = refreshToken;
+  }
+
   return sessionUser;
+}
+
+function prepareRegistrationData(registrationData) {
+  if (!registrationData || typeof registrationData !== "object") {
+    return {};
+  }
+
+  const preparedData = {};
+
+  for (const [key, value] of Object.entries(registrationData)) {
+    if (typeof value === "string" && key !== "password") {
+      preparedData[key] = value.trim();
+      continue;
+    }
+    preparedData[key] = value;
+  }
+
+  return preparedData;
+}
+
+function createRegisterResult(responseData, fallbackData) {
+  const response =
+    responseData && typeof responseData === "object" ? responseData : {};
+  const fallback =
+    fallbackData && typeof fallbackData === "object" ? fallbackData : {};
+
+  return {
+    ...response,
+    detail:
+      typeof response.detail === "string" && response.detail.trim()
+        ? response.detail.trim()
+        : REGISTER_SUCCESS_MESSAGE,
+    email: response.email ?? fallback.email ?? "",
+    role: response.role ?? fallback.role ?? "",
+  };
 }
 
 export function AuthProvider({ children }) {
@@ -112,14 +149,31 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   const register = useCallback(
-    (registrationData) => {
-      const createdUser = createUserFromRegistration(
-        registrationData,
-        registeredUsers,
-      );
-      setRegisteredUsers((previousUsers) => [...previousUsers, createdUser]);
-      const { password: _password, ...sessionUser } = createdUser;
-      return sessionUser;
+    async (registrationData) => {
+      const preparedData = prepareRegistrationData(registrationData);
+
+      const registerWithLocalFallback = () => {
+        const createdUser = createUserFromRegistration(
+          preparedData,
+          registeredUsers,
+        );
+        setRegisteredUsers((previousUsers) => [...previousUsers, createdUser]);
+        return createRegisterResult(null, toSessionUser(createdUser));
+      };
+
+      if (!IS_API_LOGIN_ENABLED) {
+        return registerWithLocalFallback();
+      }
+
+      try {
+        const apiRegisterResponse = await authApi.register(preparedData);
+        return createRegisterResult(apiRegisterResponse, preparedData);
+      } catch (error) {
+        if (error?.response) {
+          throw error;
+        }
+        return registerWithLocalFallback();
+      }
     },
     [registeredUsers],
   );
@@ -141,7 +195,10 @@ export function AuthProvider({ children }) {
         const sessionUser = createSessionUserFromApiLogin(apiLoginResponse);
         setUser(sessionUser);
         return sessionUser;
-      } catch {
+      } catch (error) {
+        if (error?.response) {
+          throw error;
+        }
         return loginWithLocalFallback();
       }
     },
