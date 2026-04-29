@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import './Modal.css';
 import './PlacementDetailsModal.css';
 import { 
-  workplaceSupervisors, 
-  academicSupervisors,
   getOrganisationTypeLabel,
   getRemunerationLabel,
   getIntakeCohortLabel,
   formatDate,
   calculateDurationWeeks
 } from '../../data/dashboardData';
+import { useAdmin, AdminProvider } from "../../context/AdminContext";
 
 export default function PlacementDetailsModal({ placement, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -19,6 +18,7 @@ export default function PlacementDetailsModal({ placement, onClose, onSave }) {
     rejectionReason: '',
     comments: '',
   });
+  const { workplaceSupervisors, academicSupervisors } = useAdmin();
 
   const handleChange = (e) => {
     const { name, value } = e.target;

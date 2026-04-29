@@ -147,7 +147,7 @@ class PlacementApprovalSerializer(serializers.ModelSerializer):
         fields = [
             "status",
             "academic_supervisor",
-            "intake_cohort",
+            "workplace_supervisor",
             "rejection_reason",
         ]
 
@@ -158,10 +158,10 @@ class PlacementApprovalSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"academic_supervisor": "An academic supervisor must be assigned on approval."}
             )
-        if status == "approved" and not attrs.get("intake_cohort"):
-            raise serializers.ValidationError(
-                {"intake_cohort": "An intake cohort must be set on approval."}
-            )
+        # if status == "approved" and not attrs.get("intake_cohort"):
+        #     raise serializers.ValidationError(
+        #         {"intake_cohort": "An intake cohort must be set on approval."}
+        #     )
         if status == "rejected" and not attrs.get("rejection_reason"):
             raise serializers.ValidationError(
                 {"rejection_reason": "A rejection reason is required."}
@@ -186,7 +186,8 @@ class PlacementApprovalSerializer(serializers.ModelSerializer):
 
         if status == "approved":
             instance.academic_supervisor = validated_data.get("academic_supervisor")
-            instance.intake_cohort       = validated_data.get("intake_cohort")
+            instance.workplace_supervisor = validated_data.get("workplace_supervisor")
+            # instance.intake_cohort       = validated_data.get("intake_cohort")
             instance.approval_by         = self.context["request"].user
             instance.approval_date       = timezone.now()
         else:

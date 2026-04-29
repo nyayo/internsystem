@@ -58,7 +58,7 @@ export function StudentProvider({ children }) {
     };
   }, [user]);
   const [placement, setPlacement] = useState(null);
-  const [weeklyLogs, setWeeklyLogs] = useState(studentWeeklyLogs);
+  const [weeklyLogs, setWeeklyLogs] = useState([]);
 
   const [placementDraft, setPlacementDraft] = useState(() =>
     getDraft(DRAFT_KEYS.placement),
@@ -69,6 +69,35 @@ export function StudentProvider({ children }) {
 
   const [isPlacementLoading, setIsPlacementLoading] = useState(true);
 
+  const normalizePlacement = (p) => ({
+    id: p.id,
+    student: {
+      name: p.student_name ?? "-",
+      regNumber: p.student_number ?? "-",
+      program: p.programme ?? p.student_programme ?? "-",
+      email: p.student_email ?? "-",
+    },
+    organisationName: p.organisation_name,
+    organisationType: p.organisation_type,
+    organisationDistrict: p.organisation_district,
+    organisationAddress: p.organisation_address,
+    department: p.department,
+    startDate: p.start_date,
+    endDate: p.end_date,
+    status: p.status,
+    intakeCohort: p.intake_cohort,
+    remunerationType: p.remuneration_type,
+    requestLetter: p.request_letter,
+    acceptanceLetter: p.acceptance_letter,
+    wpSupervisorName: p.wp_supervisor_name,
+    wpSupervisorEmail: p.wp_supervisor_email,
+    wpSupervisorPhone: p.wp_supervisor_phone,
+    wpSupervisorTitle: p.wp_supervisor_title,
+    workplaceSupervisorName: p.workplace_sup_name,
+    academicSupervisorName: p.academic_sup_name,
+    createdAt: p.created_at ?? null,
+  });
+
   useEffect(() => {
     let cancelled = false;
 
@@ -77,7 +106,8 @@ export function StudentProvider({ children }) {
         const data = await listPlacements();
         if (cancelled) return;
 
-        setPlacement(Array.isArray(data) ? (data[0] ?? null) : (data ?? null));
+        const normalized = normalizePlacement(Array.isArray(data) ? (data[0] ?? null) : (data ?? null));
+        setPlacement(normalized);
       } finally {
         if (!cancelled) setIsPlacementLoading(false);
       }

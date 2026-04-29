@@ -23,6 +23,7 @@ import {
   withCriteriaDisplayValues,
 } from "../services/adminService";
 import placementApi from "../services/placementApi";
+import adminApi from "../services/adminApi";
 
 const AdminContext = createContext(null);
 
@@ -44,7 +45,7 @@ export const useAdmin = () => {
 export const AdminProvider = ({ children }) => {
   const { user } = useAuth();
   const [placements, setPlacements] = useState([]);
-  const [students] = useState([]);
+  const [students, setStudents] = useState([]);
   const [criteria, setCriteria] = useState([]);
   const [workplaceSupervisors, setWorkplaceSupervisors] = useState([]);
   const [academicSupervisors, setAcademicSupervisors] = useState([]);
@@ -107,16 +108,83 @@ export const AdminProvider = ({ children }) => {
     createdAt: p.created_at ?? null,
   });
 
+  const normalizeStudents = (s) => ({
+    id: s.id,
+    firstName: s.first_name,
+    lastName: s.last_name,
+    email: s.email,
+    phone: s.phone_number,
+    studentName: s.student_number,
+    programme: s.programme,
+    yearOfStudy: s.year_of_study,
+    university: s.university,
+    gender: s.gender,
+    district: s.district,
+    accountStatus: s.account_status,
+    dateJoined: s.date_joined,
+  });
+
+  const normalizeWorkplaceSupervisors = (w) => ({
+    id: w.id,
+    firstName: w.first_name,
+    lastName: w.last_name,
+    name: w.full_name,
+    email: w.email,
+    phone: w.phone_number,
+    organisation: w.organisation_name,
+    department: w.department,
+    jobTitle: w.job_title,
+    gender: w.gender,
+    district: w.district,
+    accountStatus: w.account_status,
+    dateJoined: w.date_joined,
+  });
+
+  const normalizeAcademicSupervisors = (a) => ({
+    id: a.id,
+    firstName: a.firstName,
+    lastName: a.last_name,
+    name: a.full_name,
+    email: a.email,
+    phone: a.phone_number,
+    university: a.university,
+    jobTitle: a.job_title,
+    gender: a.gender,
+    district: a.district,
+    accountStatus: a.account_status,
+    dateJoined: a.date_joined,
+  });
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const raw = await placementApi.listPlacements();
-        console.log(raw);
+        const rawStudents = await adminApi.listStudents();
+        const rawWorkplace = await adminApi.listWorkplaceSupervisor();
+        const rawAcademic = await adminApi.listAcademicSupervisor();
         const rows = Array.isArray(raw) ? raw : (raw?.results ?? []);
+        const studentRows = Array.isArray(rawStudents)
+          ? rawStudents
+          : (rawStudents?.results ?? []);
+        const workplaceRows = Array.isArray(rawWorkplace)
+          ? rawWorkplace
+          : (rawWorkplace?.results ?? []);
+        const academicRows = Array.isArray(rawAcademic)
+          ? rawAcademic
+          : (rawAcademic?.results ?? []);
         const normalized = rows.map(normalizePlacement);
-        // console.log(normalized);
+        const normalizedStudents = studentRows.map(normalizeStudents);
+        const normalizedWorkplace = workplaceRows.map(
+          normalizeWorkplaceSupervisors,
+        );
+        const normalizedAcademic = academicRows.map(
+          normalizeAcademicSupervisors,
+        );
         if (!cancelled) setPlacements(normalized);
+        if (!cancelled) setStudents(normalizedStudents);
+        if (!cancelled) setWorkplaceSupervisors(normalizedWorkplace);
+        if (!cancelled) setAcademicSupervisors(normalizedAcademic);
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -127,16 +195,21 @@ export const AdminProvider = ({ children }) => {
   }, []);
 
   const handleUpdatePlacement = useCallback(
-    async(updatedPlacement) => {
-       const payload = {
-     decision: updatedPlacement.status, // or backend-required key
-     workplace_supervisor: updatedPlacement.workplaceSupervisor || null,
-     academic_supervisor: updatedPlacement.academicSupervisor || null,
-     rejection_reason: updatedPlacement.rejectionReason || "",
-   };
-   const saved = await placementApi.approvePlacement(updatedPlacement.id, payload);
-   const normalized = normalizePlacement(saved);
-   setPlacements(prev => prev.map(p => p.id === normalized.id ? normalized : p));
+    async (updatedPlacement) => {
+      const payload = {
+        status: updatedPlacement.status, // or backend-required key
+        workplace_supervisor: updatedPlacement.workplaceSupervisor || null,
+        academic_supervisor: updatedPlacement.academicSupervisor || null,
+        rejection_reason: updatedPlacement.rejectionReason || "",
+      };
+      const saved = await placementApi.approvePlacement(
+        updatedPlacement.id,
+        payload,
+      );
+      const normalized = normalizePlacement(saved);
+      setPlacements((prev) =>
+        prev.map((p) => (p.id === normalized.id ? normalized : p)),
+      );
 
       if (updatedPlacement.status === "approved") {
         showNotification(
