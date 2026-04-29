@@ -346,6 +346,19 @@ class PlacementWithdrawView(APIView):
             {"detail": "Placement withdrawn.", "status": obj.status},
             status=status.HTTP_200_OK,
         )
+    
+    @extend_schema(
+    operation_id="placements_complete",
+    request=None,
+    responses={
+        200: inline_serializer("PlacementCompleteResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Preconditions not met."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 
 
