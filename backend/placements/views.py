@@ -406,8 +406,17 @@ class PlacementCompleteView(APIView):
             {"detail": "Placement marked as completed.", "status": obj.status},
             status=status.HTTP_200_OK,
         )
+    
 
-
+    @extend_schema(
+    operation_id="placements_final_report_upload",
+    request=FinalReportSerializer,
+    responses={
+        200: OpenApiResponse(description="Final report uploaded successfully."),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 class FinalReportUploadView(APIView):
    
