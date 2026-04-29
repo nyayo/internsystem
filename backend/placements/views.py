@@ -218,6 +218,19 @@ class PlacementSubmitView(APIView):
             {"detail": "Placement submitted for review.", "status": obj.status},
             status=status.HTTP_200_OK,
         )
+    
+    @extend_schema(
+    operation_id="placements_approve",
+    request=PlacementApprovalSerializer,
+    responses={
+        200: inline_serializer("PlacementApprovalResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 
 
