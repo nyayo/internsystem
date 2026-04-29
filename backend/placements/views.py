@@ -439,6 +439,18 @@ class FinalReportUploadView(APIView):
             {"detail": "Final report uploaded successfully."},
             status=status.HTTP_200_OK,
         )
+    
+    @extend_schema(
+    operation_id="placements_stats",
+    request=None,
+    responses={
+        200: inline_serializer("PlacementStatsResponse", fields={
+            "total":     drf_serializers.IntegerField(),
+            "by_status": drf_serializers.DictField(child=drf_serializers.DictField()),
+            "by_cohort": drf_serializers.DictField(child=drf_serializers.DictField()),
+        }),
+    },
+)
 
 
 class PlacementStatsView(APIView):
