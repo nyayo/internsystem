@@ -14,6 +14,8 @@ export default function AcademicDashboard() {
     logs,
     evaluations,
     activity,
+    selectedLog,
+    selectedEvaluation,
     openLog,
     closeLog,
     openEvaluation,
