@@ -36,6 +36,7 @@ import {
   listPendingLogs,
   closeLog,
   submitLog,
+  getLog,
 } from "../services/logsApi";
 
 const StudentContext = createContext(null);
@@ -162,8 +163,11 @@ export function StudentProvider({ children }) {
         const data = await listLogs();
         if (cancelled) return;
 
-        const logs = Array.isArray(data) ? data : data ? [data] : [];
-        const normalized = logs.filter(Boolean).map(normalizeWeeklyLog);
+        const list = Array.isArray(data) ? data : data ? [data] : [];
+        const detailed = await Promise.all(
+          list.filter(Boolean).map((item) => getLog(item.id)),
+        );
+        const normalized = detailed.filter(Boolean).map(normalizeWeeklyLog);
 
         setWeeklyLogs(normalized);
       } finally {
@@ -287,10 +291,16 @@ export function StudentProvider({ children }) {
   const submitWeeklyLog = useCallback(
     async (logData) => {
       const saved = await saveWeeklyLogDraft(logData);
-      const submitted = await submitLog(saved.id); // POST /placements/:id/submit/
-      setWeeklyLogs(submitted);
+      const submitted = await submitLog(saved.id);
+      const normalized = normalizeWeeklyLog(submitted);
+
+      setWeeklyLogs((prev) =>
+        prev.some((l) => l.id === normalized.id)
+          ? prev.map((l) => (l.id === normalized.id ? normalized : l))
+          : [...prev, normalized],
+      );
       clearWeeklyLogDraft();
-      return submitted;
+      return normalized;
     },
     [saveWeeklyLogDraft, clearWeeklyLogDraft],
   );

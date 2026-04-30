@@ -106,6 +106,19 @@ export async function assessLog(logId) {
   }
 }
 
+export async function getLog(logId) {
+  try {
+    const response = await httpClient.get(`${AUTH_BASE_PATH}/${logId}/`);
+    return responseData(response);
+  } catch (error) {
+    const statusCode = error?.response?.status;
+    if (statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
 export async function closeLog(logId) {
   try {
     const response = await httpClient.post(`${AUTH_BASE_PATH}/${logId}/close/`);
@@ -128,6 +141,7 @@ const logsApi = {
   endorseLog,
   assessLog,
   closeLog,
+  getLog,
 };
 
 export default logsApi;
