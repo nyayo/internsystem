@@ -155,8 +155,12 @@ export const SupervisorProvider = ({ children, role }) => {
             : "Log returned for revision.";
         showNotification(msg, "success");
       } catch (err) {
-        console.error("Endorse log failed:", err);
-        showNotification("Failed to endorse log. Please try again.", "error");
+        const detail =
+          err?.response?.data?.detail ??
+          err?.response?.data?.resubmit_reason ??
+          "Failed to update log. Please try again.";
+        showNotification(detail, "error");
+        throw err;
       }
     },
     [showNotification],
@@ -195,19 +199,28 @@ export const SupervisorProvider = ({ children, role }) => {
   const assessLog = useCallback(
     async (logId, grade, comment) => {
       try {
-        // Pass grade/comment if the API accepts a body, e.g.:
-        // assessLogApi(logId, { academic_grade: grade, academic_remarks: comment })
-        const updated = await assessLogApi(logId, grade, comment);
+        const result = await assessLogApi(
+          logId,
+          academicGrade,
+          academicRemarks,
+        );
+        if (!result) return;
+
+        const updated = await getLog(logId);
         if (!updated) return;
 
         const normalized = normalizeLog(updated);
         setLogs((prev) =>
           prev.map((l) => (l.id === normalized.id ? normalized : l)),
         );
-        showNotification("Weekly log assessed successfully!", "success");
+        showNotification(`Log assessed — grade: ${result.grade}`, "success");
       } catch (err) {
-        console.error("Assess log failed:", err);
-        showNotification("Failed to assess log. Please try again.", "error");
+        const detail =
+          err?.response?.data?.detail ??
+          err?.response?.data?.academic_grade ??
+          "Failed to assess log. Please try again.";
+        showNotification(detail, "error");
+        throw err;
       }
     },
     [showNotification],
