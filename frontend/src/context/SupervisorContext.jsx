@@ -132,16 +132,28 @@ export const SupervisorProvider = ({ children, role }) => {
   }, []);
 
   const endorseLog = useCallback(
-    async (logId, comment) => {
+    async (logId, action, workplaceRemarks = "", resubmitReason = "") => {
       try {
-        const updated = await endorseLogApi(logId);
+        const result = await endorseLogApi(
+          logId,
+          action,
+          workplaceRemarks,
+          resubmitReason,
+        );
+        if (!result) return;
+
+        const updated = await getLog(logId);
         if (!updated) return;
 
         const normalized = normalizeLog(updated);
         setLogs((prev) =>
           prev.map((l) => (l.id === normalized.id ? normalized : l)),
         );
-        showNotification("Weekly log endorsed successfully!", "success");
+        const msg =
+          action === "endorse"
+            ? "Weekly log endorsed successfully!"
+            : "Log returned for revision.";
+        showNotification(msg, "success");
       } catch (err) {
         console.error("Endorse log failed:", err);
         showNotification("Failed to endorse log. Please try again.", "error");
@@ -185,7 +197,7 @@ export const SupervisorProvider = ({ children, role }) => {
       try {
         // Pass grade/comment if the API accepts a body, e.g.:
         // assessLogApi(logId, { academic_grade: grade, academic_remarks: comment })
-        const updated = await assessLogApi(logId);
+        const updated = await assessLogApi(logId, grade, comment);
         if (!updated) return;
 
         const normalized = normalizeLog(updated);

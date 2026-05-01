@@ -102,10 +102,15 @@ export async function endorseLog(
   }
 }
 
-export async function assessLog(logId) {
+export async function assessLog(logId, academicGrade, academicRemarks = "") {
   try {
+    const payload = {
+      academic_grade: academicGrade,
+      academic_remarks: academicRemarks,
+    };
     const response = await httpClient.post(
       `${AUTH_BASE_PATH}/${logId}/assess/`,
+      payload
     );
     return responseData(response);
   } catch (error) {
