@@ -1,5 +1,11 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import {
   currentWorkplaceSupervisor,
   currentAcademicSupervisor,
@@ -81,13 +87,9 @@ export const SupervisorProvider = ({ children, role }) => {
     [role, user],
   );
 
-  const [students] = useState(
-    isWorkplace ? workplaceAssignedStudents : academicAssignedStudents,
-  );
-  const [logs, setLogs] = useState(isWorkplace ? workplaceWeeklyLogs : academicWeeklyLogs);
-  const [evaluations, setEvaluations] = useState(
-    isWorkplace ? workplaceEvaluations : academicEvaluations,
-  );
+  const [students, setStudents] = useState([]);
+  const [logs, setLogs] = useState([]);
+  const [evaluations, setEvaluations] = useState([]);
   const [criteria] = useState(evaluationCriteria);
   const [notification, setNotification] = useState(null);
 
@@ -96,41 +98,112 @@ export const SupervisorProvider = ({ children, role }) => {
     [isWorkplace],
   );
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadLogs = async () => {
+      try {
+        const list = await listLogs();
+        if (cancelled || !list) return;
+
+        const detailed = await Promise.all(
+          list.filter(Boolean).map((item) => getLog(item.id)),
+        );
+
+        if (!cancelled) {
+          setLogs(detailed.filter(Boolean).map(normalizeLog));
+        }
+      } catch (err) {
+        console.error("Failed to load logs:", err);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    loadLogs();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const showNotification = useCallback((message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 4000);
   }, []);
 
-  const endorseLog = useCallback((logId, comment) => {
-    setLogs((previousLogs) => endorseWeeklyLog(previousLogs, logId, comment));
-    showNotification("Weekly log endorsed successfully!", "success");
-  }, [showNotification]);
+  const endorseLog = useCallback(
+    async (logId, comment) => {
+      try {
+        const updated = await endorseLogApi(logId);
+        if (!updated) return;
 
-  const saveEvaluationDraft = useCallback((evaluationId, scores, overallRemarks) => {
-    setEvaluations((previousEvaluations) =>
-      saveEvaluationDraftInList(previousEvaluations, evaluationId, scores, overallRemarks),
-    );
-    showNotification("Evaluation draft saved!", "info");
-  }, [showNotification]);
+        const normalized = normalizeLog(updated);
+        setLogs((prev) =>
+          prev.map((l) => (l.id === normalized.id ? normalized : l)),
+        );
+        showNotification("Weekly log endorsed successfully!", "success");
+      } catch (err) {
+        console.error("Endorse log failed:", err);
+        showNotification("Failed to endorse log. Please try again.", "error");
+      }
+    },
+    [showNotification],
+  );
 
-  const submitEvaluation = useCallback((evaluationId, scores, overallRemarks) => {
-    setEvaluations((previousEvaluations) =>
-      submitEvaluationInList(previousEvaluations, evaluationId, scores, overallRemarks),
-    );
-    showNotification("Evaluation submitted successfully!", "success");
-  }, [showNotification]);
+  const saveEvaluationDraft = useCallback(
+    (evaluationId, scores, overallRemarks) => {
+      setEvaluations((previousEvaluations) =>
+        saveEvaluationDraftInList(
+          previousEvaluations,
+          evaluationId,
+          scores,
+          overallRemarks,
+        ),
+      );
+      showNotification("Evaluation draft saved!", "info");
+    },
+    [showNotification],
+  );
 
-  const assessLog = useCallback((logId, grade, comment) => {
-    setLogs((previousLogs) => assessWeeklyLog(previousLogs, logId, grade, comment));
-    showNotification("Weekly log assessed successfully!", "success");
-  }, [showNotification]);
+  const submitEvaluation = useCallback(
+    (evaluationId, scores, overallRemarks) => {
+      setEvaluations((previousEvaluations) =>
+        submitEvaluationInList(
+          previousEvaluations,
+          evaluationId,
+          scores,
+          overallRemarks,
+        ),
+      );
+      showNotification("Evaluation submitted successfully!", "success");
+    },
+    [showNotification],
+  );
 
-  const acknowledgeEvaluation = useCallback((evaluationId, notes) => {
-    setEvaluations((previousEvaluations) =>
-      acknowledgeEvaluationInList(previousEvaluations, evaluationId, notes, supervisor),
-    );
-    showNotification("Evaluation acknowledged successfully!", "success");
-  }, [showNotification, supervisor]);
+  const assessLog = useCallback(
+    (logId, grade, comment) => {
+      setLogs((previousLogs) =>
+        assessWeeklyLog(previousLogs, logId, grade, comment),
+      );
+      showNotification("Weekly log assessed successfully!", "success");
+    },
+    [showNotification],
+  );
+
+  const acknowledgeEvaluation = useCallback(
+    (evaluationId, notes) => {
+      setEvaluations((previousEvaluations) =>
+        acknowledgeEvaluationInList(
+          previousEvaluations,
+          evaluationId,
+          notes,
+          supervisor,
+        ),
+      );
+      showNotification("Evaluation acknowledged successfully!", "success");
+    },
+    [showNotification, supervisor],
+  );
 
   const value = useMemo(
     () => ({
