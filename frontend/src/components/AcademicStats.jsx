@@ -1,4 +1,6 @@
 export default function AcademicStats({ stats }) {
+      if (!stats) return null;
+
   return(
      <div className="stats">
       <div>Total Students: {stats.totalStudents}</div>
