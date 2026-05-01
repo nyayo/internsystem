@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   academicAssignedStudents,
   academicWeeklyLogs,
@@ -5,7 +6,7 @@ import {
   getAcademicStats,
   getAcademicRecentActivity,
 } from "../data/mockData";
-import { useState } from "react";
+
 
 export const useAcademicDashboard = () => {
     const [selectedLog, setSelectedLog] = useState(null);
@@ -25,16 +26,16 @@ export const useAcademicDashboard = () => {
     logs: academicWeeklyLogs,
     evaluations: academicEvaluations,
     activity: getAcademicRecentActivity()
+
     selectedLog,
     selectedEvaluation,
-    openLog,
-    closeLog,
-    openEvaluation,
-    closeEvaluation,
-    openLog: setSelectedLog,
-closeLog: () => setSelectedLog(null),
 
-openEvaluation: setSelectedEvaluation,
-closeEvaluation: () => setSelectedEvaluation(null),
+    openLog: setSelectedLog
+    closeLog: () => setSelectedLog(null),
+    
+    openEvaluation: setSelectedEvaluation
+    closeEvaluation: () => setSelectedEvaluation(null)
+    
+
   };
 };
