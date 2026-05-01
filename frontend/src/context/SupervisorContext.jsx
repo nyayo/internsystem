@@ -22,6 +22,12 @@ import {
   saveEvaluationDraft as saveEvaluationDraftInList,
   submitEvaluation as submitEvaluationInList,
 } from "../services/supervisorService";
+import {
+  listLogs,
+  getLog,
+  endorseLog as endorseLogApi,
+  assessLog as assessLogApi,
+} from "../services/logsApi";
 
 const SupervisorContext = createContext(null);
 
