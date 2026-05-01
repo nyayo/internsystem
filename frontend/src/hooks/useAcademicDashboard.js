@@ -9,6 +9,7 @@ import { useState } from "react";
 
 export const useAcademicDashboard = () => {
     const [selectedLog, setSelectedLog] = useState(null);
+    const [selectedEvaluation, setSelectedEvaluation] = useState(null);
 
   return {
 
@@ -18,5 +19,6 @@ export const useAcademicDashboard = () => {
     evaluations: academicEvaluations,
     activity: getAcademicRecentActivity()
     selectedLog,
+    selectedEvaluation,
   };
 };
