@@ -11,9 +11,11 @@ export const useAcademicDashboard = () => {
     const [selectedLog, setSelectedLog] = useState(null);
     const [selectedEvaluation, setSelectedEvaluation] = useState(null);
     const openLog = (log) => setSelectedLog(log);
-const closeLog = () => setSelectedLog(null);
-    
-    
+    const closeLog = () => setSelectedLog(null);
+    const openEvaluation = (evaluation) => setSelectedEvaluation(evaluation);
+    const closeEvaluation = () => setSelectedEvaluation(null);
+        
+        
 
 
   return {
@@ -27,5 +29,7 @@ const closeLog = () => setSelectedLog(null);
     selectedEvaluation,
     openLog,
     closeLog,
+    openEvaluation,
+    closeEvaluation,
   };
 };
