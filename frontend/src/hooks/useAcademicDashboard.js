@@ -8,3 +8,10 @@ import {
 export const useAcademicDashboard = () => {
   return {};
 };
+tats: getAcademicStats(),
+    students: academicAssignedStudents,
+    logs: academicWeeklyLogs,
+    evaluations: academicEvaluations,
+    activity: getAcademicRecentActivity(),
+  };
+};
