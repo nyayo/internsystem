@@ -10,6 +10,11 @@ import { useState } from "react";
 export const useAcademicDashboard = () => {
     const [selectedLog, setSelectedLog] = useState(null);
     const [selectedEvaluation, setSelectedEvaluation] = useState(null);
+    const openLog = (log) => setSelectedLog(log);
+const closeLog = () => setSelectedLog(null);
+    
+    
+
 
   return {
 
@@ -20,5 +25,7 @@ export const useAcademicDashboard = () => {
     activity: getAcademicRecentActivity()
     selectedLog,
     selectedEvaluation,
+    openLog,
+    closeLog,
   };
 };
