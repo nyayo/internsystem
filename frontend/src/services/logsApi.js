@@ -76,10 +76,21 @@ export async function submitLog(logId) {
   }
 }
 
-export async function endorseLog(logId) {
+export async function endorseLog(
+  logId,
+  action,
+  workplaceRemarks = "",
+  resubmitReason = "",
+) {
   try {
+    const payload = {
+      action,
+      workplace_remarks: workplaceRemarks,
+      ...(action === "return" && { resubmit_reason: resubmitReason }),
+    };
     const response = await httpClient.post(
       `${AUTH_BASE_PATH}/${logId}/endorse/`,
+      payload
     );
     return responseData(response);
   } catch (error) {

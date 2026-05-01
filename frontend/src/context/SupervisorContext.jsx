@@ -181,11 +181,22 @@ export const SupervisorProvider = ({ children, role }) => {
   );
 
   const assessLog = useCallback(
-    (logId, grade, comment) => {
-      setLogs((previousLogs) =>
-        assessWeeklyLog(previousLogs, logId, grade, comment),
-      );
-      showNotification("Weekly log assessed successfully!", "success");
+    async (logId, grade, comment) => {
+      try {
+        // Pass grade/comment if the API accepts a body, e.g.:
+        // assessLogApi(logId, { academic_grade: grade, academic_remarks: comment })
+        const updated = await assessLogApi(logId);
+        if (!updated) return;
+
+        const normalized = normalizeLog(updated);
+        setLogs((prev) =>
+          prev.map((l) => (l.id === normalized.id ? normalized : l)),
+        );
+        showNotification("Weekly log assessed successfully!", "success");
+      } catch (err) {
+        console.error("Assess log failed:", err);
+        showNotification("Failed to assess log. Please try again.", "error");
+      }
     },
     [showNotification],
   );
