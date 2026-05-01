@@ -5,7 +5,7 @@ const WorkplaceSideBar = ({ activeLink, onLinkClick, pendingLogs, pendingEvals, 
     { id: 'dashboard', icon: 'grid_view', label: 'Dashboard' },
     { id: 'students', icon: 'people_outline', label: 'My Students' },
     { id: 'logs', icon: 'description', label: 'Weekly Logs', count: pendingLogs },
-    { id: 'evaluations', icon: 'rate_review', label: 'Evaluations', count: pendingEvals },
+   
   ];
 
   return (
@@ -34,7 +34,7 @@ const WorkplaceSideBar = ({ activeLink, onLinkClick, pendingLogs, pendingEvals, 
               onLinkClick(item.id);
             }}
           >
-            <span className="material-icons-sharp">{item.icon}</span>
+            <span className"material-icons-sharp">{item.icon}</span>
             <h3>{item.label}</h3>
             {item.count !== undefined && item.count > 0 && (
               <span className="message-count">{item.count}</span>
