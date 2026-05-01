@@ -6,7 +6,7 @@ import WorkplaceRightPanel from '../../../components/supervisor/workplace/Workpl
 import WorkplaceStudentsPage from './WorkplaceStudentsPage';
 import WorkplaceLogsPage from './WorkplaceLogsPage';
 import WorkplaceEvaluationsPage from './WorkplaceEvaluationsPage';
-import '../../../components/supervisor/shared/SupervisorStyles.css';
+;
 
 const WorkplaceDashboardContent = () => {
   const [activeLink, setActiveLink] = useState('dashboard');
