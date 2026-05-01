@@ -31,5 +31,10 @@ export const useAcademicDashboard = () => {
     closeLog,
     openEvaluation,
     closeEvaluation,
+    openLog: setSelectedLog,
+closeLog: () => setSelectedLog(null),
+
+openEvaluation: setSelectedEvaluation,
+closeEvaluation: () => setSelectedEvaluation(null),
   };
 };
