@@ -46,7 +46,21 @@ const WorkplaceStudentsPage = () => {
               <tr key={student.id}>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      background: 'var(--color-primary-light)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--color-primary)',
+                      fontWeight: '600',
+                      fontSize: '0.85rem',
+                      flexShrink: 0
+                    }}>
+                      {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                    </div>
                     <div>
                       <div style={{ fontWeight: '500' }}>{student.firstName} {student.lastName}</div>
                       <small className="text-muted">{student.studentId}</small>
