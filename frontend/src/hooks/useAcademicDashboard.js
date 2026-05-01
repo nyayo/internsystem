@@ -5,13 +5,18 @@ import {
   getAcademicStats,
   getAcademicRecentActivity,
 } from "../data/mockData";
+import { useState } from "react";
+
 export const useAcademicDashboard = () => {
-  return {};
-};
-tats: getAcademicStats(),
+    const [selectedLog, setSelectedLog] = useState(null);
+
+  return {
+
+    stats: getAcademicStats(),
     students: academicAssignedStudents,
     logs: academicWeeklyLogs,
     evaluations: academicEvaluations,
-    activity: getAcademicRecentActivity(),
+    activity: getAcademicRecentActivity()
+    selectedLog,
   };
 };
