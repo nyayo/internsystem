@@ -39,16 +39,46 @@ export const useSupervisor = () => {
   return context;
 };
 
+const normalizeLog = (log) => ({
+  id: log.id,
+  placement: log.placement ?? null,
+  student: {
+    name: log.student_name ?? "-",
+    regNumber: log.student_number ?? "-",
+    organisation: log.organisation ?? "-",
+  },
+  weekNumber: log.week_number,
+  weekStartDate: log.week_start_date ?? null,
+  weekEndDate: log.week_end_date ?? null,
+  activitiesPerformed: log.activities_performed ?? "",
+  skillsGained: log.skills_gained ?? "",
+  challengesFaced: log.challenges_faced ?? "",
+  studentRemarks: log.student_remarks ?? "",
+  status: log.status ?? "draft",
+
+  workplaceComment: log.workplace_remarks ?? null,
+  workplaceEndorsedBy: log.workplace_endorsed_by ?? null,
+  workplaceEndorsedByName: log.workplace_endorsed_by_name ?? null,
+  workplaceEndorsedAt: log.workplace_endorsed_at ?? null,
+
+  academicComment: log.academic_remarks ?? null,
+  academicGrade: log.academic_grade ?? null,
+  academicAssessedBy: log.academic_assessed_by ?? null,
+  academicAssessedByName: log.academic_assessed_by_name ?? null,
+  academicAssessedAt: log.academic_assessed_at ?? null,
+
+  submittedAt: log.submitted_at ?? null,
+  createdAt: log.created_at ?? null,
+  updatedAt: log.updated_at ?? null,
+});
+
 export const SupervisorProvider = ({ children, role }) => {
   const { user } = useAuth();
   const isWorkplace = role === "workplace_supervisor";
 
-  const fallbackSupervisor = isWorkplace
-    ? currentWorkplaceSupervisor
-    : currentAcademicSupervisor;
   const supervisor = useMemo(
-    () => buildSupervisorProfile(user, role, fallbackSupervisor),
-    [fallbackSupervisor, role, user],
+    () => buildSupervisorProfile(user, role),
+    [role, user],
   );
 
   const [students] = useState(

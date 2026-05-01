@@ -1,11 +1,9 @@
-export function buildSupervisorProfile(user, role, fallbackSupervisor) {
+export function buildSupervisorProfile(user, role) {
   if (user && user.role === role) {
     return {
-      ...fallbackSupervisor,
       ...user,
     };
   }
-  return fallbackSupervisor;
 }
 
 function nowIso() {
