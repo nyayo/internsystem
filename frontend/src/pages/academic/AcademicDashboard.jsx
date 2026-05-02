@@ -4,6 +4,8 @@ import AcademicStudentsTable from "../components/AcademicStudentsTable";
 import AcademicLogsTable from "../components/AcademicLogsTable";
 import AcademicEvaluationsTable from "../components/AcademicEvaluationsTable";
 import RecentActivity from "../components/RecentActivity";
+import ViewLogModal from "../modals/ViewLogModal";
+import ViewEvaluationModal from "../modals/ViewEvaluationModal";
 import { useAcademicDashboard } from "../hooks/useAcademicDashboard";
 
 
@@ -35,7 +37,7 @@ export default function AcademicDashboard() {
         
       
       <div className="students-section"></div>
-      <div className="students-table">
+      
         <AcademicStudentsTable students={students} />
       </div>    
       <div className="logs-section">
@@ -45,6 +47,18 @@ export default function AcademicDashboard() {
         <AcademicEvaluationsTable evaluations={evaluations}
         onView={openEvaluation} />
       </div>
+      {selectedLog && (
+        <ViewLogModal log={selectedLog} onClose={closeLog} />
+      )}
+
+      {selectedEvaluation && (
+        <ViewEvaluationModal
+          evaluation={selectedEvaluation}
+          onClose={closeEvaluation}
+        />
+      )}
     </div>
   );
 }
+    
+  
