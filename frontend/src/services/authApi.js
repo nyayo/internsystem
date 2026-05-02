@@ -17,6 +17,14 @@ export async function login(loginCredentials = {}) {
   );
 }
 
+export async function logout(refreshToken = "") {
+  return responseData(
+    await httpClient.post(`${AUTH_BASE_PATH}/logout/`, {
+      refresh: refreshToken,
+    }),
+  );
+}
+
 export async function register(registrationPayload = {}) {
   return responseData(
     await httpClient.post(`${AUTH_BASE_PATH}/register/`, registrationPayload),
@@ -42,6 +50,7 @@ export async function getCurrentUser(token = "") {
 
 const authApi = {
   login,
+  logout,
   register,
   verifyEmail,
   getCurrentUser,
