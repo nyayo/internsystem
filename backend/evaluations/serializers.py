@@ -255,3 +255,55 @@ class EvaluationSubmitSerializer(serializers.Serializer):
 
         return instance
 
+
+class EvaluationSaveDraftSerializer(serializers.Serializer):
+    """
+    Workplace supervisor saves partial scores without submitting.
+    Scores list may be incomplete — no validation against active criteria.
+    """
+    overall_remarks = serializers.CharField(allow_blank=True, default="")
+    scores = serializers.ListField(
+        child=serializers.DictField(), allow_empty=True
+    )
+
+    def update(self, instance, validated_data):
+        from .models import EvaluationCriteria, EvaluationScore
+
+        if instance.status not in ("not_started", "in_progress"):
+            raise serializers.ValidationError(
+                {"status": "Cannot update a submitted or acknowledged evaluation."}
+            )
+
+        scores_data = validated_data.get("scores", [])
+
+        for item in scores_data:
+            criteria_id = item.get("criteria")
+            score       = item.get("score_awarded")
+            comment     = item.get("comment", "")
+
+            if not criteria_id or score is None:
+                continue
+
+            try:
+                criteria = EvaluationCriteria.objects.get(
+                    id=criteria_id, is_active=True
+                )
+            except EvaluationCriteria.DoesNotExist:
+                continue
+
+            EvaluationScore.objects.update_or_create(
+                evaluation=instance,
+                criteria=criteria,
+                defaults={
+                    "score_awarded": score,
+                    "comment":       comment,
+                },
+            )
+
+        instance.overall_remarks = validated_data.get(
+            "overall_remarks", instance.overall_remarks
+        )
+        instance.status = "in_progress"
+        instance.save()
+        return instance
+
