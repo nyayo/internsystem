@@ -307,3 +307,26 @@ class EvaluationSaveDraftSerializer(serializers.Serializer):
         instance.save()
         return instance
 
+
+
+class EvaluationAcknowledgeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = Evaluation
+        fields = ["acknowledgement_notes"]
+
+    def update(self, instance, validated_data):
+        from django.utils import timezone
+
+        if instance.status != "submitted":
+            raise serializers.ValidationError(
+                {"status": "Only submitted evaluations can be acknowledged."}
+            )
+
+        instance.acknowledged_by    = self.context["request"].user
+        instance.acknowledgement_notes = validated_data.get(
+            "acknowledgement_notes", ""
+        )
+        instance.acknowledged_at    = timezone.now()
+        instance.status             = "acknowledged"
+        instance.save()
+        return instance
