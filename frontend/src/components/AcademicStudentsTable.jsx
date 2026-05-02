@@ -13,9 +13,21 @@ export default function AcademicStudentsTable({ students }) {
           </tr>
         </thead>
 
-        <tbody></tbody>
+        <tbody>
+            <tbody>
+  {students.map((student) => (
+    <tr key={student.id}>
+      <td>{student.firstName} {student.lastName}</td>
+      <td>{student.programme}</td>
+      <td>{student.year}</td>
+      <td>{student.status}</td>
+    </tr>
+  ))}
+</tbody>
+        </tbody>
       </table>
     </div>
+    
   );
   
 }
