@@ -81,3 +81,102 @@ class EvaluationScoreSerializer(serializers.ModelSerializer):
                     }
                 )
         return attrs
+
+
+class EvaluationListSerializer(serializers.ModelSerializer):
+    """
+    Lightweight serializer for list views.
+    """
+    student_name    = serializers.CharField(
+        source="placement.student.get_full_name", read_only=True
+    )
+    student_number  = serializers.CharField(
+        source="placement.student.student_number", read_only=True
+    )
+    organisation    = serializers.CharField(
+        source="placement.organisation_name", read_only=True
+    )
+    evaluator_name  = serializers.CharField(
+        source="evaluator.get_full_name", read_only=True
+    )
+
+    class Meta:
+        model  = Evaluation
+        fields = [
+            "id",
+            "placement",
+            "student_name",
+            "student_number",
+            "organisation",
+            "evaluator_name",
+            "evaluation_type",
+            "status",
+            "total_score",
+            "submitted_at",
+        ]
+
+
+class EvaluationDetailSerializer(serializers.ModelSerializer):
+    """
+    Full serializer for evaluation detail views.
+    Includes nested scores and all related user names.
+    """
+    student_name        = serializers.CharField(
+        source="placement.student.get_full_name", read_only=True
+    )
+    student_number      = serializers.CharField(
+        source="placement.student.student_number", read_only=True
+    )
+    organisation        = serializers.CharField(
+        source="placement.organisation_name", read_only=True
+    )
+    evaluator_name      = serializers.CharField(
+        source="evaluator.get_full_name", read_only=True
+    )
+    acknowledged_by_name = serializers.CharField(
+        source="acknowledged_by.get_full_name", read_only=True, default=None
+    )
+    scores = EvaluationScoreSerializer(many=True, read_only=True)
+
+    class Meta:
+        model  = Evaluation
+        fields = [
+            "id",
+            "placement",
+            # Student info
+            "student_name",
+            "student_number",
+            "organisation",
+            # Evaluator
+            "evaluator",
+            "evaluator_name",
+            # Type & status
+            "evaluation_type",
+            "status",
+            # Scores
+            "scores",
+            "total_score",
+            "overall_remarks",
+            # Acknowledgement
+            "acknowledged_by",
+            "acknowledged_by_name",
+            "acknowledgement_notes",
+            "acknowledged_at",
+            # Audit
+            "submitted_at",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "placement",
+            "evaluator",
+            "evaluation_type",
+            "status",
+            "total_score",
+            "acknowledged_by",
+            "acknowledged_at",
+            "submitted_at",
+            "created_at",
+            "updated_at",
+        ]
