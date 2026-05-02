@@ -34,4 +34,50 @@ class EvaluationCriteriaSerializer(serializers.ModelSerializer):
             )
         return value
     
-    
+
+class EvaluationScoreSerializer(serializers.ModelSerializer):
+    """
+    Serializer for individual criterion scores.
+    Used nested inside EvaluationDetailSerializer.
+    """
+    criteria_title     = serializers.CharField(
+        source="criteria.title", read_only=True
+    )
+    criteria_max_score = serializers.IntegerField(
+        source="criteria.max_score", read_only=True
+    )
+    criteria_category  = serializers.CharField(
+        source="criteria.category", read_only=True
+    )
+
+    class Meta:
+        model  = EvaluationScore
+        fields = [
+            "id",
+            "criteria",
+            "criteria_title",
+            "criteria_category",
+            "criteria_max_score",
+            "score_awarded",
+            "comment",
+        ]
+        read_only_fields = ["id"]
+
+    def validate(self, attrs):
+        criteria    = attrs.get("criteria")
+        score       = attrs.get("score_awarded")
+        if criteria and score is not None:
+            if score < 0:
+                raise serializers.ValidationError(
+                    {"score_awarded": "Score cannot be negative."}
+                )
+            if score > criteria.max_score:
+                raise serializers.ValidationError(
+                    {
+                        "score_awarded": (
+                            f"Score {score} exceeds the maximum of "
+                            f"{criteria.max_score} for '{criteria.title}'."
+                        )
+                    }
+                )
+        return attrs
