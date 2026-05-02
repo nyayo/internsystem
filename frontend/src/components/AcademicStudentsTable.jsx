@@ -1,4 +1,8 @@
 export default function AcademicStudentsTable({ students }) {
+    if (!students || students.length === 0) {
+    return <p>No students assigned</p>;
+  }
+
   return (
   <div>
     <h3>Assigned Students</h3>
@@ -11,25 +15,45 @@ export default function AcademicStudentsTable({ students }) {
             <th>Year</th>
             <th>Status</th>
             <th>Organization</th>
-    <th>Progress</th>
-    <th>Status</th>
+            <th>Progress</th>
+            <th>Status</th>
           </tr>
         </thead>
 
         <tbody>
-            <tbody>
-  {students.map((student) => (
+            
+        
+         {students.map((student) => {
+             const progress = Math.round(
+                 (student.completedWeeks / student.totalWeeks) * 100
+            );
+             return (
+                
+      
+
+  
+  
+
     <tr key={student.id}>
       <td>{student.firstName} {student.lastName}</td>
       <td>{student.programme}</td>
       <td>{student.year}</td>
+      <td>{student.organization}</td>
+      <td>{progress}%</td>
       <td>{student.status}</td>
+      <td>
+      <button onClick={() => onView?.(student)}>
+        View
+        </button>
+    </td>
     </tr>
-  ))}
+);
+})}
 </tbody>
-        </tbody>
-      </table>
-    </div>
+</table>
+</div>
+    
+  
     
   );
   
