@@ -8,6 +8,7 @@ export default function StudentSideBar({
   isOpen,
   onToggle,
   pendingCount,
+  onLogout,
 }) {
   return (
     <aside className={`student-sidebar ${isOpen ? 'open' : ''}`}>
@@ -50,6 +51,7 @@ export default function StudentSideBar({
           className="nav-link logout-link"
           onClick={(e) => {
             e.preventDefault();
+            onLogout();
           }}
         >
           <span className="material-icons-sharp">logout</span>

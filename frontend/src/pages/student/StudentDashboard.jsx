@@ -88,6 +88,7 @@ function StudentDashboardContent() {
       <StudentSideBar
         activeLink={activeLink}
         onNavClick={handleNavClick}
+        onLogout={handleLogout}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         pendingCount={weeklyLogs.filter((l) => l.status === "resubmit").length}
