@@ -2,10 +2,6 @@ from rest_framework import serializers
 from .models import EvaluationCriteria, Evaluation, EvaluationScore
 
 class EvaluationCriteriaSerializer(serializers.ModelSerializer):
-    """
-    Full serializer for criteria management.
-    Administrator only for write operations.
-    """
     created_by_name = serializers.CharField(
         source="created_by.get_full_name", read_only=True, default=None
     )
@@ -36,10 +32,6 @@ class EvaluationCriteriaSerializer(serializers.ModelSerializer):
     
 
 class EvaluationScoreSerializer(serializers.ModelSerializer):
-    """
-    Serializer for individual criterion scores.
-    Used nested inside EvaluationDetailSerializer.
-    """
     criteria_title     = serializers.CharField(
         source="criteria.title", read_only=True
     )
@@ -84,9 +76,6 @@ class EvaluationScoreSerializer(serializers.ModelSerializer):
 
 
 class EvaluationListSerializer(serializers.ModelSerializer):
-    """
-    Lightweight serializer for list views.
-    """
     student_name    = serializers.CharField(
         source="placement.student.get_full_name", read_only=True
     )
@@ -143,26 +132,20 @@ class EvaluationDetailSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "placement",
-            # Student info
             "student_name",
             "student_number",
             "organisation",
-            # Evaluator
             "evaluator",
             "evaluator_name",
-            # Type & status
             "evaluation_type",
             "status",
-            # Scores
             "scores",
             "total_score",
             "overall_remarks",
-            # Acknowledgement
             "acknowledged_by",
             "acknowledged_by_name",
             "acknowledgement_notes",
             "acknowledged_at",
-            # Audit
             "submitted_at",
             "created_at",
             "updated_at",
@@ -180,3 +163,95 @@ class EvaluationDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+class EvaluationSubmitSerializer(serializers.Serializer):
+    overall_remarks = serializers.CharField(allow_blank=True, default="")
+    scores = serializers.ListField(
+        child=serializers.DictField(), allow_empty=False
+    )
+
+    def validate_scores(self, value):
+        from .models import EvaluationCriteria
+
+        active_criteria = EvaluationCriteria.objects.filter(is_active=True)
+        active_ids      = set(active_criteria.values_list("id", flat=True))
+        submitted_ids   = set()
+
+        for item in value:
+            if "criteria" not in item:
+                raise serializers.ValidationError(
+                    "Each score entry must include a 'criteria' id."
+                )
+            if "score_awarded" not in item:
+                raise serializers.ValidationError(
+                    "Each score entry must include a 'score_awarded' value."
+                )
+
+            criteria_id = item["criteria"]
+            score       = item["score_awarded"]
+
+            if criteria_id not in active_ids:
+                raise serializers.ValidationError(
+                    f"Criteria {criteria_id} is not active."
+                )
+
+            if criteria_id in submitted_ids:
+                raise serializers.ValidationError(
+                    f"Criteria {criteria_id} appears more than once."
+                )
+            submitted_ids.add(criteria_id)
+
+            criteria = active_criteria.get(id=criteria_id)
+            try:
+                score = float(score)
+            except (TypeError, ValueError):
+                raise serializers.ValidationError(
+                    f"Score for '{criteria.title}' must be a number."
+                )
+            if score < 0 or score > criteria.max_score:
+                raise serializers.ValidationError(
+                    f"Score for '{criteria.title}' must be between 0 and {criteria.max_score}."
+                )
+
+        if submitted_ids != active_ids:
+            missing = active_ids - submitted_ids
+            missing_titles = active_criteria.filter(
+                id__in=missing
+            ).values_list("title", flat=True)
+            raise serializers.ValidationError(
+                f"Missing scores for: {', '.join(missing_titles)}."
+            )
+
+        return value
+
+    def update(self, instance, validated_data):
+        from django.utils import timezone
+        from .models import EvaluationCriteria, EvaluationScore
+
+        if instance.status not in ("not_started", "in_progress"):
+            raise serializers.ValidationError(
+                {"status": "Only not_started or in_progress evaluations can be submitted."}
+            )
+
+        overall_remarks = validated_data.get("overall_remarks", "")
+        scores_data     = validated_data.get("scores")
+
+        instance.scores.all().delete()
+
+        for item in scores_data:
+            criteria = EvaluationCriteria.objects.get(id=item["criteria"])
+            EvaluationScore.objects.create(
+                evaluation    = instance,
+                criteria      = criteria,
+                score_awarded = item["score_awarded"],
+                comment       = item.get("comment", ""),
+            )
+
+        instance.overall_remarks = overall_remarks
+        instance.status          = "submitted"
+        instance.submitted_at    = timezone.now()
+        instance.save()
+        instance.calculate_total_score()
+
+        return instance
+
