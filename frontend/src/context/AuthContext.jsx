@@ -255,9 +255,19 @@ export function AuthProvider({ children }) {
     [registeredUsers],
   );
 
-  const logout = useCallback(() => {
-    setUser(null);
-  }, []);
+  const logout = useCallback(async () => {
+    try {
+      if (user?.refreshToken) {
+        await authApi.logout(user.refreshToken);
+      }
+    } catch (error) {
+      // token already blacklisted or expired — proceed anyway
+      console.warn("Logout API error:", error);
+    } finally {
+      setUser(null);
+      saveSessionUser(null);
+    }
+  }, [user]);
 
   const contextValue = useMemo(
     () => ({
