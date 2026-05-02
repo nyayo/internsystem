@@ -42,7 +42,7 @@ export default function SideBar({
             <span className="material-icons-sharp">school</span>
           </div>
           <h2>
-            Intern<span className="accent">Hub</span>
+            Intern<span className="accent">System</span>
           </h2>
         </div>
         <div className="close" onClick={onClose}>
@@ -67,7 +67,13 @@ export default function SideBar({
             )}
           </a>
         ))}
-        <a href="#">
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            handleLogout();
+          }}
+        >
           <span className="material-icons-sharp">logout</span>
           <h3>Logout</h3>
         </a>
