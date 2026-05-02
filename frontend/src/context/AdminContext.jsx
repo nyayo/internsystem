@@ -156,6 +156,7 @@ export const AdminProvider = ({ children }) => {
   });
 
   useEffect(() => {
+    if (!adminUser) return;
     let cancelled = false;
     (async () => {
       try {
@@ -192,7 +193,7 @@ export const AdminProvider = ({ children }) => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [adminUser]);
 
   const handleUpdatePlacement = useCallback(
     async (updatedPlacement) => {

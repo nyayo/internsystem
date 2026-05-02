@@ -48,7 +48,6 @@ function LoginPage() {
 
     try {
       const sessionUser = await login({ role, email, password });
-      console.log(sessionUser)
       setError("");
       navigate(getRoleHomePath(sessionUser.role), { replace: true });
     } catch (loginError) {

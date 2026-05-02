@@ -99,6 +99,7 @@ export const SupervisorProvider = ({ children, role }) => {
   );
 
   useEffect(() => {
+    if (!user) return;
     let cancelled = false;
 
     const loadLogs = async () => {
@@ -124,7 +125,7 @@ export const SupervisorProvider = ({ children, role }) => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [user]);
 
   const showNotification = useCallback((message, type = "success") => {
     setNotification({ message, type });

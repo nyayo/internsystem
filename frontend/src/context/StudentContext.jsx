@@ -142,6 +142,7 @@ export function StudentProvider({ children }) {
   });
 
   useEffect(() => {
+    if (!user) return;
     let cancelled = false;
 
     const loadPlacement = async () => {
@@ -180,7 +181,7 @@ export function StudentProvider({ children }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [user]);
 
   const savePlacementDraft = useCallback(
     async (data) => {

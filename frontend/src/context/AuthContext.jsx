@@ -16,7 +16,6 @@ import {
 import {
   createDefaultAuthUsers,
   createUserFromRegistration,
-  getLoggedInUser,
   loadRegisteredUsers,
   loadSessionUser,
   saveRegisteredUsers,
@@ -24,6 +23,7 @@ import {
   toSessionUser,
 } from "../services/authService";
 import authApi from "../services/authApi";
+import SessionExpiredModal from "../components/modals/SessionExpiredModal";
 import { API_BASE_URL, registerSessionPrompt } from "../services/httpClient";
 
 const AuthContext = createContext(null);
@@ -230,19 +230,6 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async (credentials) => {
-      // const loginWithLocalFallback = () => {
-      //   const fallbackSessionUser = getLoggedInUser(
-      //     credentials,
-      //     registeredUsers,
-      //   );
-      //   setUser(fallbackSessionUser);
-      //   return fallbackSessionUser;
-      // };
-
-      // if (!IS_API_LOGIN_ENABLED) {
-      //   return loginWithLocalFallback();
-      // }
-
       try {
         const apiLoginResponse = await authApi.login(credentials);
         const baseSession = createSessionUserFromApiLogin(apiLoginResponse);
@@ -299,7 +286,15 @@ export function AuthProvider({ children }) {
   );
 
   return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>
+      {children}
+      {showSessionPrompt && (
+        <SessionExpiredModal
+          onExtend={handleExtendSession}
+          onLogout={handleSessionLogout}
+        />
+      )}
+    </AuthContext.Provider>
   );
 }
 
