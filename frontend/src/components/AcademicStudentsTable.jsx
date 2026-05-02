@@ -10,6 +10,9 @@ export default function AcademicStudentsTable({ students }) {
             <th>Programme</th>
             <th>Year</th>
             <th>Status</th>
+            <th>Organization</th>
+    <th>Progress</th>
+    <th>Status</th>
           </tr>
         </thead>
 
