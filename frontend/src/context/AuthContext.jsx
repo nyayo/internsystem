@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
 import { getRoleHomePath } from "../auth/authConfig";
 import {
@@ -23,7 +24,7 @@ import {
   toSessionUser,
 } from "../services/authService";
 import authApi from "../services/authApi";
-import { API_BASE_URL } from "../services/httpClient";
+import { API_BASE_URL, registerSessionPrompt } from "../services/httpClient";
 
 const AuthContext = createContext(null);
 const IS_API_LOGIN_ENABLED = Boolean(API_BASE_URL);
@@ -173,14 +174,29 @@ export function AuthProvider({ children }) {
     loadRegisteredUsers(DEFAULT_AUTH_USERS),
   );
   const [user, setUser] = useState(() => loadSessionUser());
+  const [showSessionPrompt, setShowSessionPrompt] = useState(false);
+  const sessionResolverRef = useRef(null);
 
   useEffect(() => {
+    registerSessionPrompt((resolve) => {
+      sessionResolverRef.current = resolve;
+      setShowSessionPrompt(true);
+    });
     saveRegisteredUsers(registeredUsers);
-  }, [registeredUsers]);
-
-  useEffect(() => {
     saveSessionUser(user);
-  }, [user]);
+  }, [registeredUsers, user]);
+
+  const handleExtendSession = useCallback(() => {
+    setShowSessionPrompt(false);
+    sessionResolverRef.current?.(true);
+    sessionResolverRef.current = null;
+  }, []);
+
+  const handleSessionLogout = useCallback(() => {
+    setShowSessionPrompt(false);
+    sessionResolverRef.current?.(false);
+    sessionResolverRef.current = null;
+  }, []);
 
   const register = useCallback(
     async (registrationData) => {
