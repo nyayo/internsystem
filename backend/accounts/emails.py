@@ -324,6 +324,31 @@ def send_log_overdue_email(log):
         recipient = student.email,
     )
 
+
+def send_log_pending_endorsement_email(log):
+    """
+    Remind the workplace supervisor of a submitted log awaiting endorsement.
+    Sent by the Celery beat task.
+    """
+    wp_sup  = log.placement.workplace_supervisor
+    student = log.placement.student
+    if not wp_sup:
+        return
+    _send(
+        subject   = (
+            f"Reminder: log pending your endorsement -- "
+            f"{student.get_full_name()} Week {log.week_number}"
+        ),
+        message   = (
+            f"Hello {wp_sup.first_name},\n\n"
+            f"A reminder that {student.get_full_name()}'s Week {log.week_number} "
+            f"log is still waiting for your endorsement.\n\n"
+            f"Please log in to review it:\n"
+            f"{settings.FRONTEND_URL}/workplace/logs/{log.id}/"
+            f"{_footer()}"
+        ),
+        recipient = wp_sup.email,
+    )
      
 
 
