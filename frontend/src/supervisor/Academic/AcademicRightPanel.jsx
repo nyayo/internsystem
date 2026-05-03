@@ -41,3 +41,20 @@ const AcademicRightPanel = ({ onMenuClick }) => {
           </div>
         </div>
       </div>
+            <div className="recent-updates">
+        <h2>Your Profile</h2>
+        <div className="updates">
+          <div className="update">
+            ...
+            <small>{supervisor.university}</small>
+          </div>
+          <div className="update">
+            ...
+            <small>{supervisor.department}</small>
+          </div>
+          <div className="update">
+            ...
+            <small>{supervisor.email}</small>
+          </div>
+        </div>
+      </div>
