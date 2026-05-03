@@ -282,3 +282,24 @@ def send_placement_completed_email(placement):
         ),
         recipient = student.email,
     )
+
+    def send_log_assessed_email(log):
+     """
+    Notify the student that their log has been graded by the
+    academic supervisor.
+    """
+    student = log.placement.student
+    _send(
+        subject   = f"Log graded -- Week {log.week_number}",
+        message   = (
+            f"Hello {student.first_name},\n\n"
+            f"Your Week {log.week_number} log has been assessed by your "
+            f"academic supervisor.\n\n"
+            f"Grade:   {log.academic_grade}%\n"
+            f"Comment: {log.academic_comment or 'No comment provided.'}\n\n"
+            f"Log in to view your assessment:\n"
+            f"{settings.FRONTEND_URL}/student/logs/{log.id}/"
+            f"{_footer()}"
+        ),
+        recipient = student.email,
+    )
