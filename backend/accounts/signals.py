@@ -18,3 +18,10 @@ def user_post_save(sender, instance, created, **kwargs):
     else:
         _handle_existing_user_update(instance)
 
+def _handle_new_registration(user):
+    """
+    Fires once when a new user account is created.
+    Sends the email verification link asynchronously.
+    """
+    from accounts.tasks import send_verification_email_task
+    send_verification_email_task.delay(user.id)
