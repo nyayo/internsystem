@@ -1,11 +1,6 @@
 import React from 'react';
+import { useSupervisor } from '../../../context/SupervisorContext';
+import { getAcademicRecentActivity } from '../../../data/supervisorData';
+import '../shared/SupervisorStyles.css';
 
-const AcademicMainPanel = () => {
-  return (
-    <main>
-      <h1>Academic Supervisor</h1>
-    </main>
-  );
-};
-
-export default AcademicMainPanel;
+const AcademicMainPanel = ({ onNavigate }) => {
