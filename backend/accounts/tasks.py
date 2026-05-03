@@ -21,8 +21,6 @@ def send_verification_email_task(user_id):
     send_verification_email(user, token)
     return f"Verification email sent to {user.email}."
 
-
-
 @shared_task(name="accounts.tasks.send_password_reset_email_task")
 def send_password_reset_email_task(user_id):
     """
@@ -42,4 +40,23 @@ def send_password_reset_email_task(user_id):
 
     token = password_reset_token.make_token(user)
     send_password_reset_email(user, token)
-    return f"Pass
+    return f"Password reset email sent to {user.email}"
+
+
+@shared_task(name="accounts.tasks.send_welcome_email_task")
+def send_welcome_email_task(user_id):
+    """
+    Sends the welcome email after account activation.
+    Triggered by the signal when account_status changes to active.
+    """
+    from django.contrib.auth import get_user_model
+    from notifications.emails import send_welcome_email
+
+    User = get_user_model()
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return f"User {user_id} not found."
+
+    send_welcome_email(user)
+    return f"Welcome email sent to {user.email}."
