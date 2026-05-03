@@ -58,3 +58,50 @@ const AcademicRightPanel = ({ onMenuClick }) => {
           </div>
         </div>
       </div>
+            <div className="analytics">
+        <h2>Quick Stats</h2>
+
+        <div className="item online">
+          <div className="icon">
+            <span className="material-icons-sharp">groups</span>
+          </div>
+          <div className="right-side">
+            <div className="info">
+              <h3>Total Students</h3>
+              <small className="text-muted">Assigned to you</small>
+            </div>
+            <h3>{stats.totalStudents}</h3>
+          </div>
+        </div>
+
+        <div className="item offline">
+          <div className="icon">
+            <span className="material-icons-sharp">grading</span>
+          </div>
+          <div className="right-side">
+            <div className="info">
+              <h3>Pending Logs</h3>
+              <small className="text-muted">Need assessment</small>
+            </div>
+            <h3>{stats.pendingAssessment}</h3>
+          </div>
+        </div>
+
+        <div className="item customers">
+          <div className="icon">
+            <span className="material-icons-sharp">trending_up</span>
+          </div>
+          <div className="right-side">
+            <div className="info">
+              <h3>Average Grade</h3>
+              <small className="text-muted">Across all students</small>
+            </div>
+            <h3>{stats.averageGrade?.toFixed(0) || '-'}%</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AcademicRightPanel;
