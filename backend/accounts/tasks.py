@@ -60,3 +60,23 @@ def send_welcome_email_task(user_id):
 
     send_welcome_email(user)
     return f"Welcome email sent to {user.email}."
+
+@shared_task(name="accounts.tasks.send_password_changed_email_task")
+def send_password_changed_email_task(user_id):
+    """
+    Sends a security notification after a password change.
+    Triggered from ChangePasswordView and ResetPasswordView
+    after the new password is saved.
+    """
+    from django.contrib.auth import get_user_model
+    from notifications.emails import send_password_changed_email
+
+    User = get_user_model()
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return f"User {user_id} not found."
+
+    send_password_changed_email(user)
+    return f"Password changed notification sent to {user.email}."
+
