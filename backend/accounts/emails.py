@@ -261,3 +261,24 @@ def send_placement_completed_email(placement):
         ),
         recipient = ac_sup.email,
     )
+
+    def send_log_returned_email(log):
+     """
+    Notify the student that their log has been returned for revision.
+    """
+    student = log.placement.student
+    _send(
+        subject   = (
+            f"Weekly log returned for revision -- Week {log.week_number}"
+        ),
+        message   = (
+            f"Hello {student.first_name},\n\n"
+            f"Your Week {log.week_number} log has been returned by your "
+            f"workplace supervisor for revision.\n\n"
+            f"Supervisor comment:\n\"{log.workplace_comment}\"\n\n"
+            f"Please update and resubmit your log:\n"
+            f"{settings.FRONTEND_URL}/student/logs/{log.id}/"
+            f"{_footer()}"
+        ),
+        recipient = student.email,
+    )
