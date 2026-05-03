@@ -28,3 +28,21 @@ const menuItems = [
       <span className="material-icons-sharp">close</span>
     </div>
   </div>
+  <div className="sidebar">
+  {menuItems.map(item => (
+    <a 
+      key={item.id}
+      href="#" 
+      className={activeLink === item.id ? 'active' : ''}
+      onClick={(e) => {
+        e.preventDefault();
+        onLinkClick(item.id);
+      }}
+    >
+      <span className="material-icons-sharp">{item.icon}</span>
+      <h3>{item.label}</h3>
+      {item.count !== undefined && item.count > 0 && (
+        <span className="message-count">{item.count}</span>
+      )}
+    </a>
+  ))}
