@@ -179,7 +179,7 @@ def send_placement_rejected_email(placement):
     )
 
     def send_placement_activated_email(placement):
-    """Notify the student that their internship is now active."""
+     """Notify the student that their internship is now active."""
     student = placement.student
     _send(
         subject   = "Your internship has started -- InternSystem",
@@ -234,4 +234,30 @@ def send_placement_completed_email(placement):
             f"{_footer()}"
         ),
         recipient = wp_sup.email,
+    )
+
+    def send_log_endorsed_email(log):
+     """
+    Notify the academic supervisor that a log has been endorsed
+    and is ready for grading.
+    """
+    ac_sup  = log.placement.academic_supervisor
+    student = log.placement.student
+    if not ac_sup:
+        return
+    _send(
+        subject   = (
+            f"Log endorsed -- {student.get_full_name()} "
+            f"Week {log.week_number}"
+        ),
+        message   = (
+            f"Hello {ac_sup.first_name},\n\n"
+            f"{student.get_full_name()}'s Week {log.week_number} log has been "
+            f"endorsed by the workplace supervisor and is ready for your assessment.\n\n"
+            f"Workplace comment:\n\"{log.workplace_comment}\"\n\n"
+            f"Please log in to grade the log:\n"
+            f"{settings.FRONTEND_URL}/academic/logs/{log.id}/"
+            f"{_footer()}"
+        ),
+        recipient = ac_sup.email,
     )
