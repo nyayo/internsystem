@@ -14,3 +14,17 @@ const menuItems = [
   { id: 'logs', icon: 'grading', label: 'Weekly Logs', count: pendingLogs },
   { id: 'evaluations', icon: 'fact_check', label: 'Evaluations', count: pendingEvals },
 ];
+<aside className={isOpen ? 'show-menu' : ''}>
+  <div className="top">
+    <div className="logo">
+      <div className="logo-icon">
+        <span className="material-icons-sharp">school</span>
+      </div>
+      <h2>
+        Intern<span className="accent">Hub</span>
+      </h2>
+    </div>
+    <div className="close" onClick={onClose}>
+      <span className="material-icons-sharp">close</span>
+    </div>
+  </div>
