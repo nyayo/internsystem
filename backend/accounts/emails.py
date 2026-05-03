@@ -428,6 +428,34 @@ def send_evaluation_acknowledged_email(evaluation):
         recipient = student.email,
     )
 
+
+
+def send_evaluation_pending_reminder_email(evaluation):
+    """
+    Remind the workplace supervisor of a pending evaluation.
+    Sent by the Celery beat task.
+    """
+    wp_sup  = evaluation.placement.workplace_supervisor
+    student = evaluation.placement.student
+    if not wp_sup:
+        return
+    eval_type = evaluation.get_evaluation_type_display()
+    _send(
+        subject   = (
+            f"Reminder: {eval_type} evaluation pending -- "
+            f"{student.get_full_name()}"
+        ),
+        message   = (
+            f"Hello {wp_sup.first_name},\n\n"
+            f"A reminder that the {eval_type.lower()} evaluation for "
+            f"{student.get_full_name()} has not yet been submitted.\n\n"
+            f"Please log in to complete it:\n"
+            f"{settings.FRONTEND_URL}/workplace/evaluations/{evaluation.id}/"
+            f"{_footer()}"
+        ),
+        recipient = wp_sup.email,
+    )
+
      
 
 
