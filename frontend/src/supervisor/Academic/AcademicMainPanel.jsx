@@ -13,3 +13,9 @@ const AcademicMainPanel = ({ onNavigate }) => {
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
   };
+    return (
+    <main>
+      <h1>Academic Supervisor</h1>
+      <p className="welcome-text">
+        {getGreeting()}, {supervisor.firstName.split(' ').pop()}! You have {stats.pendingAssessment} logs to assess and {stats.pendingAcknowledgement} evaluations to acknowledge.
+      </p>
