@@ -105,3 +105,4 @@ const AcademicRightPanel = ({ onMenuClick }) => {
 };
 
 export default AcademicRightPanel;
+      
