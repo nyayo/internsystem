@@ -52,11 +52,11 @@ def send_password_reset_email(user, token):
         recipient = user.email,
     )
 
-    def send_account_suspended_email(user):
+def send_account_suspended_email(user):
       """Notify a user that their account has been suspended."""
     _send(
-        subject   = "Account suspended -- InternSystem",
-        message   = (
+    subject   = "Account suspended -- InternSystem",
+    message   = (
             f"Hello {user.first_name},\n\n"
             f"Your InternSystem account has been suspended.\n"
             f"If you believe this is an error, please contact your "
@@ -178,7 +178,7 @@ def send_placement_rejected_email(placement):
         recipient = student.email,
     )
 
-    def send_placement_activated_email(placement):
+def send_placement_activated_email(placement):
      """Notify the student that their internship is now active."""
     student = placement.student
     _send(
@@ -241,53 +241,53 @@ def send_placement_completed_email(placement):
     Notify the academic supervisor that a log has been endorsed
     and is ready for grading.
     """
-    ac_sup  = log.placement.academic_supervisor
-    student = log.placement.student
-    if not ac_sup:
-        return
-    _send(
-        subject   = (
-            f"Log endorsed -- {student.get_full_name()} "
-            f"Week {log.week_number}"
-        ),
-        message   = (
-            f"Hello {ac_sup.first_name},\n\n"
-            f"{student.get_full_name()}'s Week {log.week_number} log has been "
-            f"endorsed by the workplace supervisor and is ready for your assessment.\n\n"
-            f"Workplace comment:\n\"{log.workplace_comment}\"\n\n"
-            f"Please log in to grade the log:\n"
-            f"{settings.FRONTEND_URL}/academic/logs/{log.id}/"
-            f"{_footer()}"
-        ),
-        recipient = ac_sup.email,
-    )
+        ac_sup  = log.placement.academic_supervisor
+        student = log.placement.student
+        if not ac_sup:
+            return
+        _send(
+            subject   = (
+                f"Log endorsed -- {student.get_full_name()} "
+                f"Week {log.week_number}"
+            ),
+            message   = (
+                f"Hello {ac_sup.first_name},\n\n"
+                f"{student.get_full_name()}'s Week {log.week_number} log has been "
+                f"endorsed by the workplace supervisor and is ready for your assessment.\n\n"
+                f"Workplace comment:\n\"{log.workplace_comment}\"\n\n"
+                f"Please log in to grade the log:\n"
+                f"{settings.FRONTEND_URL}/academic/logs/{log.id}/"
+                f"{_footer()}"
+            ),
+            recipient = ac_sup.email,
+        )
 
     def send_log_returned_email(log):
      """
     Notify the student that their log has been returned for revision.
     """
-    student = log.placement.student
-    _send(
-        subject   = (
-            f"Weekly log returned for revision -- Week {log.week_number}"
-        ),
-        message   = (
-            f"Hello {student.first_name},\n\n"
-            f"Your Week {log.week_number} log has been returned by your "
-            f"workplace supervisor for revision.\n\n"
-            f"Supervisor comment:\n\"{log.workplace_comment}\"\n\n"
-            f"Please update and resubmit your log:\n"
-            f"{settings.FRONTEND_URL}/student/logs/{log.id}/"
-            f"{_footer()}"
-        ),
-        recipient = student.email,
-    )
+        student = log.placement.student
+        _send(
+            subject   = (
+                f"Weekly log returned for revision -- Week {log.week_number}"
+            ),
+            message   = (
+                f"Hello {student.first_name},\n\n"
+                f"Your Week {log.week_number} log has been returned by your "
+                f"workplace supervisor for revision.\n\n"
+                f"Supervisor comment:\n\"{log.workplace_comment}\"\n\n"
+                f"Please update and resubmit your log:\n"
+                f"{settings.FRONTEND_URL}/student/logs/{log.id}/"
+                f"{_footer()}"
+            ),
+            recipient = student.email,
+        )
 
-    def send_log_assessed_email(log):
-     """
-    Notify the student that their log has been graded by the
-    academic supervisor.
-    """
+def send_log_assessed_email(log):
+     
+    """Notify the student that their log has been graded by the
+    academic supervisor."""
+        
     student = log.placement.student
     _send(
         subject   = f"Log graded -- Week {log.week_number}",
@@ -300,6 +300,33 @@ def send_placement_completed_email(placement):
             f"Log in to view your assessment:\n"
             f"{settings.FRONTEND_URL}/student/logs/{log.id}/"
             f"{_footer()}"
+            ),
+            recipient = student.email,
+        )
+    
+def send_log_overdue_email(log):
+    """
+    Remind the student that a weekly log is overdue.
+    Sent by the Celery beat task.
+    """
+    student = log.placement.student
+    _send(
+        subject   = f"Overdue weekly log -- Week {log.week_number}",
+        message   = (
+            f"Hello {student.first_name},\n\n"
+            f"Your Week {log.week_number} log "
+            f"({log.week_start_date} to {log.week_end_date}) "
+            f"has not been submitted yet.\n\n"
+            f"Please submit it as soon as possible to avoid falling behind:\n"
+            f"{settings.FRONTEND_URL}/student/logs/"
+            f"{_footer()}"
         ),
         recipient = student.email,
     )
+
+     
+
+
+     
+
+
