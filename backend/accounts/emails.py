@@ -177,3 +177,36 @@ def send_placement_rejected_email(placement):
         ),
         recipient = student.email,
     )
+
+    def send_placement_activated_email(placement):
+    """Notify the student that their internship is now active."""
+    student = placement.student
+    _send(
+        subject   = "Your internship has started -- InternSystem",
+        message   = (
+            f"Hello {student.first_name},\n\n"
+            f"Your internship at {placement.organisation_name} is now active.\n\n"
+            f"You should begin submitting your weekly logs every Friday.\n"
+            f"Log in to your dashboard to get started:\n"
+            f"{settings.FRONTEND_URL}/student/dashboard/"
+            f"{_footer()}"
+        ),
+        recipient = student.email,
+    )
+
+
+def send_placement_completed_email(placement):
+    """Notify the student that their placement has been marked complete."""
+    student = placement.student
+    _send(
+        subject   = "Internship completed -- InternSystem",
+        message   = (
+            f"Hello {student.first_name},\n\n"
+            f"Your internship at {placement.organisation_name} has been "
+            f"marked as completed. Well done!\n\n"
+            f"You can view your final evaluation and grades on your dashboard:\n"
+            f"{settings.FRONTEND_URL}/student/dashboard/"
+            f"{_footer()}"
+        ),
+        recipient = student.email,
+    )
