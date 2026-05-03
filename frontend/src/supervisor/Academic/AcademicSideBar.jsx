@@ -46,3 +46,9 @@ const menuItems = [
       )}
     </a>
   ))}
+    <a href="#">
+    <span className="material-icons-sharp">logout</span>
+    <h3>Logout</h3>
+  </a>
+</div>
+</aside>
