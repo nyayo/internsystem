@@ -377,7 +377,32 @@ def send_evaluation_due_email(evaluation):
     )
 
 
-
+def send_evaluation_submitted_email(evaluation):
+    """
+    Notify the academic supervisor that a workplace evaluation has
+    been submitted and is ready for acknowledgement.
+    """
+    ac_sup  = evaluation.placement.academic_supervisor
+    student = evaluation.placement.student
+    if not ac_sup:
+        return
+    eval_type = evaluation.get_evaluation_type_display()
+    _send(
+        subject   = (
+            f"{eval_type} evaluation submitted -- {student.get_full_name()}"
+        ),
+        message   = (
+            f"Hello {ac_sup.first_name},\n\n"
+            f"The {eval_type.lower()} evaluation for {student.get_full_name()} "
+            f"has been submitted by the workplace supervisor.\n\n"
+            f"Total score:    {evaluation.total_score} / 100\n"
+            f"Overall remarks: {evaluation.overall_remarks or 'None provided.'}\n\n"
+            f"Please log in to review and acknowledge the evaluation:\n"
+            f"{settings.FRONTEND_URL}/academic/evaluations/{evaluation.id}/"
+            f"{_footer()}"
+        ),
+        recipient = ac_sup.email,
+    )
 
 
      
