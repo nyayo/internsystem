@@ -349,7 +349,35 @@ def send_log_pending_endorsement_email(log):
         ),
         recipient = wp_sup.email,
     )
-     
+
+
+def send_evaluation_due_email(evaluation):
+    """
+    Notify the workplace supervisor that an evaluation is due.
+    Sent by the Celery beat task at the midpoint or end of the placement.
+    """
+    wp_sup  = evaluation.placement.workplace_supervisor
+    student = evaluation.placement.student
+    if not wp_sup:
+        return
+    eval_type = evaluation.get_evaluation_type_display()
+    _send(
+        subject   = (
+            f"{eval_type} evaluation due -- {student.get_full_name()}"
+        ),
+        message   = (
+            f"Hello {wp_sup.first_name},\n\n"
+            f"The {eval_type.lower()} evaluation for "
+            f"{student.get_full_name()} is now due.\n\n"
+            f"Please log in to complete the evaluation form:\n"
+            f"{settings.FRONTEND_URL}/workplace/evaluations/{evaluation.id}/"
+            f"{_footer()}"
+        ),
+        recipient = wp_sup.email,
+    )
+
+
+
 
 
      
