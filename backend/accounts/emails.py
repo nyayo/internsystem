@@ -405,6 +405,29 @@ def send_evaluation_submitted_email(evaluation):
     )
 
 
+def send_evaluation_acknowledged_email(evaluation):
+    """
+    Notify the student that their evaluation has been acknowledged
+    by the academic supervisor.
+    """
+    student   = evaluation.placement.student
+    eval_type = evaluation.get_evaluation_type_display()
+    _send(
+        subject   = f"{eval_type} evaluation acknowledged -- InternSystem",
+        message   = (
+            f"Hello {student.first_name},\n\n"
+            f"Your {eval_type.lower()} evaluation has been reviewed and "
+            f"acknowledged by your academic supervisor.\n\n"
+            f"Total score:          {evaluation.total_score} / 100\n"
+            f"Acknowledgement notes: "
+            f"{evaluation.acknowledgement_notes or 'None provided.'}\n\n"
+            f"Log in to view your full evaluation:\n"
+            f"{settings.FRONTEND_URL}/student/evaluations/{evaluation.id}/"
+            f"{_footer()}"
+        ),
+        recipient = student.email,
+    )
+
      
 
 
