@@ -18,6 +18,12 @@ export default function MainPanel({
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   const pendingApplications = applications.filter(app => app.status === 'pending');
+  const activeInternships = applications.filter(app => app.status === 'active');
+  const completedThisSemester = applications.filter(app => app.status === 'completed' && new Date(app.completedAt) >= new Date(new Date().setMonth(new Date().getMonth() - 6))).length;
+
+  const handleUpdateApplication = (updatedApp) => {
+      onUpdateApplication(updatedApp);
+  };
 
   const handleViewDetails = (student) => {
     setSelectedStudent(student);
@@ -88,14 +94,14 @@ export default function MainPanel({
           <div className="middle">
             <div className="left">
               <h3>Active Internships</h3>
-              <h1>{stats.activeInternships}</h1>
+              <h1>{activeInternships.length}</h1>
             </div>
             <div className="progress">
               <svg>
                 <circle cx="38" cy="38" r="36"></circle>
               </svg>
               <div className="number">
-                <p>78%</p>
+                <p>{Math.round((activeInternships.length / Math.max(applications.length, 1)) * 100)}%</p>
               </div>
             </div>
           </div>
@@ -107,14 +113,14 @@ export default function MainPanel({
           <div className="middle">
             <div className="left">
               <h3>Completed</h3>
-              <h1>{stats.completedThisSemester}</h1>
+              <h1>{completedThisSemester}</h1>
             </div>
             <div className="progress">
               <svg>
                 <circle cx="38" cy="38" r="36"></circle>
               </svg>
               <div className="number">
-                <p>92%</p>
+                <p>{Math.round((completedThisSemester.length / Math.max(applications.length, 1)) * 100)}%</p>
               </div>
             </div>
           </div>

@@ -7,8 +7,6 @@ import {
   getOrganisationTypeLabel, 
   getStatusLabel,
   organisationTypes,
-  workplaceSupervisors,
-  academicSupervisors,
   calculateDurationWeeks
 } from '../../data/dashboardData';
 
@@ -211,8 +209,6 @@ export default function ActiveInternshipsPage({ placements }) {
               </tr>
             ) : (
               paginatedPlacements.map(placement => {
-                const wpSup = workplaceSupervisors.find(s => s.id === placement.workplaceSupervisor);
-                const acSup = academicSupervisors.find(s => s.id === placement.academicSupervisor);
                 const weeks = calculateDurationWeeks(placement.startDate, placement.endDate);
                 
                 return (
@@ -240,11 +236,11 @@ export default function ActiveInternshipsPage({ placements }) {
                       <div className="supervisors-cell">
                         <span className="wp-sup" title="Workplace Supervisor">
                           <span className="material-icons-sharp">work</span>
-                          {wpSup?.name || 'Not assigned'}
+                          {placement.workplaceSupervisorName || 'Not assigned'}
                         </span>
                         <span className="ac-sup" title="Academic Supervisor">
                           <span className="material-icons-sharp">school</span>
-                          {acSup?.name || 'Not assigned'}
+                          {placement.academicSupervisorName || 'Not assigned'}
                         </span>
                       </div>
                     </td>

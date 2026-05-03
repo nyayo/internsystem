@@ -15,7 +15,7 @@ import { useAdmin, AdminProvider } from "../../context/AdminContext";
 const DashboardContent = () => {
   const [activeLink, setActiveLink] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { placements, students, criteria, applications, stats, pendingCount, workplaceSupervisors, academicSupervisors, handleUpdatePlacement, handleUpdateApplication, handleAddCriteria, handleUpdateCriteria } = useAdmin();
+  const { placements, students, criteria, applications, stats, pendingCount, workplaceSupervisors, academicSupervisors, handleUpdatePlacement, handleUpdateApplication, handleAddCriteria, handleUpdateCriteria, adminUser } = useAdmin();
 
   // Render the appropriate main content based on activeLink
   const renderMainContent = () => {
@@ -86,7 +86,7 @@ const DashboardContent = () => {
         isOpen={sidebarOpen}
       />
       {renderMainContent()}
-      <RightPanel onMenuClick={() => setSidebarOpen(true)} stats={stats} />
+      <RightPanel onMenuClick={() => setSidebarOpen(true)} stats={stats} admin={adminUser} />
     </div>
   );
 }

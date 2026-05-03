@@ -209,7 +209,7 @@ export default function SupervisorsPage({ workplaceSupervisors, academicSupervis
                   <td>
                     <div className="supervisor-info">
                       <span className="supervisor-name">
-                        {supervisor.organisation || supervisor.department}
+                        {supervisor.organisation || supervisor.university}
                       </span>
                       <span className="supervisor-role">
                         {supervisor.jobTitle || supervisor.faculty}

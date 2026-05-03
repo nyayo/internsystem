@@ -6,7 +6,7 @@ import Profile4 from '../../assets/images/profile-4.jpg'
 import './RightPanel.css'
 import { useTheme } from '../../context/ThemeContext';
 
-export default function RightPanel({ onMenuClick, stats }) {
+export default function RightPanel({ onMenuClick, stats, admin }) {
   const { isDarkMode, toggleTheme } = useTheme();
 
   return (
@@ -22,9 +22,9 @@ export default function RightPanel({ onMenuClick, stats }) {
         <div className="profile">
           <div className="info">
             <p>
-              Hey, <b>Dr. Namutebi</b>
+              Hey, <b>{admin.fullName}</b>
             </p>
-            <small className="text-muted">Internship Coordinator</small>
+            <small className="text-muted">{admin.jobTitle}</small>
           </div>
           <div className="profile-photo">
             <img src={Profile1} alt="Administrator" />
