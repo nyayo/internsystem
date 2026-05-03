@@ -77,3 +77,56 @@ const AcademicMainPanel = ({ onNavigate }) => {
           <small className="text-muted">Across All Students</small>
         </div>
       </div>
+            <div className="recent-orders">
+        <h2>Action Required</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Student</th>
+              <th>Organization</th>
+              <th>Details</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recentActivity.length > 0 ? (
+              recentActivity.map((item) => (
+                <tr key={`${item.type}-${item.id}`}>
+                  <td>
+                    <span className={item.type === 'log' ? 'primary' : 'warning'}>
+                      {item.type === 'log' ? 'Weekly Log' : 'Evaluation'}
+                    </span>
+                  </td>
+                  <td>{item.studentName}</td>
+                  <td style={{ fontSize: '0.85rem', color: 'var(--color-info-dark)' }}>
+                    {item.organization}
+                  </td>
+                  <td>{item.title}</td>
+                  <td>
+                    <button 
+                      className="btn-view"
+                      onClick={() => onNavigate(item.type === 'log' ? 'logs' : 'evaluations')}
+                    >
+                      {item.action}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
+                  <span className="material-icons-sharp" style={{ fontSize: '2rem', color: 'var(--color-success)' }}>task_alt</span>
+                  <p style={{ marginTop: '0.5rem' }}>All caught up! No pending actions.</p>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+        <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('logs'); }}>View All Logs</a>
+      </div>
+    </main>
+  );
+};
+
+export default AcademicMainPanel;
