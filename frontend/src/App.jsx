@@ -9,7 +9,7 @@ import LoginPage from "./pages/auth/login/LoginPage";
 import RegisterPage from "./pages/auth/register/RegisterPage";
 import Dashboard from "./pages/admin/Dashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
-import AcademicDashboard from "./pages/supervisor/AcademicDashboard";
+import AcademicDashboard from "./pages/supervisor/academic/AcademicDashboard";
 
 
 function App() {
