@@ -210,3 +210,28 @@ def send_placement_completed_email(placement):
         ),
         recipient = student.email,
     )
+    def send_log_submitted_email(log):
+     """
+    Notify the workplace supervisor that a student has submitted
+    a weekly log for review.
+    """
+    wp_sup   = log.placement.workplace_supervisor
+    student  = log.placement.student
+    if not wp_sup:
+        return
+    _send(
+        subject   = (
+            f"Weekly log to review -- {student.get_full_name()} "
+            f"Week {log.week_number}"
+        ),
+        message   = (
+            f"Hello {wp_sup.first_name},\n\n"
+            f"{student.get_full_name()} has submitted their Week {log.week_number} "
+            f"log ({log.week_start_date} to {log.week_end_date}) "
+            f"for your review.\n\n"
+            f"Please log in to endorse or return the log:\n"
+            f"{settings.FRONTEND_URL}/workplace/logs/{log.id}/"
+            f"{_footer()}"
+        ),
+        recipient = wp_sup.email,
+    )
