@@ -154,6 +154,12 @@ export function StudentProvider({ children }) {
           Array.isArray(data) ? (data[0] ?? null) : (data ?? null),
         );
         setPlacement(normalized);
+      } catch (error) {
+        // Log the error but don't crash - let it retry on next load
+        if (!cancelled) {
+          console.warn("Failed to load placement:", error);
+          // Don't clear placement on error - keep previous state
+        }
       } finally {
         if (!cancelled) setIsPlacementLoading(false);
       }
@@ -171,6 +177,12 @@ export function StudentProvider({ children }) {
         const normalized = detailed.filter(Boolean).map(normalizeWeeklyLog);
 
         setWeeklyLogs(normalized);
+      } catch (error) {
+        // Log the error but don't crash - let it retry on next load
+        if (!cancelled) {
+          console.warn("Failed to load logs:", error);
+          // Don't clear logs on error - keep previous state
+        }
       } finally {
         if (!cancelled) setIsPlacementLoading(false);
       }
@@ -320,6 +332,7 @@ export function StudentProvider({ children }) {
       student,
       placement,
       weeklyLogs,
+      isPlacementLoading,
       placementDraft,
       weeklyLogDraft,
       savePlacementDraft,
@@ -337,6 +350,7 @@ export function StudentProvider({ children }) {
       student,
       placement,
       weeklyLogs,
+      isPlacementLoading,
       placementDraft,
       weeklyLogDraft,
       savePlacementDraft,

@@ -49,6 +49,43 @@ function getStoredToken() {
   }
 }
 
+function getStoredRefreshToken() {
+  if (typeof window === "undefined" || typeof localStorage === "undefined")
+    return "";
+
+  const rawSession = localStorage.getItem(AUTH_SESSION_KEY);
+  if (!rawSession) return "";
+
+  try {
+    const session = JSON.parse(rawSession);
+    if (session && typeof session === "object") {
+      return normalizeToken(session.refreshToken ?? session.refresh ?? "");
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
+function updateStoredToken(accessToken) {
+  if (typeof window === "undefined" || typeof localStorage === "undefined")
+    return;
+
+  const rawSession = localStorage.getItem(AUTH_SESSION_KEY);
+  if (!rawSession) return;
+
+  try {
+    const session = JSON.parse(rawSession);
+    if (session && typeof session === "object") {
+      session.token = accessToken;
+      session.access = accessToken;
+      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
+    }
+  } catch {
+    // Unable to update stored token
+  }
+}
+
 function shouldAttachAuthHeader(url) {
   if (typeof url !== "string" || !url) {
     return true;
@@ -110,6 +147,8 @@ httpClient.interceptors.response.use(
       }).then((token) => {
         originalRequest.headers.Authorization = `Bearer ${token}`;
         return httpClient(originalRequest);
+      }).catch((err) => {
+        return Promise.reject(err);
       });
     }
 

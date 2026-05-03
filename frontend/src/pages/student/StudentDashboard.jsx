@@ -21,6 +21,7 @@ function StudentDashboardContent() {
     student,
     placement,
     weeklyLogs,
+    isPlacementLoading,
     submitPlacement,
     submitWeeklyLog,
     saveWeeklyLogAsDraft,
@@ -99,6 +100,7 @@ function StudentDashboardContent() {
         student={student}
         placement={placement}
         weeklyLogs={weeklyLogs}
+        isPlacementLoading={isPlacementLoading}
         onNewLog={handleNewLog}
         onEditLog={handleEditLog}
         onOpenPlacement={() => setShowPlacementModal(true)}

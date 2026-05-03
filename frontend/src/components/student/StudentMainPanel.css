@@ -22,6 +22,10 @@
   border-left-color: var(--color-primary);
 }
 
+.student-main-panel .status-card.loading {
+  border-left-color: var(--color-info);
+}
+
 .student-main-panel .status-card > span.material-icons-sharp {
   font-size: 3rem;
   color: var(--color-primary);
@@ -29,6 +33,11 @@
 
 .student-main-panel .status-card.pending > span.material-icons-sharp {
   color: var(--color-warning);
+}
+
+.student-main-panel .status-card.loading > span.material-icons-sharp {
+  color: var(--color-info);
+  animation: spin 1.5s linear infinite;
 }
 
 .student-main-panel .status-content h3 {
@@ -292,5 +301,15 @@
   .student-main-panel .placement-header {
     flex-direction: column;
     gap: 0.75rem;
+  }
+}
+
+/* Loading animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
