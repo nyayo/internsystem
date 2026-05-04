@@ -7,7 +7,7 @@ import {
 import "../shared/SupervisorStyles.css";
 
 const WorkplaceMainPanel = ({ onNavigate }) => {
-  const { supervisor, logs, isLoading } = useSupervisor();
+  const { supervisor, logs, isLoading, students, stats } = useSupervisor();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -15,22 +15,6 @@ const WorkplaceMainPanel = ({ onNavigate }) => {
     if (hour < 17) return "Good afternoon";
     return "Good evening";
   };
-
-  const stats = useMemo(() => {
-    const pendingLogs = logs.filter((l) => l.status === "submitted").length;
-    const endorsedLogs = logs.filter((l) =>
-      ["endorsed", "assessed", "closed"].includes(l.status),
-    ).length;
-    const resubmitLogs = logs.filter((l) => l.status === "resubmit").length;
-    const uniqueStudents = new Set(logs.map((l) => l.student?.regNumber)).size;
-
-    return {
-      pendingLogs,
-      endorsedLogs,
-      resubmitLogs,
-      totalStudents: uniqueStudents,
-    };
-  }, [logs]);
 
   const actionRequired = useMemo(() => {
     return logs
@@ -60,7 +44,7 @@ const WorkplaceMainPanel = ({ onNavigate }) => {
                 <circle cx="38" cy="38" r="36"></circle>
               </svg>
               <div className="number">
-                <p>100%</p>
+                <p>{stats.activeStudentsPercent}%</p>
               </div>
             </div>
           </div>
@@ -79,7 +63,7 @@ const WorkplaceMainPanel = ({ onNavigate }) => {
                 <circle cx="38" cy="38" r="36"></circle>
               </svg>
               <div className="number">
-                <p>{stats.pendingLogs > 0 ? "Action" : "0%"}</p>
+                <p>{stats.pendingPercent}%</p>
               </div>
             </div>
           </div>

@@ -211,8 +211,7 @@ class UserListView(APIView):
     GET /api/auth/users/?role=student
     Administrator only. Filter by role using query parameter.
     """
-    permission_classes = [IsAuthenticated, IsActiveAccount,
-                          IsInternshipAdministrator]
+    permission_classes = [IsAuthenticated, IsActiveAccount]
  
     def get(self, request):
         role     = request.query_params.get('role')

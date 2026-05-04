@@ -7,6 +7,7 @@ import '../../../components/supervisor/shared/SupervisorStyles.css';
 
 const WorkplaceStudentsPage = () => {
   const { students } = useSupervisor();
+  console.log("Students", students)
   const {
     currentPage,
     itemsPerPage,
@@ -15,6 +16,7 @@ const WorkplaceStudentsPage = () => {
     setCurrentPage,
     setItemsPerPage,
   } = usePagination(students);
+  console.log("Paginated Students", paginatedStudents)
 
   const getProgressPercentage = (completed, total) => {
     return Math.round((completed / total) * 100);
@@ -85,7 +87,7 @@ const WorkplaceStudentsPage = () => {
                       overflow: 'hidden'
                     }}>
                       <div style={{
-                        width: `${getProgressPercentage(student.completedWeeks, student.totalWeeks)}%`,
+                        width: `${getProgressPercentage(2, 12)}%`,
                         height: '100%',
                         background: 'var(--color-primary)',
                         borderRadius: '3px'

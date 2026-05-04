@@ -10,7 +10,7 @@ class PlacementStudentSerializer(serializers.Serializer):
      programme = serializers.CharField(source="student.programme", read_only=True)
 
 class PlacementListSerializer(serializers.ModelSerializer):
-    student = PlacementStudentSerializer(read_only=True)
+    student_details = PlacementStudentSerializer(read_only=True)
     student_name      = serializers.CharField(source="student.get_full_name", read_only=True)
     student_number    = serializers.CharField(source="student.student_number", read_only=True)
     student_email   = serializers.CharField(source="student.email", read_only=True)
@@ -28,6 +28,7 @@ class PlacementListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "student",
+            "student_details",
             "student_name",
             "student_number",
             "student_email",

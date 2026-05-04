@@ -17,8 +17,6 @@ import {
   workplaceEvaluations,
   academicEvaluations,
   evaluationCriteria,
-  getWorkplaceStats,
-  getAcademicStats,
 } from "../data/supervisorData";
 import { useAuth } from "./AuthContext";
 import {
@@ -35,6 +33,8 @@ import {
   endorseLog as endorseLogApi,
   assessLog as assessLogApi,
 } from "../services/logsApi";
+import { listPlacements } from "../services/placementApi";
+import { listStudents } from "../services/adminApi";
 
 const SupervisorContext = createContext(null);
 
@@ -95,14 +95,137 @@ export const SupervisorProvider = ({ children, role }) => {
   const [criteria] = useState(evaluationCriteria);
   const [notification, setNotification] = useState(null);
 
-  const stats = useMemo(
-    () => (isWorkplace ? getWorkplaceStats() : getAcademicStats()),
-    [isWorkplace],
-  );
+  const stats = useMemo(() => {
+    if (isWorkplace) {
+      const totalLogs = logs.length;
+      const pendingLogs = logs.filter((l) => l.status === "submitted").length;
+      const endorsedLogs = logs.filter((l) =>
+        ["endorsed", "assessed", "closed"].includes(l.status),
+      ).length;
+      const resubmitLogs = logs.filter((l) => l.status === "resubmit").length;
+
+      const activeStudents = new Set(
+        logs
+          .filter((l) => l.status !== "draft")
+          .map((l) => l.student?.regNumber),
+      ).size;
+
+      return {
+        totalStudents: students.length,
+        activeStudents,
+        pendingLogs,
+        endorsedLogs,
+        resubmitLogs,
+        totalLogs,
+
+        // Percentages
+        activeStudentsPercent:
+          students.length > 0
+            ? Math.round((activeStudents / students.length) * 100)
+            : 0,
+        endorsedPercent:
+          totalLogs > 0 ? Math.round((endorsedLogs / totalLogs) * 100) : 0,
+        pendingPercent:
+          totalLogs > 0 ? Math.round((pendingLogs / totalLogs) * 100) : 0,
+      };
+    }
+
+    // Academic supervisor stats
+    const pendingAssessment = logs.filter(
+      (l) => l.status === "endorsed",
+    ).length;
+    const assessedLogs = logs.filter((l) =>
+      ["assessed", "closed"].includes(l.status),
+    ).length;
+    const totalAssessable = pendingAssessment + assessedLogs;
+
+    const gradesOnly = logs
+      .filter((l) => l.academicGrade !== null && l.academicGrade !== undefined)
+      .map((l) => parseFloat(l.academicGrade))
+      .filter((g) => !isNaN(g));
+
+    const averageGrade =
+      gradesOnly.length > 0
+        ? Math.round(
+            gradesOnly.reduce((sum, g) => sum + g, 0) / gradesOnly.length,
+          )
+        : 0;
+
+    return {
+      totalStudents: students.length,
+      pendingAssessment,
+      assessedLogs,
+      totalAssessable,
+
+      // Percentages
+      assessedPercent:
+        totalAssessable > 0
+          ? Math.round((assessedLogs / totalAssessable) * 100)
+          : 0,
+      pendingPercent:
+        totalAssessable > 0
+          ? Math.round((pendingAssessment / totalAssessable) * 100)
+          : 0,
+      averageGrade,
+    };
+  }, [logs, students, isWorkplace]);
 
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
+
+    const loadStudents = async () => {
+      try {
+        const placementList = await listPlacements();
+        const studentList = await listStudents();
+        if (cancelled || !placementList || !studentList) return;
+
+        const placements = Array.isArray(placementList)
+          ? placementList
+          : (placementList?.results ?? []);
+
+        const studentRows = Array.isArray(studentList)
+          ? studentList
+          : (studentList?.results ?? []);
+
+        // Build a student lookup map by id for fast access
+        const studentMap = Object.fromEntries(
+          studentRows.map((s) => [s.id, s]),
+        );
+        console.log(studentMap)
+
+        const enrichedStudents = placements.map((p) => {
+          console.log(p.student)
+          const student = studentMap[p.student] ?? {}; // p.student is the FK id
+          return {
+            id: p.student,
+            placementId: p.id,
+            firstName: student.first_name ?? "-",
+            lastName: student.last_name ?? "-",
+            name:
+              student.full_name ??
+              `${student.first_name ?? ""} ${student.last_name ?? ""}`.trim(),
+            email: student.email ?? "-",
+            phone: student.phone_number ?? "-",
+            regNumber: student.student_number ?? "-",
+            programme: student.programme ?? "-",
+            year: student.year_of_study ?? "-",
+            gender: student.gender ?? "-",
+            // From placement
+            status: p.status ?? "-",
+            startDate: p.start_date ?? null,
+            endDate: p.end_date ?? null,
+            placementStatus: p.status ?? "-",
+            department: p.department ?? "-",
+            organisation: p.organisation_name ?? "-",
+          };
+        });
+
+        if (!cancelled) setStudents(enrichedStudents);
+      } catch (err) {
+        console.error("Failed to load students:", err);
+      }
+    };
 
     const loadLogs = async () => {
       try {
@@ -124,6 +247,7 @@ export const SupervisorProvider = ({ children, role }) => {
     };
 
     loadLogs();
+    loadStudents();
     return () => {
       cancelled = true;
     };
