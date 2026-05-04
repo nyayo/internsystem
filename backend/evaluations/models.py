@@ -118,3 +118,7 @@ class EvaluationScore(models.Model):
 
     def _str_(self):
         return f"{self.criteria.title}:{self.score_awarded}/{self.critera.max_score}"
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_status = self.status

@@ -104,6 +104,10 @@ class InternshipPlacement(models.Model):
         return (
             f"{self.student.get_full_name()} @ {self.organisation_name} ({self.status})"
         )
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_status = self.status
 
     @property
     def duration_weeks(self):
