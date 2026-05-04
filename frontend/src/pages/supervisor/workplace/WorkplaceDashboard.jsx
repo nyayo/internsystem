@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { SupervisorProvider, useSupervisor } from '../../../context/SupervisorContext';
-import WorkplaceSideBar from '../../../components/supervisor/workplace/WorkplaceSideBar';
-import WorkplaceMainPanel from '../../../components/supervisor/workplace/WorkplaceMainPanel';
-import WorkplaceRightPanel from '../../../components/supervisor/workplace/WorkplaceRightPanel';
+import WorkplaceSideBar from '../../../components/supervisor/academic/WorkplaceSideBar';
+import WorkplaceMainPanel from '../../../components/supervisor/academic/WorkplaceMainPanel';
+import WorkplaceRightPanel from '../../../components/supervisor/academic/WorkplaceRightPanel';
 import WorkplaceStudentsPage from './WorkplaceStudentsPage';
 import WorkplaceLogsPage from './WorkplaceLogsPage';
 import WorkplaceEvaluationsPage from './WorkplaceEvaluationsPage';
