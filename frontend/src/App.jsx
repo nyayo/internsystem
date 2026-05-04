@@ -12,7 +12,7 @@ import EmailConfirmedPage from "./pages/auth/verify/EmailConfirmedPage";
 import RegisterPage from "./pages/auth/register/RegisterPage";
 import Dashboard from "./pages/admin/Dashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
-// import AcademicDashboard from "./pages/supervisor/academic/AcademicDashboard";
+import AcademicDashboard from "./pages/supervisor/academic/AcademicDashboard";
 import WorkplaceDashboard from "./pages/supervisor/workplace/WorkplaceDashboard";
 
 
@@ -70,14 +70,14 @@ function App() {
             </RoleRoute>
           }
         />
-        {/* <Route
+        <Route
           path="/supervisor/academic"
           element={
             <RoleRoute allowedRoles={["academic_supervisor"]}>
               <AcademicDashboard />
             </RoleRoute>
           }
-        /> */}
+        />
         <Route
           path="/admin"
           element={
