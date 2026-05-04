@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSupervisor } from '../../../context/SupervisorContext';
 import { formatDate } from '../../../data/supervisorData';
 import Pagination from '../../../components/Pagination';
@@ -6,8 +6,7 @@ import usePagination from '../../../hooks/usePagination';
 import '../../../components/supervisor/shared/SupervisorStyles.css';
 
 const WorkplaceStudentsPage = () => {
-  const { students } = useSupervisor();
-  console.log("Students", students)
+  const { students, logs } = useSupervisor();
   const {
     currentPage,
     itemsPerPage,
@@ -16,11 +15,54 @@ const WorkplaceStudentsPage = () => {
     setCurrentPage,
     setItemsPerPage,
   } = usePagination(students);
-  console.log("Paginated Students", paginatedStudents)
 
   const getProgressPercentage = (completed, total) => {
+    if (!total) return 0;
     return Math.round((completed / total) * 100);
   };
+
+  const weeksBetween = (startDate, endDate) => {
+    if (!startDate || !endDate) return 0;
+    const [startY, startM, startD] = String(startDate).split('T')[0].split('-').map(Number);
+    const [endY, endM, endD] = String(endDate).split('T')[0].split('-').map(Number);
+    const start = new Date(Date.UTC(startY, (startM ?? 1) - 1, startD ?? 1));
+    const end = new Date(Date.UTC(endY, (endM ?? 1) - 1, endD ?? 1));
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
+    const diffDays = Math.max(
+      0,
+      Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)),
+    );
+    return Math.floor(diffDays / 7);
+  };
+
+  const studentProgressMap = useMemo(() => {
+    const map = new Map();
+
+    logs.forEach((log) => {
+      const regNumber = log.student?.regNumber;
+      if (!regNumber) return;
+
+      const current = map.get(regNumber) ?? {
+        totalLoggedWeeks: 0,
+        completedWeeks: 0,
+        pendingLogs: 0,
+      };
+
+      if (log.status !== 'draft') {
+        current.totalLoggedWeeks += 1;
+      }
+      if (['endorsed', 'assessed', 'closed'].includes(log.status)) {
+        current.completedWeeks += 1;
+      }
+      if (log.status === 'submitted') {
+        current.pendingLogs += 1;
+      }
+
+      map.set(regNumber, current);
+    });
+
+    return map;
+  }, [logs]);
 
   return (
     <main>
@@ -44,7 +86,23 @@ const WorkplaceStudentsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedStudents.map((student) => (
+            {paginatedStudents.map((student) => {
+              const progress = studentProgressMap.get(student.regNumber) ?? {
+                totalLoggedWeeks: 0,
+                completedWeeks: 0,
+                pendingLogs: 0,
+              };
+              const expectedWeeks = weeksBetween(student.startDate, student.endDate);
+              const totalWeeks =
+                expectedWeeks > 0
+                  ? expectedWeeks
+                  : progress.totalLoggedWeeks;
+              const completedWeeks =
+                totalWeeks > 0
+                  ? Math.min(progress.completedWeeks, totalWeeks)
+                  : 0;
+
+              return (
               <tr key={student.id}>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -65,7 +123,7 @@ const WorkplaceStudentsPage = () => {
                     </div>
                     <div>
                       <div style={{ fontWeight: '500' }}>{student.firstName} {student.lastName}</div>
-                      <small className="text-muted">{student.studentId}</small>
+                      <small className="text-muted">{student.studentId ?? student.regNumber}</small>
                     </div>
                   </div>
                 </td>
@@ -87,20 +145,20 @@ const WorkplaceStudentsPage = () => {
                       overflow: 'hidden'
                     }}>
                       <div style={{
-                        width: `${getProgressPercentage(2, 12)}%`,
+                        width: `${getProgressPercentage(completedWeeks, totalWeeks)}%`,
                         height: '100%',
                         background: 'var(--color-primary)',
                         borderRadius: '3px'
                       }} />
                     </div>
                     <small className="text-muted">
-                      {student.completedWeeks}/{student.totalWeeks}
+                      {completedWeeks}/{totalWeeks}
                     </small>
                   </div>
                 </td>
                 <td>
-                  {student.pendingLogs > 0 ? (
-                    <span className="warning">{student.pendingLogs} pending</span>
+                  {progress.pendingLogs > 0 ? (
+                    <span className="warning">{progress.pendingLogs} pending</span>
                   ) : (
                     <span className="success">None</span>
                   )}
@@ -111,7 +169,8 @@ const WorkplaceStudentsPage = () => {
                   </span>
                 </td>
               </tr>
-            ))}
+              );
+            })}
             {students.length === 0 && (
               <tr>
                 <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>

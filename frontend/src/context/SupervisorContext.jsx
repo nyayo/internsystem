@@ -211,6 +211,7 @@ export const SupervisorProvider = ({ children, role }) => {
             year: student.year_of_study ?? "-",
             gender: student.gender ?? "-",
             // From placement
+            weekNumber: p.week_number ?? "-",
             status: p.status ?? "-",
             startDate: p.start_date ?? null,
             endDate: p.end_date ?? null,
