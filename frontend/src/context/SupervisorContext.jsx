@@ -338,7 +338,7 @@ export const SupervisorProvider = ({ children, role }) => {
   );
 
   const assessLog = useCallback(
-    async (logId, grade, comment) => {
+    async (logId, academicGrade, academicRemarks) => {
       try {
         const result = await assessLogApi(
           logId,
@@ -359,6 +359,7 @@ export const SupervisorProvider = ({ children, role }) => {
         const detail =
           err?.response?.data?.detail ??
           err?.response?.data?.academic_grade ??
+          err?.response?.data?.academic_remarks ??
           "Failed to assess log. Please try again.";
         showNotification(detail, "error");
         throw err;

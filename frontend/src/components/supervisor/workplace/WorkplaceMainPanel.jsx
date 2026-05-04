@@ -1,13 +1,9 @@
 import React, { useMemo } from "react";
 import { useSupervisor } from "../../../context/SupervisorContext";
-import {
-  getWorkplaceRecentActivity,
-  formatDate,
-} from "../../../data/supervisorData";
 import "../shared/SupervisorStyles.css";
 
 const WorkplaceMainPanel = ({ onNavigate }) => {
-  const { supervisor, logs, isLoading, students, stats } = useSupervisor();
+  const { supervisor, logs, evaluations, stats } = useSupervisor();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -17,10 +13,49 @@ const WorkplaceMainPanel = ({ onNavigate }) => {
   };
 
   const actionRequired = useMemo(() => {
-    return logs
-      .filter((l) => ["submitted", "resubmit"].includes(l.status))
-      .sort((a, b) => new Date(a.submittedAt) - new Date(b.submittedAt));
-  }, [logs]);
+    const pendingLogActions = logs
+      .filter((log) => ["submitted", "resubmit"].includes(log.status))
+      .map((log) => ({
+        key: `log-${log.id}`,
+        type: "log",
+        studentName: log.student?.name ?? "-",
+        organization: log.student?.organisation ?? "-",
+        details:
+          log.status === "submitted"
+            ? `Week ${log.weekNumber} pending endorsement`
+            : `Week ${log.weekNumber} resubmitted and pending review`,
+        action: "Review Log",
+        sortDate: log.submittedAt ?? log.updatedAt ?? log.createdAt ?? "",
+      }));
+
+    const pendingEvaluationActions = evaluations
+      .filter((evaluation) =>
+        ["not_started", "in_progress"].includes(evaluation.status),
+      )
+      .map((evaluation) => ({
+        key: `evaluation-${evaluation.id}`,
+        type: "evaluation",
+        studentName: evaluation.studentName ?? "-",
+        organization: evaluation.organization ?? "-",
+        details:
+          evaluation.status === "in_progress"
+            ? `${evaluation.evaluationTypeDisplay ?? "Evaluation"} in progress`
+            : `${evaluation.evaluationTypeDisplay ?? "Evaluation"} ready to start`,
+        action:
+          evaluation.status === "in_progress"
+            ? "Continue Evaluation"
+            : "Start Evaluation",
+        sortDate: evaluation.dueDate ?? evaluation.updatedAt ?? "",
+      }));
+
+    return [...pendingLogActions, ...pendingEvaluationActions]
+      .sort((a, b) => {
+        const aTime = a.sortDate ? new Date(a.sortDate).getTime() : 0;
+        const bTime = b.sortDate ? new Date(b.sortDate).getTime() : 0;
+        return bTime - aTime;
+      })
+      .slice(0, 6);
+  }, [logs, evaluations]);
 
   return (
     <main>
@@ -98,39 +133,35 @@ const WorkplaceMainPanel = ({ onNavigate }) => {
             <tr>
               <th>Type</th>
               <th>Student</th>
+              <th>Organization</th>
               <th>Details</th>
-              <th>Date</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {actionRequired.length > 0 ? (
-              actionRequired.map((log) => (
-                <tr key={log.id}>
-                  <td>{log.student?.name ?? "-"}</td>
-                  <td>Week {log.weekNumber}</td>
+              actionRequired.map((item) => (
+                <tr key={item.key}>
                   <td>
-                    {formatDate(log.weekStartDate)} →{" "}
-                    {formatDate(log.weekEndDate)}
-                  </td>
-                  <td>
-                    <span
-                      className={
-                        log.status === "submitted" ? "primary" : "warning"
-                      }
-                    >
-                      {log.status === "submitted"
-                        ? "Pending Review"
-                        : "Resubmitted"}
+                    <span className={item.type === "log" ? "primary" : "warning"}>
+                      {item.type === "log" ? "Weekly Log" : "Evaluation"}
                     </span>
                   </td>
-                  <td>{log.submittedAt ? formatDate(log.submittedAt) : "-"}</td>
+                  <td>{item.studentName}</td>
+                  <td>
+                    <span style={{ fontSize: "0.85rem", color: "var(--color-info-dark)" }}>
+                      {item.organization}
+                    </span>
+                  </td>
+                  <td>{item.details}</td>
                   <td>
                     <button
                       className="btn-view"
-                      onClick={() => onNavigate("logs")}
+                      onClick={() =>
+                        onNavigate(item.type === "log" ? "logs" : "evaluations")
+                      }
                     >
-                      Review
+                      {item.action}
                     </button>
                   </td>
                 </tr>
@@ -138,7 +169,7 @@ const WorkplaceMainPanel = ({ onNavigate }) => {
             ) : (
               <tr>
                 <td
-                  colSpan="6"
+                  colSpan="5"
                   style={{ textAlign: "center", padding: "2rem" }}
                 >
                   <span

@@ -1,11 +1,45 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSupervisor } from '../../../context/SupervisorContext';
-import { getAcademicRecentActivity } from '../../../data/supervisorData';
 import '../shared/SupervisorStyles.css';
 
 const AcademicMainPanel = ({ onNavigate }) => {
-  const { supervisor, stats } = useSupervisor();
-  const recentActivity = getAcademicRecentActivity();
+  const { supervisor, stats, logs, evaluations } = useSupervisor();
+
+  const actionRequired = useMemo(() => {
+    const pendingLogActions = logs
+      .filter((log) => log.status === 'endorsed')
+      .map((log) => ({
+        key: `log-${log.id}`,
+        type: 'log',
+        studentName: log.student?.name ?? '-',
+        organization: log.student?.organisation ?? '-',
+        details: `Week ${log.weekNumber} ready for academic assessment`,
+        action: 'Assess Log',
+        sortDate: log.submittedAt ?? log.updatedAt ?? log.createdAt ?? '',
+      }));
+
+    const pendingEvaluationActions = evaluations
+      .filter((evaluation) => evaluation.status === 'submitted')
+      .map((evaluation) => ({
+        key: `evaluation-${evaluation.id}`,
+        type: 'evaluation',
+        studentName: evaluation.studentName ?? '-',
+        organization: evaluation.organization ?? '-',
+        details:
+          `${evaluation.evaluationTypeDisplay ?? 'Evaluation'} submitted for acknowledgement`,
+        action: 'Review Evaluation',
+        sortDate:
+          evaluation.submittedAt ?? evaluation.updatedAt ?? evaluation.createdAt ?? '',
+      }));
+
+    return [...pendingLogActions, ...pendingEvaluationActions]
+      .sort((a, b) => {
+        const aTime = a.sortDate ? new Date(a.sortDate).getTime() : 0;
+        const bTime = b.sortDate ? new Date(b.sortDate).getTime() : 0;
+        return bTime - aTime;
+      })
+      .slice(0, 6);
+  }, [logs, evaluations]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -95,9 +129,9 @@ const AcademicMainPanel = ({ onNavigate }) => {
             </tr>
           </thead>
           <tbody>
-            {recentActivity.length > 0 ? (
-              recentActivity.map((item) => (
-                <tr key={`${item.type}-${item.id}`}>
+            {actionRequired.length > 0 ? (
+              actionRequired.map((item) => (
+                <tr key={item.key}>
                   <td>
                     <span className={item.type === 'log' ? 'primary' : 'warning'}>
                       {item.type === 'log' ? 'Weekly Log' : 'Evaluation'}
@@ -107,7 +141,7 @@ const AcademicMainPanel = ({ onNavigate }) => {
                   <td style={{ fontSize: '0.85rem', color: 'var(--color-info-dark)' }}>
                     {item.organization}
                   </td>
-                  <td>{item.title}</td>
+                  <td>{item.details}</td>
                   <td>
                     <button 
                       className="btn-view"
