@@ -178,7 +178,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 # Frontend URL for email links
-FRONTEND_URL = "http://localhost"
+FRONTEND_URL = "http://localhost:5173"
 
 # Email configuration
 # Console backend prints emails to terminal (for development)

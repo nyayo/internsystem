@@ -75,6 +75,7 @@ const AcademicDashboardContent = () => {
         pendingEvals={stats.pendingAcknowledgement}
         onClose={() => setSidebarOpen(false)}
         isOpen={sidebarOpen}
+        onLogout={handleLogout}
       />
       {renderMainContent()}
       <AcademicRightPanel onMenuClick={() => setSidebarOpen(true)} />
