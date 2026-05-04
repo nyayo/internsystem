@@ -9,12 +9,11 @@ import LoginPage from "./pages/auth/login/LoginPage";
 import CheckEmailPage from "./pages/auth/verify/CheckEmailPage";
 import VerifyEmailPage from "./pages/auth/verify/VerifyEmailPage";
 import EmailConfirmedPage from "./pages/auth/verify/EmailConfirmedPage";
-// import WorkplaceDashboard from "./pages/supervisor/WorkplaceDashboard";
-// import AcademicDashboard from "./pages/supervisor/AcademicDashboard";
 import RegisterPage from "./pages/auth/register/RegisterPage";
 import Dashboard from "./pages/admin/Dashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
-import AcademicDashboard from "./pages/supervisor/academic/AcademicDashboard";
+// import AcademicDashboard from "./pages/supervisor/academic/AcademicDashboard";
+import WorkplaceDashboard from "./pages/supervisor/workplace/WorkplaceDashboard";
 
 
 function App() {
@@ -63,7 +62,7 @@ function App() {
             </RoleRoute>
           }
         />
-        {/* <Route
+        <Route
           path="/supervisor/workplace"
           element={
             <RoleRoute allowedRoles={["workplace_supervisor"]}>
@@ -71,7 +70,7 @@ function App() {
             </RoleRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/supervisor/academic"
           element={
             <RoleRoute allowedRoles={["academic_supervisor"]}>
@@ -92,6 +91,8 @@ function App() {
       </Routes>
       {/* <Dashboard /> */}
       {/* <StudentDashboard /> */}
+      {/* <WorkplaceDashboard /> */}
+      {/* <AcademicDashboard /> */}
       <Notification />
     </>
   );

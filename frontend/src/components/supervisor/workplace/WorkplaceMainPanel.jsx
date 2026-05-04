@@ -1,24 +1,49 @@
-import React from 'react';
-import { useSupervisor } from '../../../context/SupervisorContext';
-import { getWorkplaceRecentActivity, formatDate } from '../../../data/supervisorData';
-import '../shared/SupervisorStyles.css';
+import React, { useMemo } from "react";
+import { useSupervisor } from "../../../context/SupervisorContext";
+import {
+  getWorkplaceRecentActivity,
+  formatDate,
+} from "../../../data/supervisorData";
+import "../shared/SupervisorStyles.css";
 
 const WorkplaceMainPanel = ({ onNavigate }) => {
-  const { supervisor, stats } = useSupervisor();
-  const recentActivity = getWorkplaceRecentActivity();
+  const { supervisor, logs, isLoading } = useSupervisor();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
   };
+
+  const stats = useMemo(() => {
+    const pendingLogs = logs.filter((l) => l.status === "submitted").length;
+    const endorsedLogs = logs.filter((l) =>
+      ["endorsed", "assessed", "closed"].includes(l.status),
+    ).length;
+    const resubmitLogs = logs.filter((l) => l.status === "resubmit").length;
+    const uniqueStudents = new Set(logs.map((l) => l.student?.regNumber)).size;
+
+    return {
+      pendingLogs,
+      endorsedLogs,
+      resubmitLogs,
+      totalStudents: uniqueStudents,
+    };
+  }, [logs]);
+
+  const actionRequired = useMemo(() => {
+    return logs
+      .filter((l) => ["submitted", "resubmit"].includes(l.status))
+      .sort((a, b) => new Date(a.submittedAt) - new Date(b.submittedAt));
+  }, [logs]);
 
   return (
     <main>
       <h1>Supervisor Dashboard</h1>
       <p className="welcome-text">
-        {getGreeting()}, {supervisor.firstName}! You have {stats.pendingLogs} logs to endorse and {stats.pendingEvaluations} evaluations pending.
+        {getGreeting()}, {supervisor.firstName}! You have {stats.pendingLogs}{" "}
+        logs to endorse and {stats.pendingEvaluations} evaluations pending.
       </p>
 
       {/* Stats Cards - using admin insight cards pattern */}
@@ -54,7 +79,7 @@ const WorkplaceMainPanel = ({ onNavigate }) => {
                 <circle cx="38" cy="38" r="36"></circle>
               </svg>
               <div className="number">
-                <p>{stats.pendingLogs > 0 ? 'Action' : '0%'}</p>
+                <p>{stats.pendingLogs > 0 ? "Action" : "0%"}</p>
               </div>
             </div>
           </div>
@@ -95,38 +120,66 @@ const WorkplaceMainPanel = ({ onNavigate }) => {
             </tr>
           </thead>
           <tbody>
-            {recentActivity.length > 0 ? (
-              recentActivity.map((item) => (
-                <tr key={`${item.type}-${item.id}`}>
+            {actionRequired.length > 0 ? (
+              actionRequired.map((log) => (
+                <tr key={log.id}>
+                  <td>{log.student?.name ?? "-"}</td>
+                  <td>Week {log.weekNumber}</td>
                   <td>
-                    <span className={item.type === 'log' ? 'primary' : 'warning'}>
-                      {item.type === 'log' ? 'Weekly Log' : 'Evaluation'}
+                    {formatDate(log.weekStartDate)} →{" "}
+                    {formatDate(log.weekEndDate)}
+                  </td>
+                  <td>
+                    <span
+                      className={
+                        log.status === "submitted" ? "primary" : "warning"
+                      }
+                    >
+                      {log.status === "submitted"
+                        ? "Pending Review"
+                        : "Resubmitted"}
                     </span>
                   </td>
-                  <td>{item.studentName}</td>
-                  <td>{item.title}</td>
-                  <td>{item.isDue ? `Due: ${formatDate(item.date)}` : formatDate(item.date)}</td>
+                  <td>{log.submittedAt ? formatDate(log.submittedAt) : "-"}</td>
                   <td>
-                    <button 
+                    <button
                       className="btn-view"
-                      onClick={() => onNavigate(item.type === 'log' ? 'logs' : 'evaluations')}
+                      onClick={() => onNavigate("logs")}
                     >
-                      {item.action}
+                      Review
                     </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
-                  <span className="material-icons-sharp" style={{ fontSize: '2rem', color: 'var(--color-success)' }}>task_alt</span>
-                  <p style={{ marginTop: '0.5rem' }}>All caught up! No pending actions.</p>
+                <td
+                  colSpan="6"
+                  style={{ textAlign: "center", padding: "2rem" }}
+                >
+                  <span
+                    className="material-icons-sharp"
+                    style={{ fontSize: "2rem", color: "var(--color-success)" }}
+                  >
+                    task_alt
+                  </span>
+                  <p style={{ marginTop: "0.5rem" }}>
+                    All caught up! No pending actions.
+                  </p>
                 </td>
               </tr>
             )}
           </tbody>
         </table>
-        <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('logs'); }}>View All Logs</a>
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onNavigate("logs");
+          }}
+        >
+          View All Logs
+        </a>
       </div>
     </main>
   );

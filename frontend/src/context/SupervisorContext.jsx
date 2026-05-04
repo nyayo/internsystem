@@ -5,6 +5,7 @@ import {
   useContext,
   useMemo,
   useState,
+  useEffect,
 } from "react";
 import {
   currentWorkplaceSupervisor,
@@ -88,6 +89,7 @@ export const SupervisorProvider = ({ children, role }) => {
   );
 
   const [students, setStudents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [logs, setLogs] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
   const [criteria] = useState(evaluationCriteria);
