@@ -105,8 +105,8 @@ def send_placement_submitted_email(placement):
             recipient=admin.email,
         )
 
-        def send_placement_approved_email(placement):
-            """Notify the student and both supervisors that a placement has been approved."""
+def send_placement_approved_email(placement):
+    """Notify the student and both supervisors that a placement has been approved."""
 
     student = placement.student
     _send(

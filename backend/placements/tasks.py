@@ -29,3 +29,38 @@ def activate_approved_placements():
 
     return f"Activated {activated} placement(s)."
 
+
+@shared_task(name="placements.tasks.notify_placement_status_change")
+def notify_placement_status_change(placement_id):
+    """
+    Triggered manually from a view after a status change.
+    Dispatches the correct email based on the current placement status.
+    """
+    from .models import InternshipPlacement
+    from accounts.emails import (
+        send_placement_submitted_email,
+        send_placement_approved_email,
+        send_placement_rejected_email,
+        send_placement_activated_email,
+        send_placement_completed_email,
+    )
+
+    try:
+        placement = InternshipPlacement.objects.get(id=placement_id)
+    except InternshipPlacement.DoesNotExist:
+        return f"Placement {placement_id} not found."
+
+    handlers = {
+        "pending_approval": send_placement_submitted_email,
+        "approved":         send_placement_approved_email,
+        "rejected":         send_placement_rejected_email,
+        "active":           send_placement_activated_email,
+        "completed":        send_placement_completed_email,
+    }
+
+    handler = handlers.get(placement.status)
+    if handler:
+        handler(placement)
+        return f"Notification sent for placement {placement_id} — status: {placement.status}."
+    return f"No notification configured for status: {placement.status}."
+
