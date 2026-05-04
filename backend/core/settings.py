@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -148,13 +149,50 @@ REST_FRAMEWORK = {
 }
 
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
-CELERY_RESULT_BACKEND = 'django-db'   
+CELERY_RESULT_BACKEND ='redis://localhost:6379/1'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Africa/Kampala'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT   = 30 * 60 
+
+CELERY_BEAT_SCHEDULE = {
+    # Runs every day at 07:00 EAT
+    # Activates all approved placements whose start_date == today
+    "activate-approved-placements": {
+        "task":     "placements.tasks.activate_approved_placements",
+        "schedule": crontab(hour=7, minute=0),
+    },
+
+    # Runs every day at 07:15 EAT
+    # Creates evaluation records for newly activated placements
+    "create-placement-evaluations": {
+        "task":     "evaluations.tasks.create_evaluations_for_active_placements",
+        "schedule": crontab(hour=7, minute=15),
+    },
+
+    # Runs every day at 08:00 EAT
+    # Sends deadline reminders for overdue or upcoming weekly logs
+    "notify-log-deadlines": {
+        "task":     "logs.tasks.notify_log_deadlines",
+        "schedule": crontab(hour=8, minute=0),
+    },
+
+    # Runs every day at 08:30 EAT
+    # Sends reminders to supervisors with pending evaluations
+    "notify-pending-evaluations": {
+        "task":     "evaluations.tasks.notify_pending_evaluations",
+        "schedule": crontab(hour=8, minute=30),
+    },
+
+    # Runs every day at 09:00 EAT
+    # Closes all assessed logs automatically
+    "close-assessed-logs": {
+        "task":     "logs.tasks.close_assessed_logs",
+        "schedule": crontab(hour=9, minute=0),
+    },
+}
 
 
 SIMPLE_JWT = {
@@ -166,8 +204,7 @@ SIMPLE_JWT = {
     "SIGNING_KEY": SECRET_KEY,
     "AUTH_HEADER_TYPES": ("Bearer",)
 }
-CELERY_BROKER_URL = 'redis://localhost:6379/1'
-CELERY_RESULT_BACKEND ='redis://localhost:6379/1'
+
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "InternHub API",
