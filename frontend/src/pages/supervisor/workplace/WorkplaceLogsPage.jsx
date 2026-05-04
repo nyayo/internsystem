@@ -11,6 +11,7 @@ const WorkplaceLogsPage = () => {
   const { logs, endorseLog } = useSupervisor();
   const [activeFilter, setActiveFilter] = useState('pending');
   const [selectedLog, setSelectedLog] = useState(null);
+  console.log("Logs", logs)
 
   const filteredLogs = logs.filter(log => {
     switch (activeFilter) {
@@ -82,8 +83,8 @@ const WorkplaceLogsPage = () => {
               paginatedLogs.map((log) => (
                 <tr key={log.id}>
                   <td>
-                    <div style={{ fontWeight: '500' }}>{log.studentName}</div>
-                    <small className="text-muted">{log.programme}</small>
+                    <div style={{ fontWeight: '500' }}>{log.student.name}</div>
+                    <small className="text-muted">{log.student.programme}</small>
                   </td>
                   <td>
                     <span style={{ fontWeight: '500' }}>Week {log.weekNumber}</span>

@@ -1,15 +1,33 @@
-import React from 'react';
+import React from "react";
 
-const WorkplaceSideBar = ({ activeLink, onLinkClick, pendingLogs, pendingEvals, onClose, isOpen }) => {
+const WorkplaceSideBar = ({
+  activeLink,
+  onLinkClick,
+  pendingLogs,
+  pendingEvals,
+  onClose,
+  isOpen,
+  onLogout,
+}) => {
   const menuItems = [
-    { id: 'dashboard', icon: 'grid_view', label: 'Dashboard' },
-    { id: 'students', icon: 'people_outline', label: 'My Students' },
-    { id: 'logs', icon: 'description', label: 'Weekly Logs', count: pendingLogs },
-    { id: 'evaluations', icon: 'rate_review', label: 'Evaluations', count: pendingEvals },
+    { id: "dashboard", icon: "grid_view", label: "Dashboard" },
+    { id: "students", icon: "people_outline", label: "My Students" },
+    {
+      id: "logs",
+      icon: "description",
+      label: "Weekly Logs",
+      count: pendingLogs,
+    },
+    {
+      id: "evaluations",
+      icon: "rate_review",
+      label: "Evaluations",
+      count: pendingEvals,
+    },
   ];
 
   return (
-    <aside className={isOpen ? 'show-menu' : ''}>
+    <aside className={isOpen ? "show-menu" : ""}>
       <div className="top">
         <div className="logo">
           <div className="logo-icon">
@@ -24,11 +42,11 @@ const WorkplaceSideBar = ({ activeLink, onLinkClick, pendingLogs, pendingEvals, 
         </div>
       </div>
       <div className="sidebar">
-        {menuItems.map(item => (
-          <a 
+        {menuItems.map((item) => (
+          <a
             key={item.id}
-            href="#" 
-            className={activeLink === item.id ? 'active' : ''}
+            href="#"
+            className={activeLink === item.id ? "active" : ""}
             onClick={(e) => {
               e.preventDefault();
               onLinkClick(item.id);
@@ -41,7 +59,13 @@ const WorkplaceSideBar = ({ activeLink, onLinkClick, pendingLogs, pendingEvals, 
             )}
           </a>
         ))}
-        <a href="#">
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onLogout();
+          }}
+        >
           <span className="material-icons-sharp">logout</span>
           <h3>Logout</h3>
         </a>

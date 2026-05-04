@@ -6,12 +6,22 @@ import WorkplaceRightPanel from '../../../components/supervisor/workplace/Workpl
 import WorkplaceStudentsPage from './WorkplaceStudentsPage';
 import WorkplaceLogsPage from './WorkplaceLogsPage';
 import WorkplaceEvaluationsPage from './WorkplaceEvaluationsPage';
+import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router';
 import '../../../components/supervisor/shared/SupervisorStyles.css';
 
 const WorkplaceDashboardContent = () => {
   const [activeLink, setActiveLink] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { stats, notification } = useSupervisor();
+  const { logout } = useAuth();
+
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   const renderMainContent = () => {
     switch (activeLink) {
@@ -46,6 +56,7 @@ const WorkplaceDashboardContent = () => {
         pendingEvals={stats.pendingEvaluations}
         onClose={() => setSidebarOpen(false)}
         isOpen={sidebarOpen}
+        onLogout={handleLogout}
       />
       {renderMainContent()}
       <WorkplaceRightPanel onMenuClick={() => setSidebarOpen(true)} />

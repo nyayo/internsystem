@@ -53,6 +53,7 @@ const normalizeLog = (log) => ({
     name: log.student_name ?? "-",
     regNumber: log.student_number ?? "-",
     organisation: log.organisation ?? "-",
+    programme: log.programme ?? "-",
   },
   weekNumber: log.week_number,
   weekStartDate: log.week_start_date ?? null,
@@ -192,10 +193,8 @@ export const SupervisorProvider = ({ children, role }) => {
         const studentMap = Object.fromEntries(
           studentRows.map((s) => [s.id, s]),
         );
-        console.log(studentMap)
 
         const enrichedStudents = placements.map((p) => {
-          console.log(p.student)
           const student = studentMap[p.student] ?? {}; // p.student is the FK id
           return {
             id: p.student,
