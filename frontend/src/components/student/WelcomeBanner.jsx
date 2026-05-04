@@ -4,7 +4,6 @@ import './WelcomeBanner.css';
 
 export default function WelcomeBanner({ student, placement }) {
   const hasActivePlacement = placement && ['approved', 'active', 'completed'].includes(placement.status);
-  console.log(placement)
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good Morning';

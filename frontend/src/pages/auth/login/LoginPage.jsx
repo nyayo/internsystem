@@ -82,7 +82,7 @@ function LoginPage() {
         )}
 
         <form className="auth-form" onSubmit={handleLogin}>
-          <select
+          {/* <select
             className="auth-input"
             value={role}
             onChange={(event) => setRole(event.target.value)}
@@ -92,7 +92,7 @@ function LoginPage() {
                 {option.label}
               </option>
             ))}
-          </select>
+          </select> */}
 
           <input
             className="auth-input"

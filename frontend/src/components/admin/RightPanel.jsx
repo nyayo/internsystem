@@ -32,7 +32,7 @@ export default function RightPanel({ onMenuClick, stats, admin }) {
         </div>
       </div>
 
-      <div className="recent-updates">
+      {/* <div className="recent-updates">
         <h2>Recent Activity</h2>
         <div className="updates">
           <div className="update">
@@ -72,7 +72,7 @@ export default function RightPanel({ onMenuClick, stats, admin }) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="analytics">
         <h2>Supervisors Overview</h2>

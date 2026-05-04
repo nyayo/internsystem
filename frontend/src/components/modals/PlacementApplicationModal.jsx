@@ -71,7 +71,6 @@ export default function PlacementApplicationModal({
   const [formData, setFormData] = useState(() => getInitialData());
   const [errors, setErrors] = useState({});
   const [isDirty, setIsDirty] = useState(false);
-  console.log(formData)
 
   // useEffect(() => {
   //   if (!isDirty) return;
