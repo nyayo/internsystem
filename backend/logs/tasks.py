@@ -88,3 +88,19 @@ def notify_log_deadlines():
         f"Log deadline reminders sent: "
         f"{overdue_count} overdue, {pending_count} pending endorsement."
     )
+    
+    
+@shared_task(name="logs.tasks.close_assessed_logs")
+def close_assessed_logs():
+    """
+    Runs daily at 09:00 EAT.
+    Automatically closes all logs that have been assessed.
+    No further edits are permitted after closing.
+    """
+    from .models import WeeklyLogs
+
+    assessed_logs = WeeklyLogs.objects.filter(status="assessed")
+    count = assessed_logs.count()
+    assessed_logs.update(status="closed")
+
+    return f"Closed {count} assessed log(s)."
