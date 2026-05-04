@@ -4,10 +4,27 @@ import './StudentFormStyles.css';
 
 const LogEndorsementModal = ({ log, onClose, onEndorse, readOnly = false }) => {
   const [comment, setComment] = useState(log.workplaceComment || '');
+  const [resubmitReason, setResubmitReason] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e, action = 'endorse') => {
     e.preventDefault();
-    onEndorse(log.id, comment);
+
+    if (action === 'return' && !resubmitReason.trim()) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await onEndorse(
+        log.id,
+        action,
+        comment.trim(),
+        resubmitReason.trim(),
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -34,8 +51,12 @@ const LogEndorsementModal = ({ log, onClose, onEndorse, readOnly = false }) => {
             alignItems: 'center'
           }}>
             <div>
-              <h3 style={{ fontWeight: '600', marginBottom: '0.25rem' }}>{log.studentName}</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--color-info-dark)' }}>{log.programme}</p>
+              <h3 style={{ fontWeight: '600', marginBottom: '0.25rem' }}>
+                {log.student?.name ?? log.studentName ?? '-'}
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-info-dark)' }}>
+                {log.student?.programme ?? log.programme ?? '-'}
+              </p>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ 
@@ -86,9 +107,9 @@ const LogEndorsementModal = ({ log, onClose, onEndorse, readOnly = false }) => {
 
           {/* Endorsement Section */}
           {!readOnly ? (
-            <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
+            <form onSubmit={(e) => handleSubmit(e, 'endorse')} style={{ marginTop: '1.5rem' }}>
               <div className="form-group">
-                <label htmlFor="endorsementComment">Your Endorsement Comment *</label>
+                <label htmlFor="endorsementComment">Workplace Supervisor Comment *</label>
                 <textarea
                   id="endorsementComment"
                   value={comment}
@@ -99,13 +120,33 @@ const LogEndorsementModal = ({ log, onClose, onEndorse, readOnly = false }) => {
                 />
               </div>
 
+              <div className="form-group">
+                <label htmlFor="resubmitReason">Reason for Return (only if returning)</label>
+                <textarea
+                  id="resubmitReason"
+                  value={resubmitReason}
+                  onChange={(e) => setResubmitReason(e.target.value)}
+                  placeholder="Add what the student should correct before resubmission..."
+                  rows={3}
+                />
+              </div>
+
               <div className="form-actions">
                 <button type="button" className="btn-cancel" onClick={onClose}>
                   Cancel
                 </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={(e) => handleSubmit(e, 'return')}
+                  disabled={isSubmitting || !comment.trim() || !resubmitReason.trim()}
+                >
+                  <span className="material-icons-sharp">undo</span>
+                  Return for Revision
+                </button>
                 <button type="submit" className="btn-submit">
                   <span className="material-icons-sharp">check_circle</span>
-                  Endorse Log
+                  {isSubmitting ? 'Submitting...' : 'Endorse Log'}
                 </button>
               </div>
             </form>

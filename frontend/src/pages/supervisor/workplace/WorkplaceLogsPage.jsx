@@ -39,8 +39,13 @@ const WorkplaceLogsPage = () => {
     resetPagination();
   };
 
-  const handleEndorse = (logId, comment) => {
-    endorseLog(logId, comment);
+  const handleEndorse = async (
+    logId,
+    action,
+    workplaceRemarks = '',
+    resubmitReason = '',
+  ) => {
+    await endorseLog(logId, action, workplaceRemarks, resubmitReason);
     setSelectedLog(null);
   };
 

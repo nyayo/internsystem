@@ -258,12 +258,26 @@ export const SupervisorProvider = ({ children, role }) => {
   }, []);
 
   const endorseLog = useCallback(
-    async (logId, action, workplaceRemarks = "", resubmitReason = "") => {
+    async (
+      logId,
+      actionOrRemarks = "endorse",
+      workplaceRemarks = "",
+      resubmitReason = "",
+    ) => {
+      const action =
+        actionOrRemarks === "endorse" || actionOrRemarks === "return"
+          ? actionOrRemarks
+          : "endorse";
+      const remarks =
+        action === "endorse" && actionOrRemarks !== "endorse"
+          ? actionOrRemarks
+          : workplaceRemarks;
+
       try {
         const result = await endorseLogApi(
           logId,
           action,
-          workplaceRemarks,
+          remarks,
           resubmitReason,
         );
         if (!result) return;
