@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AcademicSideBar = ({ activeLink, onLinkClick, pendingLogs, pendingEvals, onClose, isOpen }) => {
+const AcademicSideBar = ({ activeLink, onLinkClick, pendingLogs, pendingEvals, onClose, isOpen, onLogout }) => {
   const menuItems = [
     { id: 'dashboard', icon: 'grid_view', label: 'Dashboard' },
     { id: 'students', icon: 'people_outline', label: 'My Students' },
@@ -41,7 +41,13 @@ const AcademicSideBar = ({ activeLink, onLinkClick, pendingLogs, pendingEvals, o
             )}
           </a>
         ))}
-        <a href="#">
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onLogout();
+          }}
+        >
           <span className="material-icons-sharp">logout</span>
           <h3>Logout</h3>
         </a>
