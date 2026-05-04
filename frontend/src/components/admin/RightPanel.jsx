@@ -27,52 +27,23 @@ export default function RightPanel({ onMenuClick, stats, admin }) {
             <small className="text-muted">{admin.jobTitle}</small>
           </div>
           <div className="profile-photo">
-            <img src={Profile1} alt="Administrator" />
+            <div style={{
+              width: '100%',
+              height: '100%',
+              background: 'var(--color-primary)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '600',
+              fontSize: '0.9rem'
+            }}>
+              {admin.firstName.split(' ').pop().charAt(0).toUpperCase()}{admin.lastName.charAt(0).toUpperCase()}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* <div className="recent-updates">
-        <h2>Recent Activity</h2>
-        <div className="updates">
-          <div className="update">
-            <div className="profile-photo">
-              <img src={Profile2} alt="" />
-            </div>
-            <div className="message">
-              <p>
-                <b>Nakato Joy</b> submitted a new internship application for
-                Stanbic Bank.
-              </p>
-              <small>5 Minutes Ago</small>
-            </div>
-          </div>
-          <div className="update">
-            <div className="profile-photo">
-              <img src={Profile3} alt="" />
-            </div>
-            <div className="message">
-              <p>
-                <b>Kato David</b>'s internship at KCCA was approved by the
-                committee.
-              </p>
-              <small>15 Minutes Ago</small>
-            </div>
-          </div>
-          <div className="update">
-            <div className="profile-photo">
-              <img src={Profile4} alt="" />
-            </div>
-            <div className="message">
-              <p>
-                <b>Amongi Faith</b> submitted her weekly progress report from
-                URA.
-              </p>
-              <small>1 Hour Ago</small>
-            </div>
-          </div>
-        </div>
-      </div> */}
 
       <div className="analytics">
         <h2>Supervisors Overview</h2>
