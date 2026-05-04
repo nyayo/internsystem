@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import './CalendarWidget.css';
+
 export default function CalendarWidget({ startDate, endDate }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-
-   
+  
   const internshipStart = new Date(startDate);
   const internshipEnd = new Date(endDate);
   const today = new Date();
-
+  
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
   const firstDay = new Date(year, month, 1);
@@ -15,11 +15,12 @@ export default function CalendarWidget({ startDate, endDate }) {
   const startingDayOfWeek = firstDay.getDay();
   const daysInMonth = lastDay.getDate();
 
-   const calendarData = [];
+  const calendarData = [];
 
-   for (let i = 0; i < startingDayOfWeek; i++) {
+  for (let i = 0; i < startingDayOfWeek; i++) {
     calendarData.push({ day: null, type: 'empty' });
   }
+
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
     const dateStr = date.toISOString().split('T')[0];
@@ -34,14 +35,18 @@ export default function CalendarWidget({ startDate, endDate }) {
     } else if (dateStr === endDate) {
       type = 'end';
     }
+
     const isToday = date.toDateString() === today.toDateString();
     calendarData.push({ day, type, isToday, date });
   }
+  
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
+  
   const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  
   const prevMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   };
@@ -49,11 +54,11 @@ export default function CalendarWidget({ startDate, endDate }) {
   const nextMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
-
+  
   const goToToday = () => {
     setCurrentMonth(new Date());
   };
-
+  
   return (
     <div className="calendar-widget">
       <div className="calendar-header">
@@ -70,15 +75,15 @@ export default function CalendarWidget({ startDate, endDate }) {
           </button>
         </div>
       </div>
-
+      
       <div className="calendar-grid">
         <div className="day-names">
           {dayNames.map(day => (
             <span key={day} className="day-name">{day}</span>
           ))}
         </div>
-
-         <div className="days">
+        
+        <div className="days">
           {calendarData.map((item, index) => (
             <div 
               key={index} 
@@ -89,8 +94,8 @@ export default function CalendarWidget({ startDate, endDate }) {
           ))}
         </div>
       </div>
-
-       <div className="calendar-legend">
+      
+      <div className="calendar-legend">
         <div className="legend-item">
           <span className="dot start"></span>
           <span>Start</span>
@@ -108,11 +113,19 @@ export default function CalendarWidget({ startDate, endDate }) {
           <span>Today</span>
         </div>
       </div>
+<<<<<<< HEAD
+      
+=======
   
+>>>>>>> c0dce36d57d20c8edda407d43d8616cd98f13479
       <button className="today-btn" onClick={goToToday}>
         <span className="material-icons-sharp">today</span>
         Go to Today
       </button>
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c0dce36d57d20c8edda407d43d8616cd98f13479

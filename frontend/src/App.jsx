@@ -14,6 +14,7 @@ import EmailConfirmedPage from "./pages/auth/verify/EmailConfirmedPage";
 import RegisterPage from "./pages/auth/register/RegisterPage";
 import Dashboard from "./pages/admin/Dashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
+import AcademicDashboard from "./pages/supervisor/academic/AcademicDashboard";
 
 
 function App() {

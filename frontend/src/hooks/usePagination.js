@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { calculateTotalPages, getPaginatedItems } from "../utils/listUtils";
+
 
 export default function usePagination(items, initialItemsPerPage = 10) {
   const [currentPage, setCurrentPage] = useState(1);

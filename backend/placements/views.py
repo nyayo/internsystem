@@ -51,6 +51,14 @@ class PlacementListCreateView(APIView):
     
     permission_classes = [IsAuthenticated, IsActiveAccount]
     parser_classes     = [MultiPartParser, FormParser, JSONParser]
+    @extend_schema(
+        operation_id="placements_list",
+        parameters=[
+            OpenApiParameter("status", str, description="Filter by placement status"),
+            OpenApiParameter("cohort", str, description="Filter by intake cohort"),
+        ],
+        responses={200: PlacementListSerializer(many=True)},
+     )
 
     def get(self, request):
         queryset = get_queryset_for_role(request.user)
@@ -64,6 +72,16 @@ class PlacementListCreateView(APIView):
 
         serializer = PlacementListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @extend_schema(
+        operation_id="placements_create",
+        request=PlacementDetailSerializer,
+        responses={
+            201: PlacementDetailSerializer,
+            400: OpenApiResponse(description="Validation errors."),
+            403: OpenApiResponse(description="Only students can create placements."),
+        },
+    )
 
     def post(self, request):
         if request.user.role != "student":
@@ -102,6 +120,16 @@ class PlacementDetailView(APIView):
             return None, Response({"detail": perm.message}, status=403)
  
         return obj, None
+    
+
+    @extend_schema(
+        operation_id="placements_detail",
+        responses={
+            200: PlacementDetailSerializer,
+            403: OpenApiResponse(description="Not linked to this placement."),
+            404: OpenApiResponse(description="Placement not found."),
+        },
+    )
 
     def get(self, request, pk):
         obj, err = self.get_object(pk, request)
@@ -109,7 +137,18 @@ class PlacementDetailView(APIView):
             return err
         serializer = PlacementDetailSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
+    
+    @extend_schema(
+        operation_id="placements_partial_update",
+        request=PlacementDetailSerializer,
+        responses={
+            200: PlacementDetailSerializer,
+            400: OpenApiResponse(description="Not a draft or validation error."),
+            403: OpenApiResponse(description="Only the student can edit a placement."),
+            404: OpenApiResponse(description="Placement not found."),
+        },
+    )
+    
     def patch(self, request, pk):
         obj, err = self.get_object(pk, request)
         if err:
@@ -130,6 +169,20 @@ class PlacementDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    @extend_schema(
+    operation_id="placements_submit",
+    request=None,
+    responses={
+        200: inline_serializer("PlacementSubmitResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 
 
@@ -153,6 +206,19 @@ class PlacementSubmitView(APIView):
             {"detail": "Placement submitted for review.", "status": obj.status},
             status=status.HTTP_200_OK,
         )
+    
+    @extend_schema(
+    operation_id="placements_approve",
+    request=PlacementApprovalSerializer,
+    responses={
+        200: inline_serializer("PlacementApprovalResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 
 
@@ -181,7 +247,18 @@ class PlacementApprovalView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
+@extend_schema(
+    operation_id="placements_activate",
+    request=None,
+    responses={
+        200: inline_serializer("PlacementActivateResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Only approved placements can be activated."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 
 class PlacementActivateView(APIView):
@@ -208,6 +285,22 @@ class PlacementActivateView(APIView):
             {"detail": "Placement is now active.", "status": obj.status},
             status=status.HTTP_200_OK,
         )
+    
+    @extend_schema(
+    operation_id="placements_withdraw",
+    request=PlacementWithdrawSerializer,
+    responses={
+        200: inline_serializer("PlacementWithdrawResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        403: OpenApiResponse(description="Not permitted to withdraw this placement."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
+    
+
 
 class PlacementWithdrawView(APIView):
    
@@ -241,6 +334,19 @@ class PlacementWithdrawView(APIView):
             {"detail": "Placement withdrawn.", "status": obj.status},
             status=status.HTTP_200_OK,
         )
+    
+    @extend_schema(
+    operation_id="placements_complete",
+    request=None,
+    responses={
+        200: inline_serializer("PlacementCompleteResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Preconditions not met."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 
 
@@ -288,8 +394,17 @@ class PlacementCompleteView(APIView):
             {"detail": "Placement marked as completed.", "status": obj.status},
             status=status.HTTP_200_OK,
         )
+    
 
-
+    @extend_schema(
+    operation_id="placements_final_report_upload",
+    request=FinalReportSerializer,
+    responses={
+        200: OpenApiResponse(description="Final report uploaded successfully."),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 class FinalReportUploadView(APIView):
    
@@ -312,6 +427,18 @@ class FinalReportUploadView(APIView):
             {"detail": "Final report uploaded successfully."},
             status=status.HTTP_200_OK,
         )
+    
+    @extend_schema(
+    operation_id="placements_stats",
+    request=None,
+    responses={
+        200: inline_serializer("PlacementStatsResponse", fields={
+            "total":     drf_serializers.IntegerField(),
+            "by_status": drf_serializers.DictField(child=drf_serializers.DictField()),
+            "by_cohort": drf_serializers.DictField(child=drf_serializers.DictField()),
+        }),
+    },
+)
 
 
 class PlacementStatsView(APIView):
