@@ -30,3 +30,39 @@ def create_evaluations_for_active_placements():
                 created_count += 1
 
     return f"Created {created_count} new evaluation record(s)."
+
+
+@shared_task(name="evaluations.tasks.notify_evaluation_status_change")
+def notify_evaluation_status_change(evaluation_id):
+    """
+    Triggered from a view after an evaluation status change.
+    Dispatches the correct email based on the current evaluation status.
+    """
+    from .models import Evaluation
+    from accounts.emails import (
+        send_evaluation_submitted_email,
+        send_evaluation_acknowledged_email,
+    )
+
+    try:
+        evaluation = Evaluation.objects.select_related(
+            "placement__student",
+            "placement__workplace_supervisor",
+            "placement__academic_supervisor",
+        ).get(id=evaluation_id)
+    except Evaluation.DoesNotExist:
+        return f"Evaluation {evaluation_id} not found."
+
+    handlers = {
+        "submitted":    send_evaluation_submitted_email,
+        "acknowledged": send_evaluation_acknowledged_email,
+    }
+
+    handler = handlers.get(evaluation.status)
+    if handler:
+        handler(evaluation)
+        return (
+            f"Notification sent for evaluation {evaluation_id} "
+            f"— status: {evaluation.status}."
+        )
+    return f"No notification configured for status: {evaluation.status}."
