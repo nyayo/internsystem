@@ -14,6 +14,7 @@ const AcademicStudentsPage = () => {
     setCurrentPage,
     setItemsPerPage,
   } = usePagination(students);
+  console.log("Students", paginatedStudents)
 
   const getProgressPercentage = (completed, total) => {
     return Math.round((completed / total) * 100);
@@ -41,7 +42,7 @@ const AcademicStudentsPage = () => {
             <tr>
               <th>Student</th>
               <th>Programme</th>
-              <th>Organization</th>
+              <th>Organisation</th>
               <th>Progress</th>
               <th>Avg. Grade</th>
               <th>Pending</th>
@@ -79,8 +80,8 @@ const AcademicStudentsPage = () => {
                   <small className="text-muted">Year {student.year}</small>
                 </td>
                 <td>
-                  <div style={{ fontSize: '0.9rem' }}>{student.organization}</div>
-                  <small className="text-muted">{student.workplaceSupervisor}</small>
+                  <div style={{ fontSize: '0.9rem' }}>{student.organisation}</div>
+                  <small className="text-muted">{student.department}</small>
                 </td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

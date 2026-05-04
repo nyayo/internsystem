@@ -32,6 +32,7 @@ const AcademicLogsPage = () => {
     setItemsPerPage,
     resetPagination,
   } = usePagination(filteredLogs);
+  console.log("Logs Page", paginatedLogs)
 
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
@@ -94,12 +95,12 @@ const AcademicLogsPage = () => {
               paginatedLogs.map((log) => (
                 <tr key={log.id}>
                   <td>
-                    <div style={{ fontWeight: '500' }}>{log.studentName}</div>
-                    <small className="text-muted">{log.programme}</small>
+                    <div style={{ fontWeight: '500' }}>{log.student.name}</div>
+                    <small className="text-muted">{log.student.programme}</small>
                   </td>
                   <td>
-                    <div style={{ fontSize: '0.9rem' }}>{log.organization}</div>
-                    <small className="text-muted">{log.workplaceEndorsedBy}</small>
+                    <div style={{ fontSize: '0.9rem' }}>{log.student.organisation}</div>
+                    <small className="text-muted">{log.workplaceEndorsedByName}</small>
                   </td>
                   <td>
                     <span style={{ fontWeight: '500' }}>Week {log.weekNumber}</span>

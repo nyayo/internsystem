@@ -67,7 +67,7 @@ const LogAssessmentModal = ({ log, onClose, onAssess, readOnly = false }) => {
               fontSize: '0.85rem',
               color: 'var(--color-info-dark)'
             }}>
-              <strong>Organization:</strong> {log.organization} · <strong>Supervisor:</strong> {log.workplaceEndorsedBy}
+              <strong>Organization:</strong> {log.student.organisation} · <strong>Supervisor:</strong> {log.workplaceEndorsedByName}
             </div>
           </div>
 
@@ -104,7 +104,7 @@ const LogAssessmentModal = ({ log, onClose, onAssess, readOnly = false }) => {
               {log.workplaceComment}
             </div>
             <div style={{ fontSize: '0.8rem', color: 'var(--color-info-dark)', marginTop: '0.5rem' }}>
-              Endorsed by {log.workplaceEndorsedBy} on {formatDateTime(log.workplaceEndorsedAt)}
+              Endorsed by {log.workplaceEndorsedByName} on {formatDateTime(log.workplaceEndorsedAt)}
             </div>
           </div>
 
