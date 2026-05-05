@@ -94,3 +94,18 @@ class CanViewEvaluation(BasePermission):
             or user == obj.placement.academic_supervisor
             or user.role == "internship_administrator"
         )
+
+class CanViewEvaluation(BasePermission):
+    """
+    Object-level: any user linked to the placement can view its evaluations.
+    """
+    message = "You are not linked to this placement."
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        return (
+            user == obj.placement.student
+            or user == obj.placement.workplace_supervisor
+            or user == obj.placement.academic_supervisor
+            or user.role == "internship_administrator"
+        )
