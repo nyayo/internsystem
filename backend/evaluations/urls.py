@@ -23,4 +23,14 @@ urlpatterns = [
         EvaluationCriteriaDetailView.as_view(),
         name="criteria_detail",
     ),
+    path(
+        "evaluations/pending/",
+        PendingEvaluationsView.as_view(),
+        name="evaluation_pending",
+    ),
+    path(
+        "evaluations/placement/<int:placement_id>/summary/",
+        PlacementEvaluationSummaryView.as_view(),
+        name="evaluation_placement_summary",
+    ),
 ]
