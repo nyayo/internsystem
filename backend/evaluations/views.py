@@ -297,3 +297,49 @@ class EvaluationSubmitView(APIView):
             status=status.HTTP_200_OK,
         )
 
+
+class EvaluationAcknowledgeView(APIView):
+    """
+    POST /api/evaluations/<id>/acknowledge/
+    Academic supervisor acknowledges a submitted evaluation.
+    Optionally adds acknowledgement notes.
+
+    Request body:
+        {
+            "acknowledgement_notes": "..."   (optional)
+        }
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount, IsAcademicSupervisor]
+
+    def post(self, request, pk):
+        evaluation, err = get_evaluation_or_404(pk, request.user)
+        if err:
+            return err
+
+        if evaluation.placement.academic_supervisor != request.user:
+            return Response(
+                {"detail": "You are not the academic supervisor for this placement."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = EvaluationAcknowledgeSerializer(
+            evaluation,
+            data=request.data,
+            context={"request": request},
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+
+        return Response(
+            {
+                "detail": "Evaluation acknowledged.",
+                "status": evaluation.status,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+
