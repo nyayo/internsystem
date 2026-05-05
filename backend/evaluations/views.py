@@ -135,6 +135,23 @@ class EvaluationCriteriaDetailView(APIView):
         serializer = EvaluationCriteriaSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    
+    def patch(self, request, pk):
+        if request.user.role != "internship_administrator":
+            return Response(
+                {"detail": "Only administrators can update evaluation criteria."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        obj, err = self.get_object(pk)
+        if err:
+            return err
+        serializer = EvaluationCriteriaSerializer(
+            obj, data=request.data, partial=True
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
