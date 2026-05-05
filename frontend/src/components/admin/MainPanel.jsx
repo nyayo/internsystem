@@ -149,35 +149,46 @@ export default function MainPanel({
             </tr>
           </thead>
           <tbody>
-            {applications.map((app) => (
-              <tr key={app.id}>
-                <td>{app.studentName}</td>
-                <td>{app.regNumber}</td>
-                <td>{app.program}</td>
-                <td className={!app.workplaceSupervisor ? 'text-muted' : ''}>
-                  {app.workplaceSupervisor || 'Not Assigned'}
-                </td>
-                <td className={!app.academicSupervisor ? 'text-muted' : ''}>
-                  {app.academicSupervisor || 'Not Assigned'}
-                </td>
-                <td className={
-                  app.status === 'pending' ? 'warning' : 
-                  app.status === 'approved' ? 'success' : 'danger'
-                }>
-                  {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                </td>
-                <td>
-                  <button 
-                    className="btn-view"
-                    onClick={() => handleViewDetails(app)}
-                    disabled={app.status !== 'pending'}
-                    style={app.status !== 'pending' ? { opacity: 0.5 } : {}}
+            {pendingApplications.length > 0 ? (
+              pendingApplications.map((app) => (
+                <tr key={app.id}>
+                  <td>{app.studentName}</td>
+                  <td>{app.regNumber}</td>
+                  <td>{app.program}</td>
+                  <td className={!app.workplaceSupervisor ? 'text-muted' : ''}>
+                    {app.workplaceSupervisor || 'Not Assigned'}
+                  </td>
+                  <td className={!app.academicSupervisor ? 'text-muted' : ''}>
+                    {app.academicSupervisor || 'Not Assigned'}
+                  </td>
+                  <td className="warning">
+                    Pending
+                  </td>
+                  <td>
+                    <button 
+                      className="btn-view"
+                      onClick={() => handleViewDetails(app)}
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center", padding: "2rem" }}>
+                  <span
+                    className="material-icons-sharp"
+                    style={{ fontSize: "2rem", color: "var(--color-success)" }}
                   >
-                    {app.status === 'pending' ? 'View Details' : 'Processed'}
-                  </button>
+                    task_alt
+                  </span>
+                  <p style={{ marginTop: "0.5rem" }}>
+                    No pending placement applications.
+                  </p>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
         <a href="#">View All Applications</a>
