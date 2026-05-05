@@ -23,3 +23,38 @@ from accounts.permissions import (
     IsAssignedAcademicSupervisor,
     CanViewEvaluation,
 )
+
+def get_evaluation_or_404(pk, user):
+    """
+    Fetches an evaluation and verifies the user is linked
+    to its placement. Returns (evaluation, error_response).
+    """
+    try:
+        evaluation = Evaluation.objects.select_related(
+            "placement__student",
+            "placement__workplace_supervisor",
+            "placement__academic_supervisor",
+            "evaluator",
+            "acknowledged_by",
+        ).get(pk=pk)
+    except Evaluation.DoesNotExist:
+        return None, Response(
+            {"detail": "Evaluation not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    user_obj = user
+    if not (
+        user_obj == evaluation.placement.student
+        or user_obj == evaluation.placement.workplace_supervisor
+        or user_obj == evaluation.placement.academic_supervisor
+        or user_obj.role == "internship_administrator"
+    ):
+        return None, Response(
+            {"detail": "You are not linked to this placement."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    return evaluation, None
+
+
