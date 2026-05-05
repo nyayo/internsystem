@@ -384,3 +384,84 @@ class PendingEvaluationsView(APIView):
         )
 
 
+class PlacementEvaluationSummaryView(APIView):
+    """
+    GET /api/evaluations/placement/<placement_id>/summary/
+    Returns both evaluations (midterm + final) for a placement
+    with their scores and status.
+    Accessible by any user linked to the placement.
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+
+    def get(self, request, placement_id):
+        try:
+            placement = InternshipPlacement.objects.get(pk=placement_id)
+        except InternshipPlacement.DoesNotExist:
+            return Response(
+                {"detail": "Placement not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        user = request.user
+        if not (
+            user == placement.student
+            or user == placement.workplace_supervisor
+            or user == placement.academic_supervisor
+            or user.role == "internship_administrator"
+        ):
+            return Response(
+                {"detail": "You are not linked to this placement."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        evaluations = Evaluation.objects.filter(
+            placement=placement
+        ).prefetch_related("scores__criteria")
+
+        midterm = evaluations.filter(evaluation_type="midterm").first()
+        final   = evaluations.filter(evaluation_type="final").first()
+
+        def summarise(ev):
+            if not ev:
+                return None
+            return {
+                "id":             ev.id,
+                "status":         ev.status,
+                "total_score":    str(ev.total_score) if ev.total_score else None,
+                "overall_remarks":ev.overall_remarks,
+                "submitted_at":   ev.submitted_at,
+                "acknowledged_at":ev.acknowledged_at,
+                "scores": [
+                    {
+                        "criteria":    s.criteria.title,
+                        "max_score":   s.criteria.max_score,
+                        "score_awarded": str(s.score_awarded),
+                        "comment":     s.comment,
+                    }
+                    for s in ev.scores.all()
+                ],
+            }
+
+        # Combined average if both evaluations are acknowledged
+        combined_avg = None
+        if (
+            midterm and midterm.total_score is not None
+            and final and final.total_score is not None
+        ):
+            combined_avg = round(
+                (float(midterm.total_score) + float(final.total_score)) / 2, 2
+            )
+
+        return Response(
+            {
+                "placement_id":   placement.id,
+                "student":        placement.student.get_full_name(),
+                "organisation":   placement.organisation_name,
+                "midterm":        summarise(midterm),
+                "final":          summarise(final),
+                "combined_average": combined_avg,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
