@@ -16,6 +16,11 @@ export default function MainPanel({
   const [showCriteriaModal, setShowCriteriaModal] = useState(false);
   const [editingCriteria, setEditingCriteria] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const truncateDescription = (value, max = 90) => {
+    const text = String(value ?? "");
+    if (text.length <= max) return text;
+    return `${text.slice(0, max).trimEnd()}...`;
+  };
 
   const pendingApplications = applications.filter(app => app.status === 'pending');
   const activeInternships = applications.filter(app => app.status === 'active');
@@ -206,7 +211,9 @@ export default function MainPanel({
                     <span className={`criteria-dot ${item.category.split('_')[0]}`}></span>
                     {item.title}
                   </div>
-                  <small className="text-muted">{item.description}</small>
+                  <small className="text-muted" title={item.description}>
+                    {truncateDescription(item.description)}
+                  </small>
                 </td>
                 <td>{item.categoryDisplay}</td>
                 <td>

@@ -1,13 +1,31 @@
 import React from "react";
-import Profile1 from '../../assets/images/profile-1.jpg'
-import Profile2 from '../../assets/images/profile-2.jpg'
-import Profile3 from '../../assets/images/profile-3.jpg'
-import Profile4 from '../../assets/images/profile-4.jpg'
 import './RightPanel.css'
 import { useTheme } from '../../context/ThemeContext';
 
-export default function RightPanel({ onMenuClick, stats, admin }) {
+export default function RightPanel({
+  onMenuClick,
+  stats,
+  admin,
+  workplaceSupervisors = [],
+  academicSupervisors = [],
+}) {
   const { isDarkMode, toggleTheme } = useTheme();
+  const safeAdmin = admin ?? {
+    fullName: "Administrator",
+    jobTitle: "Internship Administrator",
+    firstName: "A",
+    lastName: "D",
+  };
+
+  const workplaceTotal = workplaceSupervisors.length;
+  const academicTotal = academicSupervisors.length;
+  const workplaceActive = workplaceSupervisors.filter(
+    (item) => item.accountStatus === "active",
+  ).length;
+  const academicActive = academicSupervisors.filter(
+    (item) => item.accountStatus === "active",
+  ).length;
+  const activeCriteria = Number(stats?.activeCriteria ?? 0);
 
   return (
     <div className="right">
@@ -22,9 +40,9 @@ export default function RightPanel({ onMenuClick, stats, admin }) {
         <div className="profile">
           <div className="info">
             <p>
-              Hey, <b>{admin.fullName}</b>
+              Hey, <b>{safeAdmin.fullName}</b>
             </p>
-            <small className="text-muted">{admin.jobTitle}</small>
+            <small className="text-muted">{safeAdmin.jobTitle}</small>
           </div>
           <div className="profile-photo">
             <div style={{
@@ -39,7 +57,7 @@ export default function RightPanel({ onMenuClick, stats, admin }) {
               fontWeight: '600',
               fontSize: '0.9rem'
             }}>
-              {admin.firstName.split(' ').pop().charAt(0).toUpperCase()}{admin.lastName.charAt(0).toUpperCase()}
+              {safeAdmin.firstName.split(' ').pop().charAt(0).toUpperCase()}{safeAdmin.lastName.charAt(0).toUpperCase()}
             </div>
           </div>
         </div>
@@ -56,8 +74,10 @@ export default function RightPanel({ onMenuClick, stats, admin }) {
               <h3>Workplace Supervisors</h3>
               <small className="text-muted">Industry professionals</small>
             </div>
-            <h5 className="success">+5%</h5>
-            <h3>{stats.workplaceSupervisors}</h3>
+            <h5 className={workplaceTotal ? "success" : "danger"}>
+              {workplaceActive}/{workplaceTotal} active
+            </h5>
+            <h3>{workplaceTotal}</h3>
           </div>
         </div>
         <div className="item offline">
@@ -69,8 +89,10 @@ export default function RightPanel({ onMenuClick, stats, admin }) {
               <h3>Academic Supervisors</h3>
               <small className="text-muted">Faculty members</small>
             </div>
-            <h5 className="success">+2%</h5>
-            <h3>{stats.academicSupervisors}</h3>
+            <h5 className={academicTotal ? "success" : "danger"}>
+              {academicActive}/{academicTotal} active
+            </h5>
+            <h3>{academicTotal}</h3>
           </div>
         </div>
         <div className="item customers">
@@ -82,8 +104,10 @@ export default function RightPanel({ onMenuClick, stats, admin }) {
               <h3>Active Criteria</h3>
               <small className="text-muted">Evaluation metrics</small>
             </div>
-            <h5 className="success">{stats.activeCriteria} total</h5>
-            <h3>100%</h3>
+            <h5 className={activeCriteria > 0 ? "success" : "danger"}>
+              {activeCriteria} total
+            </h5>
+            <h3>{activeCriteria > 0 ? "Live" : "0"}</h3>
           </div>
         </div>
       </div>

@@ -86,7 +86,13 @@ const DashboardContent = () => {
         isOpen={sidebarOpen}
       />
       {renderMainContent()}
-      <RightPanel onMenuClick={() => setSidebarOpen(true)} stats={stats} admin={adminUser} />
+      <RightPanel
+        onMenuClick={() => setSidebarOpen(true)}
+        stats={stats}
+        admin={adminUser}
+        workplaceSupervisors={workplaceSupervisors}
+        academicSupervisors={academicSupervisors}
+      />
     </div>
   );
 }
