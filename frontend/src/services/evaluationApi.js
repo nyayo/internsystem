@@ -22,16 +22,35 @@ export async function listCriteria() {
 }
 
 export async function createCriteria(criteriaPayload = {}) {
-  const response = await httpClient.post(`${CRITERIA_BASE_PATH}/`, criteriaPayload);
-  return responseData(response);
+  try {
+    const response = await httpClient.post(
+      `${CRITERIA_BASE_PATH}/`,
+      criteriaPayload,
+    );
+    return responseData(response);
+  } catch (error) {
+    const statusCode = error?.response?.status;
+    if (statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function updateCriteria(criteriaId, criteriaPayload = {}) {
-  const response = await httpClient.patch(
-    `${CRITERIA_BASE_PATH}/${criteriaId}/`,
-    criteriaPayload,
-  );
-  return responseData(response);
+  try {
+    const response = await httpClient.patch(
+      `${CRITERIA_BASE_PATH}/${criteriaId}/`,
+      criteriaPayload,
+    );
+    return responseData(response);
+  } catch (error) {
+    const statusCode = error?.response?.status;
+    if (statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function listPendingEvaluations() {
