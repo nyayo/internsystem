@@ -12,4 +12,15 @@ from .views import (
     EvaluationStatsView,
 )
 
-urlpatterns = []
+urlpatterns = [
+    path(
+        "criteria/",
+        EvaluationCriteriaListCreateView.as_view(),
+        name="criteria_list_create",
+    ),
+    path(
+        "criteria/<int:pk>/",
+        EvaluationCriteriaDetailView.as_view(),
+        name="criteria_detail",
+    ),
+]
