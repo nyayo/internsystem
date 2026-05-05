@@ -43,4 +43,14 @@ urlpatterns = [
         EvaluationDetailView.as_view(),
         name="evaluation_detail",
     ),
+    path(
+        "evaluations/<int:pk>/save-draft/",
+        EvaluationSaveDraftView.as_view(),
+        name="evaluation_save_draft",
+    ),
+    path(
+        "evaluations/<int:pk>/submit/",
+        EvaluationSubmitView.as_view(),
+        name="evaluation_submit",
+    ),
 ]
