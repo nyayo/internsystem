@@ -21,3 +21,17 @@ def evaluation_status_changed(sender, instance, created, **kwargs):
         return
 
     instance.__original_status = current
+    _dispatch_evaluation_notification(instance, current)
+
+
+def _dispatch_evaluation_notification(evaluation, new_status):
+    from .tasks import notify_evaluation_status_change
+
+    notifiable_statuses = {
+        "in_progress",
+        "submitted",
+        "acknowledged",
+    }
+
+    if new_status in notifiable_statuses:
+        notify_evaluation_status_change.delay(evaluation.id)
