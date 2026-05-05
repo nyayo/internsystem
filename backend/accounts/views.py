@@ -16,8 +16,11 @@ from accounts.tokens import (
     generate_password_reset_token,
     verify_password_reset_token,
 )
-from accounts.emails import send_verification_email, send_password_reset_email
-
+from accounts.tasks  import (
+    send_password_reset_email_task,
+    send_password_changed_email_task,
+    send_verification_email_task
+)
 @extend_schema(
     operation_id="auth_register",
     request=UserRegistrationSerializer,
@@ -44,15 +47,12 @@ class RegisterView(APIView):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
-        
-        token = generate_email_verification_token(user)
-        send_verification_email(user, token)
+    
         
         return Response({
             'detail': 'Account created. Please check your email to verify your account.',
             'email':  user.email,
             'role':   user.role,
-            'token': token
         }, status=status.HTTP_201_CREATED)
 
 @extend_schema(
@@ -308,8 +308,7 @@ class ResendVerificationView(APIView):
         if user.account_status != 'registered':
             return Response(response_msg, status=status.HTTP_200_OK)
 
-        token = generate_email_verification_token(user)
-        send_verification_email(user, token)
+        send_verification_email_task.delay(user.id)
         
         return Response(response_msg, status=status.HTTP_200_OK)
 
@@ -343,14 +342,14 @@ class ForgotPasswordView(APIView):
 
         try:
             user = CustomUser.objects.get(email=email)
+            
+            if user.account_status == "active":
+                send_password_reset_email_task.delay(user.id)
         except CustomUser.DoesNotExist:
             return Response(response_msg, status=status.HTTP_200_OK)
 
         if user.account_status in ('suspended', 'deactivated'):
             return Response(response_msg, status=status.HTTP_200_OK)
-
-        token = generate_password_reset_token(user)
-        send_password_reset_email(user, token)
         
         return Response(response_msg, status=status.HTTP_200_OK)
 

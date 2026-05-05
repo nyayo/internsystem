@@ -9,7 +9,7 @@ def send_verification_email_task(user_id):
     """
     from django.contrib.auth import get_user_model
     from accounts.tokens import email_verification_token
-    from notifications.emails import send_verification_email
+    from accounts.emails import send_verification_email
 
     User = get_user_model()
     try:
@@ -30,7 +30,7 @@ def send_password_reset_email_task(user_id):
     """
     from django.contrib.auth import get_user_model
     from accounts.tokens import password_reset_token
-    from notifications.emails import send_password_reset_email
+    from accounts.emails import send_password_reset_email
 
     User = get_user_model()
     try:
@@ -50,7 +50,7 @@ def send_welcome_email_task(user_id):
     Triggered by the signal when account_status changes to active.
     """
     from django.contrib.auth import get_user_model
-    from notifications.emails import send_welcome_email
+    from accounts.emails import send_welcome_email
 
     User = get_user_model()
     try:
@@ -69,7 +69,7 @@ def send_password_changed_email_task(user_id):
     after the new password is saved.
     """
     from django.contrib.auth import get_user_model
-    from notifications.emails import send_password_changed_email
+    from accounts.emails import send_password_changed_email
 
     User = get_user_model()
     try:
@@ -90,7 +90,7 @@ def send_account_status_email_task(user_id, new_status):
     Welcome email (registered → active) is handled by send_welcome_email_task.
     """
     from django.contrib.auth import get_user_model
-    from notifications.emails import (
+    from accounts.emails import (
         send_account_suspended_email,
         send_account_reactivated_email,
         send_account_deactivated_email,
