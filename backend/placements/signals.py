@@ -11,7 +11,6 @@ def placement_status_changed(sender, instance, created, **kwargs):
     Checks whether the status actually changed before dispatching
     a notification task.
     """
-    # Skip on initial creation — no status change has occurred yet
     if created:
         return
 
@@ -22,5 +21,26 @@ def placement_status_changed(sender, instance, created, **kwargs):
     if original == current:
         return
 
-    # Update the tracked value so repeated saves don't re-fire
     instance.__original_status = current
+
+    _dispatch_placement_notification(instance, current)
+
+
+def _dispatch_placement_notification(placement, new_status):
+    """
+    Maps a placement status to the correct notification task.
+    Using a dict keeps the mapping clean and avoids a chain of if/elif.
+    """
+    from .tasks import notify_placement_status_change
+
+    notifiable_statuses = {
+        "pending_approval",
+        "approved",
+        "rejected",
+        "active",
+        "completed",
+        "withdrawn",
+    }
+
+    if new_status in notifiable_statuses:
+        notify_placement_status_change.delay(placement.id)
