@@ -110,3 +110,31 @@ class EvaluationCriteriaListCreateView(APIView):
             )
         serializer.save(created_by=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class EvaluationCriteriaDetailView(APIView):
+    """
+    GET   /api/criteria/<id>/   — view criterion detail (all roles)
+    PATCH /api/criteria/<id>/   — update criterion (admin only)
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+
+    def get_object(self, pk):
+        try:
+            return EvaluationCriteria.objects.get(pk=pk), None
+        except EvaluationCriteria.DoesNotExist:
+            return None, Response(
+                {"detail": "Criterion not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+    def get(self, request, pk):
+        obj, err = self.get_object(pk)
+        if err:
+            return err
+        serializer = EvaluationCriteriaSerializer(obj)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    
+
+
