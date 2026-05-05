@@ -53,4 +53,9 @@ urlpatterns = [
         EvaluationSubmitView.as_view(),
         name="evaluation_submit",
     ),
+    path(
+        "evaluations/<int:pk>/acknowledge/",
+        EvaluationAcknowledgeView.as_view(),
+        name="evaluation_acknowledge",
+    ),
 ]
