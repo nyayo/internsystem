@@ -183,3 +183,19 @@ class EvaluationListView(APIView):
 
         serializer = EvaluationListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class EvaluationDetailView(APIView):
+    """
+    GET /api/evaluations/<id>/
+    Returns full evaluation detail including nested scores.
+    Accessible by any user linked to the placement.
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+
+    def get(self, request, pk):
+        evaluation, err = get_evaluation_or_404(pk, request.user)
+        if err:
+            return err
+        serializer = EvaluationDetailSerializer(evaluation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
