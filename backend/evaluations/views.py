@@ -79,3 +79,22 @@ def get_queryset_for_role(user):
         return Evaluation.objects.all()
 
     return Evaluation.objects.none()
+
+
+class EvaluationCriteriaListCreateView(APIView):
+    """
+    GET  /api/criteria/   — list all criteria (all authenticated roles)
+    POST /api/criteria/   — create a new criterion (admin only)
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+
+    def get(self, request):
+        # All roles can read criteria to understand the rubric
+        queryset   = EvaluationCriteria.objects.all().order_by("category", "title")
+        active_only = request.query_params.get("active")
+        if active_only == "true":
+            queryset = queryset.filter(is_active=True)
+        serializer = EvaluationCriteriaSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    
