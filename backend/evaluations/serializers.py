@@ -119,6 +119,9 @@ class EvaluationDetailSerializer(serializers.ModelSerializer):
     organisation        = serializers.CharField(
         source="placement.organisation_name", read_only=True
     )
+    programme           = serializers.CharField(
+        source="placement.student.programme", read_only=True
+    )
     evaluator_name      = serializers.CharField(
         source="evaluator.get_full_name", read_only=True
     )
@@ -135,6 +138,7 @@ class EvaluationDetailSerializer(serializers.ModelSerializer):
             "student_name",
             "student_number",
             "organisation",
+            "programme",
             "evaluator",
             "evaluator_name",
             "evaluation_type",
@@ -251,7 +255,7 @@ class EvaluationSubmitSerializer(serializers.Serializer):
         instance.status          = "submitted"
         instance.submitted_at    = timezone.now()
         instance.save()
-        instance.calculate_total_score()
+        # instance.calculate_total_score()
 
         return instance
 

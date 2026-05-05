@@ -4,28 +4,44 @@ import './StudentFormStyles.css';
 
 const EvaluationFormModal = ({ evaluation, criteria, onClose, onSaveDraft, onSubmit, readOnly = false }) => {
   const getInitialScores = () => {
-    if (evaluation.scores && evaluation.scores.length > 0) {
-      return evaluation.scores;
+    const savedScores = Array.isArray(evaluation.scores) ? evaluation.scores : [];
+    const savedByCriteria = new Map(
+      savedScores.map((score) => [score.criteriaId, score]),
+    );
+    const applicableCriteria = criteria.filter(
+      (c) => c.evaluatorRole === 'workplace_supervisor' || c.evaluatorRole === 'both'
+    );
+
+    if (applicableCriteria.length === 0) {
+      return savedScores;
     }
-    return criteria
-      .filter(c => c.evaluatorRole === 'workplace_supervisor' || c.evaluatorRole === 'both')
-      .map(c => ({
-        criteriaId: c.id,
-        criteriaTitle: c.title,
-        maxScore: c.maxScore,
-        scoreAwarded: null,
-        comment: '',
-      }));
+
+    return applicableCriteria.map((criterion) => {
+      const saved = savedByCriteria.get(criterion.id);
+      return {
+        criteriaId: criterion.id,
+        criteriaTitle: criterion.title,
+        maxScore: criterion.maxScore,
+        scoreAwarded: saved?.scoreAwarded ?? null,
+        comment: saved?.comment ?? '',
+      };
+    });
   };
 
   const [scores, setScores] = useState(getInitialScores);
   const [overallRemarks, setOverallRemarks] = useState(evaluation.overallRemarks || '');
 
   const handleScoreChange = (criteriaId, value) => {
-    const numValue = value === '' ? null : Math.min(Number(value), 20);
-    setScores(prev => prev.map(s => 
-      s.criteriaId === criteriaId ? { ...s, scoreAwarded: numValue } : s
-    ));
+    setScores(prev =>
+      prev.map((s) => {
+        if (s.criteriaId !== criteriaId) {
+          return s;
+        }
+        const max = Number(s.maxScore) || 0;
+        const numValue = value === '' ? null : Math.min(Number(value), max);
+        return { ...s, scoreAwarded: numValue };
+      }),
+    );
   };
 
   const handleCommentChange = (criteriaId, value) => {

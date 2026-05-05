@@ -147,11 +147,11 @@ const normalizeEvaluation = (evaluation = {}) => {
     placementId: evaluation.placement ?? evaluation.placement_id ?? null,
     organization:
       evaluation.organisation_name ??
-      evaluation.organization ??
+      evaluation.organisation ??
       evaluation.placement_organisation_name ??
       "-",
     workplaceSupervisor:
-      evaluation.workplace_supervisor_name ??
+      evaluation.evaluator_name ??
       evaluation.workplaceSupervisor ??
       "-",
     evaluationType: evaluation.evaluation_type ?? evaluation.evaluationType ?? "",

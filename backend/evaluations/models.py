@@ -60,6 +60,10 @@ class Evaluation(models.Model):
 
     def __str__(self):
         return f"{self.evaluation_type}--{self.placement.student.get_full_name()}"
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_status = self.status
 
 
 class EvaluationCriteria(models.Model):
@@ -119,6 +123,3 @@ class EvaluationScore(models.Model):
     def _str_(self):
         return f"{self.criteria.title}:{self.score_awarded}/{self.critera.max_score}"
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__original_status = self.status
