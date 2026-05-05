@@ -8,8 +8,7 @@ from .views import (
     EvaluationSubmitView,
     EvaluationAcknowledgeView,
     PendingEvaluationsView,
-    PlacementEvaluationSummaryView,
-    EvaluationStatsView,
+    PlacementEvaluationSummaryView
 )
 
 urlpatterns = [
