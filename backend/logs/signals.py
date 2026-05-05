@@ -19,3 +19,19 @@ def log_status_changed(sender, instance, created, **kwargs):
         return
 
     instance.__original_status = current
+    _dispatch_log_notification(instance, current)
+
+
+def _dispatch_log_notification(log, new_status):
+    from .tasks import notify_log_status_change
+
+    notifiable_statuses = {
+        "submitted",
+        "endorsed",
+        "resubmit",
+        "assessed",
+        "closed",
+    }
+
+    if new_status in notifiable_statuses:
+        notify_log_status_change.delay(log.id)
