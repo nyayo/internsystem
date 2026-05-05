@@ -155,3 +155,31 @@ class EvaluationCriteriaDetailView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class EvaluationListView(APIView):
+    """
+    GET /api/evaluations/
+    Lists evaluations filtered by the requesting user's role.
+
+    Query params:
+        ?placement=<id>           filter by placement
+        ?type=midterm|final       filter by evaluation type
+        ?status=<status>          filter by evaluation status
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+
+    def get(self, request):
+        queryset = get_queryset_for_role(request.user)
+
+        placement_id  = request.query_params.get("placement")
+        eval_type     = request.query_params.get("type")
+        eval_status   = request.query_params.get("status")
+
+        if placement_id:
+            queryset = queryset.filter(placement_id=placement_id)
+        if eval_type:
+            queryset = queryset.filter(evaluation_type=eval_type)
+        if eval_status:
+            queryset = queryset.filter(status=eval_status)
+
+        serializer = EvaluationListSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
