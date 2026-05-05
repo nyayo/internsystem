@@ -95,6 +95,16 @@ class CanViewEvaluation(BasePermission):
             or user.role == "internship_administrator"
         )
 
+class IsAssignedEvaluator(BasePermission):
+    """
+    Object-level: the requesting user is the evaluator on this evaluation.
+    """
+    message = "You are not the evaluator for this evaluation."
+
+    def has_object_permission(self, request, view, obj):
+        return obj.evaluator == request.user
+        
+
 class CanViewEvaluation(BasePermission):
     """
     Object-level: any user linked to the placement can view its evaluations.
