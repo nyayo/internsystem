@@ -245,3 +245,55 @@ class EvaluationSaveDraftView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class EvaluationSubmitView(APIView):
+    """
+    POST /api/evaluations/<id>/submit/
+    Workplace supervisor submits a completed evaluation.
+    All active criteria must be scored.
+    Total score is calculated and stored automatically.
+
+    Request body:
+        {
+            "overall_remarks": "...",
+            "scores": [
+                { "criteria": 1, "score_awarded": 17, "comment": "..." },
+                { "criteria": 2, "score_awarded": 16, "comment": "..." },
+                { "criteria": 3, "score_awarded": 15 },
+                { "criteria": 4, "score_awarded": 16 },
+                { "criteria": 5, "score_awarded": 14, "comment": "..." }
+            ]
+        }
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount, IsWorkplaceSupervisor]
+
+    def post(self, request, pk):
+        evaluation, err = get_evaluation_or_404(pk, request.user)
+        if err:
+            return err
+
+        if evaluation.evaluator != request.user:
+            return Response(
+                {"detail": "You are not the evaluator for this evaluation."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = EvaluationSubmitSerializer(
+            evaluation, data=request.data
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+
+        return Response(
+            {
+                "detail":      "Evaluation submitted successfully.",
+                "status":      evaluation.status,
+                "total_score": str(evaluation.total_score),
+            },
+            status=status.HTTP_200_OK,
+        )
+
