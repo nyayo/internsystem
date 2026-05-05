@@ -11,7 +11,6 @@ const WorkplaceLogsPage = () => {
   const { logs, endorseLog } = useSupervisor();
   const [activeFilter, setActiveFilter] = useState('pending');
   const [selectedLog, setSelectedLog] = useState(null);
-  console.log("Logs", logs)
 
   const filteredLogs = logs.filter(log => {
     switch (activeFilter) {

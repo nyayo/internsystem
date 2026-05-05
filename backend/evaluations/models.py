@@ -47,7 +47,7 @@ class Evaluation(models.Model):
         max_digits=5, decimal_places=2, blank=True, null=True
     )
     acknowledgement_notes = models.TextField(blank=True)
-    acknowledgeda_at = models.DateTimeField(blank=True, null=True)
+    acknowledged_at = models.DateTimeField(blank=True, null=True)
     submitted_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

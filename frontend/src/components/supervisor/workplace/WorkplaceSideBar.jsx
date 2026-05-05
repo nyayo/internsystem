@@ -34,7 +34,7 @@ const WorkplaceSideBar = ({
             <span className="material-icons-sharp">work</span>
           </div>
           <h2>
-            Intern<span className="accent">Hub</span>
+            Intern<span className="accent">System</span>
           </h2>
         </div>
         <div className="close" onClick={onClose}>

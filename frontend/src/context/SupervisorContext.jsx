@@ -8,24 +8,11 @@ import {
   useEffect,
 } from "react";
 import {
-  currentWorkplaceSupervisor,
-  currentAcademicSupervisor,
-  workplaceAssignedStudents,
-  academicAssignedStudents,
-  workplaceWeeklyLogs,
-  academicWeeklyLogs,
-  workplaceEvaluations,
-  academicEvaluations,
   evaluationCriteria,
 } from "../data/supervisorData";
 import { useAuth } from "./AuthContext";
 import {
-  acknowledgeEvaluation as acknowledgeEvaluationInList,
-  assessWeeklyLog,
   buildSupervisorProfile,
-  endorseWeeklyLog,
-  saveEvaluationDraft as saveEvaluationDraftInList,
-  submitEvaluation as submitEvaluationInList,
 } from "../services/supervisorService";
 import {
   listLogs,
@@ -35,6 +22,14 @@ import {
 } from "../services/logsApi";
 import { listPlacements } from "../services/placementApi";
 import { listStudents } from "../services/adminApi";
+import {
+  listCriteria as listCriteriaApi,
+  listEvaluations,
+  getEvaluation as getEvaluationApi,
+  saveEvaluationDraft as saveEvaluationDraftApi,
+  submitEvaluation as submitEvaluationApi,
+  acknowledgeEvaluation as acknowledgeEvaluationApi,
+} from "../services/evaluationApi";
 
 const SupervisorContext = createContext(null);
 
@@ -80,6 +75,116 @@ const normalizeLog = (log) => ({
   updatedAt: log.updated_at ?? null,
 });
 
+const EVALUATION_TYPE_LABELS = {
+  midterm: "Midterm Evaluation",
+  final: "Final Evaluation",
+};
+
+const normalizeCriteria = (item) => ({
+  id: item.id,
+  title: item.title ?? "",
+  description: item.description ?? "",
+  category: item.category ?? "",
+  maxScore: Number(item.max_score ?? item.maxScore ?? 0),
+  evaluatorRole: item.evaluator_role ?? item.evaluatorRole ?? "",
+  isActive: item.is_active ?? item.isActive ?? true,
+});
+
+const normalizeEvaluationScore = (score = {}) => ({
+  criteriaId: score.criteria ?? score.criteria_id ?? score.criteriaId,
+  criteriaTitle:
+    score.criteria_title ??
+    score.criteria_name ??
+    score.criteriaTitle ??
+    score.criteria_detail?.title ??
+    score.criteria_obj?.title ??
+    `Criteria ${score.criteria ?? score.criteria_id ?? score.criteriaId ?? ""}`.trim(),
+  maxScore: Number(
+    score.max_score ??
+      score.maxScore ??
+      score.criteria_max_score ??
+      score.criteria_detail?.max_score ??
+      score.criteria_obj?.max_score ??
+      20,
+  ),
+  scoreAwarded:
+    score.score_awarded !== undefined && score.score_awarded !== null
+      ? Number(score.score_awarded)
+      : score.scoreAwarded !== undefined && score.scoreAwarded !== null
+        ? Number(score.scoreAwarded)
+        : null,
+  comment: score.comment ?? "",
+});
+
+const normalizeEvaluation = (evaluation = {}) => {
+  const scoresRaw = Array.isArray(evaluation.scores) ? evaluation.scores : [];
+  const scores = scoresRaw.map(normalizeEvaluationScore);
+  const totalScoreRaw = evaluation.total_score ?? evaluation.totalScore;
+  const totalScore =
+    totalScoreRaw === null || totalScoreRaw === undefined || totalScoreRaw === ""
+      ? null
+      : Number(totalScoreRaw);
+  const maxPossibleScoreRaw =
+    evaluation.max_possible_score ?? evaluation.maxPossibleScore;
+  const computedMaxScore = scores.reduce(
+    (sum, score) => sum + (Number(score.maxScore) || 0),
+    0,
+  );
+
+  return {
+    id: evaluation.id,
+    studentId: evaluation.student ?? evaluation.student_id ?? null,
+    studentName:
+      evaluation.student_name ??
+      evaluation.studentName ??
+      evaluation.placement_student_name ??
+      "-",
+    programme:
+      evaluation.programme ??
+      evaluation.student_programme ??
+      evaluation.program ??
+      "-",
+    placementId: evaluation.placement ?? evaluation.placement_id ?? null,
+    organization:
+      evaluation.organisation_name ??
+      evaluation.organization ??
+      evaluation.placement_organisation_name ??
+      "-",
+    workplaceSupervisor:
+      evaluation.workplace_supervisor_name ??
+      evaluation.workplaceSupervisor ??
+      "-",
+    evaluationType: evaluation.evaluation_type ?? evaluation.evaluationType ?? "",
+    evaluationTypeDisplay:
+      evaluation.evaluation_type_display ??
+      evaluation.evaluationTypeDisplay ??
+      EVALUATION_TYPE_LABELS[
+        evaluation.evaluation_type ?? evaluation.evaluationType ?? ""
+      ] ??
+      "Evaluation",
+    status: evaluation.status ?? "not_started",
+    dueDate: evaluation.due_date ?? evaluation.dueDate ?? null,
+    totalScore,
+    maxPossibleScore: Number(maxPossibleScoreRaw ?? computedMaxScore ?? 0),
+    overallRemarks:
+      evaluation.overall_remarks ?? evaluation.overallRemarks ?? "",
+    scores,
+    submittedAt: evaluation.submitted_at ?? evaluation.submittedAt ?? null,
+    acknowledgementNotes:
+      evaluation.acknowledgement_notes ??
+      evaluation.acknowledgementNotes ??
+      "",
+    acknowledgedBy:
+      evaluation.acknowledged_by_name ??
+      evaluation.acknowledgedBy ??
+      "",
+    acknowledgedAt:
+      evaluation.acknowledged_at ?? evaluation.acknowledgedAt ?? null,
+    createdAt: evaluation.created_at ?? evaluation.createdAt ?? null,
+    updatedAt: evaluation.updated_at ?? evaluation.updatedAt ?? null,
+  };
+};
+
 export const SupervisorProvider = ({ children, role }) => {
   const { user } = useAuth();
   const isWorkplace = role === "workplace_supervisor";
@@ -93,7 +198,7 @@ export const SupervisorProvider = ({ children, role }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [logs, setLogs] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
-  const [criteria] = useState(evaluationCriteria);
+  const [criteria, setCriteria] = useState(evaluationCriteria);
   const [notification, setNotification] = useState(null);
 
   const stats = useMemo(() => {
@@ -128,6 +233,12 @@ export const SupervisorProvider = ({ children, role }) => {
           totalLogs > 0 ? Math.round((endorsedLogs / totalLogs) * 100) : 0,
         pendingPercent:
           totalLogs > 0 ? Math.round((pendingLogs / totalLogs) * 100) : 0,
+        pendingEvaluations: evaluations.filter((e) =>
+          ["not_started", "in_progress"].includes(e.status),
+        ).length,
+        completedEvaluations: evaluations.filter((e) =>
+          ["submitted", "acknowledged"].includes(e.status),
+        ).length,
       };
     }
 
@@ -157,6 +268,9 @@ export const SupervisorProvider = ({ children, role }) => {
       pendingAssessment,
       assessedLogs,
       totalAssessable,
+      pendingAcknowledgement: evaluations.filter(
+        (e) => e.status === "submitted",
+      ).length,
 
       // Percentages
       assessedPercent:
@@ -169,7 +283,7 @@ export const SupervisorProvider = ({ children, role }) => {
           : 0,
       averageGrade,
     };
-  }, [logs, students, isWorkplace]);
+  }, [logs, students, evaluations, isWorkplace]);
 
   useEffect(() => {
     if (!user) return;
@@ -241,13 +355,44 @@ export const SupervisorProvider = ({ children, role }) => {
         }
       } catch (err) {
         console.error("Failed to load logs:", err);
-      } finally {
-        if (!cancelled) setIsLoading(false);
       }
     };
 
-    loadLogs();
-    loadStudents();
+    const loadCriteria = async () => {
+      try {
+        const raw = await listCriteriaApi();
+        if (cancelled || !raw) return;
+        const rows = Array.isArray(raw) ? raw : (raw?.results ?? []);
+        if (!cancelled) setCriteria(rows.map(normalizeCriteria));
+      } catch (err) {
+        console.error("Failed to load criteria:", err);
+      }
+    };
+
+    const loadEvaluations = async () => {
+      try {
+        const raw = await listEvaluations();
+        if (cancelled || !raw) return;
+        const rows = Array.isArray(raw)
+          ? raw
+          : (raw?.results ?? raw?.evaluations ?? []);
+        const detailedRows = await Promise.all(
+          rows
+            .filter((row) => row?.id)
+            .map(async (row) => (await getEvaluationApi(row.id)) ?? row),
+        );
+        if (!cancelled) {
+          setEvaluations(detailedRows.filter(Boolean).map(normalizeEvaluation));
+        }
+      } catch (err) {
+        console.error("Failed to load evaluations:", err);
+      }
+    };
+
+    Promise.all([loadLogs(), loadStudents(), loadCriteria(), loadEvaluations()])
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -307,34 +452,82 @@ export const SupervisorProvider = ({ children, role }) => {
     [showNotification],
   );
 
+  const toScorePayload = useCallback(
+    (scores = [], { allowIncomplete = false } = {}) =>
+      scores
+        .filter((score) =>
+          allowIncomplete ? score.scoreAwarded !== null : true,
+        )
+        .map((score) => ({
+          criteria: score.criteriaId,
+          score_awarded:
+            score.scoreAwarded === null || score.scoreAwarded === undefined
+              ? undefined
+              : Number(score.scoreAwarded),
+          ...(score.comment ? { comment: score.comment } : {}),
+        }))
+        .filter((score) => score.criteria && score.score_awarded !== undefined),
+    [],
+  );
+
   const saveEvaluationDraft = useCallback(
-    (evaluationId, scores, overallRemarks) => {
-      setEvaluations((previousEvaluations) =>
-        saveEvaluationDraftInList(
-          previousEvaluations,
-          evaluationId,
-          scores,
-          overallRemarks,
-        ),
-      );
-      showNotification("Evaluation draft saved!", "info");
+    async (evaluationId, scores, overallRemarks) => {
+      try {
+        const payload = {
+          overall_remarks: overallRemarks ?? "",
+          scores: toScorePayload(scores, { allowIncomplete: true }),
+        };
+        await saveEvaluationDraftApi(evaluationId, payload);
+        const updated = await getEvaluationApi(evaluationId);
+        if (updated) {
+          const normalized = normalizeEvaluation(updated);
+          setEvaluations((previousEvaluations) =>
+            previousEvaluations.map((evaluation) =>
+              evaluation.id === normalized.id ? normalized : evaluation,
+            ),
+          );
+        }
+        showNotification("Evaluation draft saved!", "info");
+      } catch (err) {
+        const detail =
+          err?.response?.data?.detail ??
+          err?.response?.data?.scores ??
+          "Failed to save evaluation draft.";
+        showNotification(detail, "error");
+        throw err;
+      }
     },
-    [showNotification],
+    [showNotification, toScorePayload],
   );
 
   const submitEvaluation = useCallback(
-    (evaluationId, scores, overallRemarks) => {
-      setEvaluations((previousEvaluations) =>
-        submitEvaluationInList(
-          previousEvaluations,
-          evaluationId,
-          scores,
-          overallRemarks,
-        ),
-      );
-      showNotification("Evaluation submitted successfully!", "success");
+    async (evaluationId, scores, overallRemarks) => {
+      try {
+        const payload = {
+          overall_remarks: overallRemarks ?? "",
+          scores: toScorePayload(scores, { allowIncomplete: false }),
+        };
+        await submitEvaluationApi(evaluationId, payload);
+        const updated = await getEvaluationApi(evaluationId);
+        if (updated) {
+          const normalized = normalizeEvaluation(updated);
+          setEvaluations((previousEvaluations) =>
+            previousEvaluations.map((evaluation) =>
+              evaluation.id === normalized.id ? normalized : evaluation,
+            ),
+          );
+        }
+        showNotification("Evaluation submitted successfully!", "success");
+      } catch (err) {
+        const detail =
+          err?.response?.data?.detail ??
+          err?.response?.data?.scores ??
+          "Failed to submit evaluation.";
+        showNotification(detail, "error");
+        throw err;
+      }
     },
-    [showNotification],
+    [showNotification, toScorePayload],
   );
 
   const assessLog = useCallback(
@@ -369,18 +562,31 @@ export const SupervisorProvider = ({ children, role }) => {
   );
 
   const acknowledgeEvaluation = useCallback(
-    (evaluationId, notes) => {
-      setEvaluations((previousEvaluations) =>
-        acknowledgeEvaluationInList(
-          previousEvaluations,
-          evaluationId,
-          notes,
-          supervisor,
-        ),
-      );
-      showNotification("Evaluation acknowledged successfully!", "success");
+    async (evaluationId, notes) => {
+      try {
+        await acknowledgeEvaluationApi(evaluationId, {
+          acknowledgement_notes: notes ?? "",
+        });
+        const updated = await getEvaluationApi(evaluationId);
+        if (updated) {
+          const normalized = normalizeEvaluation(updated);
+          setEvaluations((previousEvaluations) =>
+            previousEvaluations.map((evaluation) =>
+              evaluation.id === normalized.id ? normalized : evaluation,
+            ),
+          );
+        }
+        showNotification("Evaluation acknowledged successfully!", "success");
+      } catch (err) {
+        const detail =
+          err?.response?.data?.detail ??
+          err?.response?.data?.acknowledgement_notes ??
+          "Failed to acknowledge evaluation.";
+        showNotification(detail, "error");
+        throw err;
+      }
     },
-    [showNotification, supervisor],
+    [showNotification],
   );
 
   const value = useMemo(
