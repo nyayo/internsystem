@@ -211,7 +211,7 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
 
       {/* Table */}
       <div className="table-container">
-        <table className="data-table criteria-table">
+        <table className="data-table">
           <thead>
             <tr>
               <th>Title</th>

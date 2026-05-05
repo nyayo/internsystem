@@ -61,7 +61,6 @@ export default function StudentsPage({ students }) {
       );
     });
   }, [students, searchTerm, filters]);
-  console.log("Students", students)
 
   const {
     currentPage,
@@ -72,7 +71,6 @@ export default function StudentsPage({ students }) {
     setItemsPerPage,
     resetPagination,
   } = usePagination(filteredStudents);
-  console.log("Paginated Students", paginatedStudents);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
