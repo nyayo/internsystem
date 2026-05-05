@@ -18,12 +18,12 @@ import {
 } from "../data/dashboardData";
 import {
   buildAdminStats,
-  getDefaultAdminUser,
   toApplicationRows,
   withCriteriaDisplayValues,
 } from "../services/adminService";
 import placementApi from "../services/placementApi";
 import adminApi from "../services/adminApi";
+import evaluationApi from "../services/evaluationApi";
 
 const AdminContext = createContext(null);
 
@@ -142,7 +142,7 @@ export const AdminProvider = ({ children }) => {
 
   const normalizeAcademicSupervisors = (a) => ({
     id: a.id,
-    firstName: a.firstName,
+    firstName: a.first_name,
     lastName: a.last_name,
     name: a.full_name,
     email: a.email,
@@ -155,6 +155,16 @@ export const AdminProvider = ({ children }) => {
     dateJoined: a.date_joined,
   });
 
+  const normalizeCriteria = (item) => ({
+    id: item.id,
+    title: item.title ?? "",
+    description: item.description ?? "",
+    category: item.category ?? "",
+    maxScore: item.max_score ?? item.maxScore ?? 0,
+    evaluatorRole: item.evaluator_role ?? item.evaluatorRole ?? "",
+    isActive: item.is_active ?? item.isActive ?? true,
+  });
+
   useEffect(() => {
     if (!adminUser) return;
     let cancelled = false;
@@ -164,6 +174,7 @@ export const AdminProvider = ({ children }) => {
         const rawStudents = await adminApi.listStudents();
         const rawWorkplace = await adminApi.listWorkplaceSupervisor();
         const rawAcademic = await adminApi.listAcademicSupervisor();
+        const rawCriteria = await evaluationApi.listCriteria();
         const rows = Array.isArray(raw) ? raw : (raw?.results ?? []);
         const studentRows = Array.isArray(rawStudents)
           ? rawStudents
@@ -174,6 +185,9 @@ export const AdminProvider = ({ children }) => {
         const academicRows = Array.isArray(rawAcademic)
           ? rawAcademic
           : (rawAcademic?.results ?? []);
+        const criteriaRows = Array.isArray(rawCriteria)
+          ? rawCriteria
+          : (rawCriteria?.results ?? []);
         const normalized = rows.map(normalizePlacement);
         const normalizedStudents = studentRows.map(normalizeStudents);
         const normalizedWorkplace = workplaceRows.map(
@@ -182,10 +196,14 @@ export const AdminProvider = ({ children }) => {
         const normalizedAcademic = academicRows.map(
           normalizeAcademicSupervisors,
         );
+        const normalizedCriteria = withCriteriaDisplayValues(
+          criteriaRows.map(normalizeCriteria),
+        );
         if (!cancelled) setPlacements(normalized);
         if (!cancelled) setStudents(normalizedStudents);
         if (!cancelled) setWorkplaceSupervisors(normalizedWorkplace);
         if (!cancelled) setAcademicSupervisors(normalizedAcademic);
+        if (!cancelled) setCriteria(normalizedCriteria);
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -254,17 +272,23 @@ export const AdminProvider = ({ children }) => {
   );
 
   const handleAddCriteria = useCallback(
-    (newCriteria) => {
-      const criteriaWithId = withCriteriaDisplayValues([
-        {
-          ...newCriteria,
-          id: Date.now(),
-          isActive: true,
-        },
+    async (newCriteria) => {
+      const payload = {
+        title: newCriteria.title,
+        description: newCriteria.description ?? "",
+        category: newCriteria.category,
+        max_score: newCriteria.maxScore,
+        evaluator_role: newCriteria.evaluatorRole,
+        is_active: newCriteria.isActive ?? true,
+      };
+
+      const saved = await evaluationApi.createCriteria(payload);
+      const criteriaWithDisplay = withCriteriaDisplayValues([
+        normalizeCriteria(saved),
       ])[0];
-      setCriteria((previousCriteria) => [...previousCriteria, criteriaWithId]);
+      setCriteria((previousCriteria) => [...previousCriteria, criteriaWithDisplay]);
       showNotification(
-        `Evaluation criteria "${newCriteria.title}" has been created!`,
+        `Evaluation criteria "${criteriaWithDisplay.title}" has been created!`,
         "success",
       );
     },
@@ -272,17 +296,27 @@ export const AdminProvider = ({ children }) => {
   );
 
   const handleUpdateCriteria = useCallback(
-    (updatedCriteria) => {
+    async (updatedCriteria) => {
+      const payload = {
+        title: updatedCriteria.title,
+        description: updatedCriteria.description ?? "",
+        category: updatedCriteria.category,
+        max_score: updatedCriteria.maxScore,
+        evaluator_role: updatedCriteria.evaluatorRole,
+        is_active: updatedCriteria.isActive ?? true,
+      };
+
+      const saved = await evaluationApi.updateCriteria(updatedCriteria.id, payload);
       const criteriaWithDisplay = withCriteriaDisplayValues([
-        updatedCriteria,
+        normalizeCriteria(saved),
       ])[0];
       setCriteria((previousCriteria) =>
         previousCriteria.map((criterion) =>
-          criterion.id === updatedCriteria.id ? criteriaWithDisplay : criterion,
+          criterion.id === criteriaWithDisplay.id ? criteriaWithDisplay : criterion,
         ),
       );
       showNotification(
-        `Evaluation criteria "${updatedCriteria.title}" has been updated!`,
+        `Evaluation criteria "${criteriaWithDisplay.title}" has been updated!`,
         "success",
       );
     },
@@ -315,6 +349,8 @@ export const AdminProvider = ({ children }) => {
       stats,
       pendingCount,
       adminUser,
+      workplaceSupervisors,
+      academicSupervisors,
       handleUpdatePlacement,
       handleUpdateApplication,
       handleAddCriteria,
