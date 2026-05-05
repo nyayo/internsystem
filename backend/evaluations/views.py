@@ -342,4 +342,45 @@ class EvaluationAcknowledgeView(APIView):
         )
 
 
+class PendingEvaluationsView(APIView):
+    """
+    GET /api/evaluations/pending/
+    Returns evaluations that require the requesting supervisor's action.
+
+    Workplace supervisor  → not_started and in_progress evaluations
+    Academic supervisor   → submitted evaluations awaiting acknowledgement
+    Administrator         → all evaluations not yet acknowledged
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+
+    def get(self, request):
+        user = request.user
+
+        if user.role == "workplace_supervisor":
+            queryset = Evaluation.objects.filter(
+                placement__workplace_supervisor=user,
+                status__in=("not_started", "in_progress"),
+            )
+        elif user.role == "academic_supervisor":
+            queryset = Evaluation.objects.filter(
+                placement__academic_supervisor=user,
+                status="submitted",
+            )
+        elif user.role == "internship_administrator":
+            queryset = Evaluation.objects.exclude(status="acknowledged")
+        else:
+            return Response(
+                {"detail": "Pending evaluations are not applicable for your role."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = EvaluationListSerializer(queryset, many=True)
+        return Response(
+            {
+                "count":       queryset.count(),
+                "evaluations": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
 
