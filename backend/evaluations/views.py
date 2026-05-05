@@ -199,3 +199,49 @@ class EvaluationDetailView(APIView):
         serializer = EvaluationDetailSerializer(evaluation)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class EvaluationSaveDraftView(APIView):
+    """
+    POST /api/evaluations/<id>/save-draft/
+    Workplace supervisor saves partial scores without submitting.
+    Scores list may be incomplete.
+    Status moves to in_progress.
+
+    Request body:
+        {
+            "overall_remarks": "...",
+            "scores": [
+                { "criteria": 1, "score_awarded": 15, "comment": "..." },
+                { "criteria": 2, "score_awarded": 17 }
+            ]
+        }
+    """
+    permission_classes = [IsAuthenticated, IsActiveAccount, IsWorkplaceSupervisor]
+
+    def post(self, request, pk):
+        evaluation, err = get_evaluation_or_404(pk, request.user)
+        if err:
+            return err
+
+        if evaluation.evaluator != request.user:
+            return Response(
+                {"detail": "You are not the evaluator for this evaluation."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = EvaluationSaveDraftSerializer(
+            evaluation, data=request.data
+        )
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save()
+
+        return Response(
+            {
+                "detail": "Draft saved.",
+                "status": evaluation.status,
+            },
+            status=status.HTTP_200_OK,
+        )
