@@ -58,3 +58,24 @@ def get_evaluation_or_404(pk, user):
     return evaluation, None
 
 
+def get_queryset_for_role(user):
+    """
+    Returns evaluations visible to the requesting user based on role.
+    """
+    if user.role == "student":
+        return Evaluation.objects.filter(placement__student=user)
+
+    if user.role == "workplace_supervisor":
+        return Evaluation.objects.filter(
+            placement__workplace_supervisor=user
+        )
+
+    if user.role == "academic_supervisor":
+        return Evaluation.objects.filter(
+            placement__academic_supervisor=user
+        )
+
+    if user.role == "internship_administrator":
+        return Evaluation.objects.all()
+
+    return Evaluation.objects.none()
