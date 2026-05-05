@@ -97,4 +97,16 @@ class EvaluationCriteriaListCreateView(APIView):
         serializer = EvaluationCriteriaSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    
+    def post(self, request):
+        if request.user.role != "internship_administrator":
+            return Response(
+                {"detail": "Only administrators can create evaluation criteria."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serializer = EvaluationCriteriaSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer.save(created_by=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
