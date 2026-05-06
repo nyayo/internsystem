@@ -12,14 +12,14 @@ const WorkplaceMainPanel = ({ onNavigate }) => {
     return "Good evening";
   };
 
-  const actionRequired = useMem(() => {
+  const actionRequired = useMemo(() => {
     const pendingLogActions = logs
       .filter((log) => ["submitted", "resubmit"].includes(log.status))
       .map((log) => ({
-        key: `log-${logid}`,
+        key: `log-${log.id}`,
         type: "log",
         studentName: log.student?.name ?? "-",
-        organization: logstudent?.organisation ?? "-",
+        organization: log.student?.organisation ?? "-",
         details:
           log.status === "submitted"
             ? `Week ${log.weekNumber} pending endorsement`
