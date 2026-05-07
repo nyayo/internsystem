@@ -1,17 +1,11 @@
-import React from "react";
-import './sideBar.css'
+import React from 'react';
 
-export default function SideBar({ activeLink, onLinkClick, pendingCount, onClose, isOpen }) {
+const AcademicSideBar = ({ activeLink, onLinkClick, pendingLogs, pendingEvals, onClose, isOpen, onLogout }) => {
   const menuItems = [
     { id: 'dashboard', icon: 'grid_view', label: 'Dashboard' },
-    { id: 'pending', icon: 'pending_actions', label: 'Pending Approvals', count: pendingCount },
-    { id: 'active', icon: 'work_outline', label: 'Active Internships' },
-    { id: 'students', icon: 'people_outline', label: 'Students' },
-    { id: 'supervisors', icon: 'badge', label: 'Supervisors' },
-    { id: 'criteria', icon: 'fact_check', label: 'Evaluation Criteria' },
-    // { id: 'progress', icon: 'trending_up', label: 'Progress Tracking' },
-    // { id: 'reports', icon: 'assessment', label: 'Reports' },
-    // { id: 'settings', icon: 'settings', label: 'Settings' },
+    { id: 'students', icon: 'people_outline', label: 'My Students' },
+    { id: 'logs', icon: 'grading', label: 'Weekly Logs', count: pendingLogs },
+    { id: 'evaluations', icon: 'fact_check', label: 'Evaluations', count: pendingEvals },
   ];
 
   return (
@@ -22,7 +16,7 @@ export default function SideBar({ activeLink, onLinkClick, pendingCount, onClose
             <span className="material-icons-sharp">school</span>
           </div>
           <h2>
-            Intern<span className="accent">Hub</span>
+            Intern<span className="accent">System</span>
           </h2>
         </div>
         <div className="close" onClick={onClose}>
@@ -47,11 +41,19 @@ export default function SideBar({ activeLink, onLinkClick, pendingCount, onClose
             )}
           </a>
         ))}
-        <a href="#">
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onLogout();
+          }}
+        >
           <span className="material-icons-sharp">logout</span>
           <h3>Logout</h3>
         </a>
       </div>
     </aside>
   );
-}
+};
+
+export default AcademicSideBar;

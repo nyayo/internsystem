@@ -48,8 +48,8 @@
 
 .weekly-logs-table .empty-logs span.material-icons-sharp {
   font-size: 3.5rem;
-  color: var(--color-info-dark);
-  margin-bottom: 1rem;
+  /* color: var(--color-info-dark);
+  margin-bottom: 1rem; */
 }
 
 .weekly-logs-table .empty-logs h4 {

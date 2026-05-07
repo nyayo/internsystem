@@ -69,3 +69,7 @@ class WeeklyLogs(models.Model):
 
     def __str__(self):
         return f"Week {self.week_number}--{self.placement.student.get_full_name()}"
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_status = self.status

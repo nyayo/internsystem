@@ -499,7 +499,7 @@ export const dashboardStats = {
 
 export const categoryOptions = [
   { value: 'professional_conduct', label: 'Professional Conduct' },
-  { value: 'technical_skills', label: 'Technical Skills' },
+  { value: 'technical_skill', label: 'Technical Skill' },
   { value: 'communication', label: 'Communication' },
   { value: 'initiative', label: 'Initiative & Problem Solving' },
   { value: 'teamwork', label: 'Teamwork & Collaboration' },

@@ -1,5 +1,5 @@
 // Mock data for Workplace and Academic Supervisor Dashboards
-// import { formatDateTimeValue, formatDateValue } from "../utils/dateUtils";
+import { formatDateTimeValue, formatDateValue } from "../utils/dateUtils";
 
 // Current logged-in workplace supervisor
 export const currentWorkplaceSupervisor = {

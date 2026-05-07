@@ -47,10 +47,26 @@ class Evaluation(models.Model):
         max_digits=5, decimal_places=2, blank=True, null=True
     )
     acknowledgement_notes = models.TextField(blank=True)
-    acknowledgeda_at = models.DateTimeField(blank=True, null=True)
+    acknowledged_at = models.DateTimeField(blank=True, null=True)
     submitted_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def calculate_total_score(self):
+        """
+        Sums all EvaluationScore.score_awarded values linked
+        to this evaluation and stores the result in total_score.
+        Call this after all EvaluationScore records have been saved.
+        """
+        from django.db.models import Sum
+
+        total = self.scores.aggregate(
+            total=Sum("score_awarded")
+        )["total"]
+
+        self.total_score = total if total is not None else 0
+        self.save(update_fields=["total_score"])
+        return self.total_score
 
     class Meta:
         verbose_name = "Evaluation"
@@ -60,6 +76,10 @@ class Evaluation(models.Model):
 
     def __str__(self):
         return f"{self.evaluation_type}--{self.placement.student.get_full_name()}"
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_status = self.status
 
 
 class EvaluationCriteria(models.Model):
@@ -118,3 +138,4 @@ class EvaluationScore(models.Model):
 
     def _str_(self):
         return f"{self.criteria.title}:{self.score_awarded}/{self.critera.max_score}"
+    

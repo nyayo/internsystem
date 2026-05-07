@@ -8,6 +8,7 @@ export default function StudentSideBar({
   isOpen,
   onToggle,
   pendingCount,
+  onLogout,
 }) {
   return (
     <aside className={`student-sidebar ${isOpen ? 'open' : ''}`}>
@@ -17,7 +18,7 @@ export default function StudentSideBar({
             <span className="material-icons-sharp">school</span>
           </div>
           <h2>
-            Intern<span className="accent">Hub</span>
+            Intern<span className="accent">System</span>
           </h2>
         </div>
         <button className="menu-toggle" onClick={onToggle}>
@@ -50,6 +51,7 @@ export default function StudentSideBar({
           className="nav-link logout-link"
           onClick={(e) => {
             e.preventDefault();
+            onLogout();
           }}
         >
           <span className="material-icons-sharp">logout</span>

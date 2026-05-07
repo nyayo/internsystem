@@ -16,8 +16,19 @@ export default function MainPanel({
   const [showCriteriaModal, setShowCriteriaModal] = useState(false);
   const [editingCriteria, setEditingCriteria] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const truncateDescription = (value, max = 90) => {
+    const text = String(value ?? "");
+    if (text.length <= max) return text;
+    return `${text.slice(0, max).trimEnd()}...`;
+  };
 
   const pendingApplications = applications.filter(app => app.status === 'pending');
+  const activeInternships = applications.filter(app => app.status === 'active');
+  const completedThisSemester = applications.filter(app => app.status === 'completed' && new Date(app.completedAt) >= new Date(new Date().setMonth(new Date().getMonth() - 6))).length;
+
+  const handleUpdateApplication = (updatedApp) => {
+      onUpdateApplication(updatedApp);
+  };
 
   const handleViewDetails = (student) => {
     setSelectedStudent(student);
@@ -88,14 +99,14 @@ export default function MainPanel({
           <div className="middle">
             <div className="left">
               <h3>Active Internships</h3>
-              <h1>{stats.activeInternships}</h1>
+              <h1>{activeInternships.length}</h1>
             </div>
             <div className="progress">
               <svg>
                 <circle cx="38" cy="38" r="36"></circle>
               </svg>
               <div className="number">
-                <p>78%</p>
+                <p>{Math.round((activeInternships.length / Math.max(applications.length, 1)) * 100)}%</p>
               </div>
             </div>
           </div>
@@ -107,14 +118,14 @@ export default function MainPanel({
           <div className="middle">
             <div className="left">
               <h3>Completed</h3>
-              <h1>{stats.completedThisSemester}</h1>
+              <h1>{completedThisSemester}</h1>
             </div>
             <div className="progress">
               <svg>
                 <circle cx="38" cy="38" r="36"></circle>
               </svg>
               <div className="number">
-                <p>92%</p>
+                <p>{Math.round((completedThisSemester.length / Math.max(applications.length, 1)) * 100)}%</p>
               </div>
             </div>
           </div>
@@ -138,35 +149,46 @@ export default function MainPanel({
             </tr>
           </thead>
           <tbody>
-            {applications.map((app) => (
-              <tr key={app.id}>
-                <td>{app.studentName}</td>
-                <td>{app.regNumber}</td>
-                <td>{app.program}</td>
-                <td className={!app.workplaceSupervisor ? 'text-muted' : ''}>
-                  {app.workplaceSupervisor || 'Not Assigned'}
-                </td>
-                <td className={!app.academicSupervisor ? 'text-muted' : ''}>
-                  {app.academicSupervisor || 'Not Assigned'}
-                </td>
-                <td className={
-                  app.status === 'pending' ? 'warning' : 
-                  app.status === 'approved' ? 'success' : 'danger'
-                }>
-                  {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                </td>
-                <td>
-                  <button 
-                    className="btn-view"
-                    onClick={() => handleViewDetails(app)}
-                    disabled={app.status !== 'pending'}
-                    style={app.status !== 'pending' ? { opacity: 0.5 } : {}}
+            {pendingApplications.length > 0 ? (
+              pendingApplications.map((app) => (
+                <tr key={app.id}>
+                  <td>{app.studentName}</td>
+                  <td>{app.regNumber}</td>
+                  <td>{app.program}</td>
+                  <td className={!app.workplaceSupervisor ? 'text-muted' : ''}>
+                    {app.workplaceSupervisor || 'Not Assigned'}
+                  </td>
+                  <td className={!app.academicSupervisor ? 'text-muted' : ''}>
+                    {app.academicSupervisor || 'Not Assigned'}
+                  </td>
+                  <td className="warning">
+                    Pending
+                  </td>
+                  <td>
+                    <button 
+                      className="btn-view"
+                      onClick={() => handleViewDetails(app)}
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center", padding: "2rem" }}>
+                  <span
+                    className="material-icons-sharp"
+                    style={{ fontSize: "2rem", color: "var(--color-success)" }}
                   >
-                    {app.status === 'pending' ? 'View Details' : 'Processed'}
-                  </button>
+                    task_alt
+                  </span>
+                  <p style={{ marginTop: "0.5rem" }}>
+                    No pending placement applications.
+                  </p>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
         <a href="#">View All Applications</a>
@@ -200,7 +222,9 @@ export default function MainPanel({
                     <span className={`criteria-dot ${item.category.split('_')[0]}`}></span>
                     {item.title}
                   </div>
-                  <small className="text-muted">{item.description}</small>
+                  <small className="text-muted" title={item.description}>
+                    {truncateDescription(item.description)}
+                  </small>
                 </td>
                 <td>{item.categoryDisplay}</td>
                 <td>
@@ -225,16 +249,16 @@ export default function MainPanel({
 
       {/* Student Details Modal */}
       {selectedStudent && (
-        <PlacementDetailsModal
-          student={selectedStudent}
-          onClose={() => setSelectedStudent(null)}
-          onSave={handleSaveStudent}
-        />
-        // <StudentDetailsModal
+        // <PlacementDetailsModal
         //   student={selectedStudent}
         //   onClose={() => setSelectedStudent(null)}
         //   onSave={handleSaveStudent}
         // />
+        <StudentDetailsModal
+          student={selectedStudent}
+          onClose={() => setSelectedStudent(null)}
+          onSave={handleSaveStudent}
+        />
       )}
 
       {/* Criteria Modal */}

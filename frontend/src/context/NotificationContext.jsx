@@ -1,26 +1,41 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useContext, useState } from "react";
+import { createContext, useCallback, useContext } from "react";
+import { toast } from "react-toastify";
 
 const NotificationContext = createContext(null);
-const AUTO_HIDE_DELAY_MS = 3000;
+
+function normalizeToastType(type) {
+  if (type === "danger") return "error";
+  return type ?? "success";
+}
 
 export function NotificationProvider({ children }) {
-  const [notification, setNotification] = useState(null);
-
   const showNotification = useCallback((message, type = "success") => {
-    setNotification({ message, type });
+    const normalizedType = normalizeToastType(type);
+    const text = String(message ?? "").trim();
+    if (!text) return;
 
-    setTimeout(() => {
-      setNotification(null);
-    }, AUTO_HIDE_DELAY_MS);
+    if (normalizedType === "error") {
+      toast.error(text);
+      return;
+    }
+    if (normalizedType === "warning") {
+      toast.warn(text);
+      return;
+    }
+    if (normalizedType === "info") {
+      toast.info(text);
+      return;
+    }
+    toast.success(text);
   }, []);
 
-  const hideNotification = useCallback(() => {
-    setNotification(null);
-  }, []);
+  const hideNotification = useCallback(() => toast.dismiss(), []);
 
   return (
-    <NotificationContext.Provider value={{ notification, showNotification, hideNotification }}>
+    <NotificationContext.Provider
+      value={{ notification: null, showNotification, hideNotification }}
+    >
       {children}
     </NotificationContext.Provider>
   );

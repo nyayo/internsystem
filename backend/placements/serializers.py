@@ -2,10 +2,19 @@ from rest_framework import serializers
 from .models import InternshipPlacement
 
 
+class PlacementStudentSerializer(serializers.Serializer):
+     id = serializers.IntegerField(source="student.id", read_only=True)
+     full_name = serializers.CharField(source="student.get_full_name", read_only=True)
+     student_number = serializers.CharField(source="student.student_number", read_only=True)
+     email = serializers.EmailField(source="student.email", read_only=True)
+     programme = serializers.CharField(source="student.programme", read_only=True)
+
 class PlacementListSerializer(serializers.ModelSerializer):
-    
+    student_details = PlacementStudentSerializer(read_only=True)
     student_name      = serializers.CharField(source="student.get_full_name", read_only=True)
     student_number    = serializers.CharField(source="student.student_number", read_only=True)
+    student_email   = serializers.CharField(source="student.email", read_only=True)
+    student_programme = serializers.CharField(source="student.programme", read_only=True)
     academic_sup_name = serializers.CharField(
         source="academic_supervisor.get_full_name", read_only=True, default=None
     )
@@ -18,11 +27,16 @@ class PlacementListSerializer(serializers.ModelSerializer):
         model  = InternshipPlacement
         fields = [
             "id",
+            "student",
+            "student_details",
             "student_name",
             "student_number",
+            "student_email",
+            "student_programme",
             "organisation_name",
             "organisation_type",
             "organisation_district",
+            "organisation_address",
             "department",
             "start_date",
             "end_date",
@@ -30,8 +44,14 @@ class PlacementListSerializer(serializers.ModelSerializer):
             "status",
             "intake_cohort",
             "remuneration_type",
+            "request_letter",
+            "acceptance_letter",
             "academic_sup_name",
             "workplace_sup_name",
+            "wp_supervisor_name",   
+            "wp_supervisor_email",
+            "wp_supervisor_phone",
+            "wp_supervisor_title",
         ]
 
 
@@ -46,7 +66,7 @@ class PlacementDetailSerializer(serializers.ModelSerializer):
         source="workplace_supervisor.get_full_name", read_only=True, default=None
     )
     approved_by_name   = serializers.CharField(
-        source="approved_by.get_full_name", read_only=True, default=None
+        source="approval_by.get_full_name", read_only=True, default=None
     )
     duration_weeks = serializers.ReadOnlyField()
 
@@ -88,7 +108,7 @@ class PlacementDetailSerializer(serializers.ModelSerializer):
             "academic_sup_name",
             "workplace_supervisor",
             "workplace_sup_name",
-            "approved_by",
+            "approval_by",
             "approved_by_name",
             "created_at",
             "updated_at",
@@ -97,7 +117,7 @@ class PlacementDetailSerializer(serializers.ModelSerializer):
             "id", "student", "status",
             "rejection_reason", "withdrawal_reason",
             "approval_date", "activated_at", "completed_at",
-            "academic_supervisor", "workplace_supervisor", "approved_by",
+            "academic_supervisor", "workplace_supervisor", "approval_by",
             "created_at", "updated_at",
         ]
 
@@ -128,7 +148,7 @@ class PlacementApprovalSerializer(serializers.ModelSerializer):
         fields = [
             "status",
             "academic_supervisor",
-            "intake_cohort",
+            "workplace_supervisor",
             "rejection_reason",
         ]
 
@@ -139,10 +159,10 @@ class PlacementApprovalSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"academic_supervisor": "An academic supervisor must be assigned on approval."}
             )
-        if status == "approved" and not attrs.get("intake_cohort"):
-            raise serializers.ValidationError(
-                {"intake_cohort": "An intake cohort must be set on approval."}
-            )
+        # if status == "approved" and not attrs.get("intake_cohort"):
+        #     raise serializers.ValidationError(
+        #         {"intake_cohort": "An intake cohort must be set on approval."}
+        #     )
         if status == "rejected" and not attrs.get("rejection_reason"):
             raise serializers.ValidationError(
                 {"rejection_reason": "A rejection reason is required."}
@@ -167,8 +187,9 @@ class PlacementApprovalSerializer(serializers.ModelSerializer):
 
         if status == "approved":
             instance.academic_supervisor = validated_data.get("academic_supervisor")
-            instance.intake_cohort       = validated_data.get("intake_cohort")
-            instance.approved_by         = self.context["request"].user
+            instance.workplace_supervisor = validated_data.get("workplace_supervisor")
+            # instance.intake_cohort       = validated_data.get("intake_cohort")
+            instance.approval_by         = self.context["request"].user
             instance.approval_date       = timezone.now()
         else:
             instance.rejection_reason = validated_data.get("rejection_reason")

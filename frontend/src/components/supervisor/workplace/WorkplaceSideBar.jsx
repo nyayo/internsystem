@@ -1,0 +1,77 @@
+import React from "react";
+
+const WorkplaceSideBar = ({
+  activeLink,
+  onLinkClick,
+  pendingLogs,
+  pendingEvals,
+  onClose,
+  isOpen,
+  onLogout,
+}) => {
+  const menuItems = [
+    { id: "dashboard", icon: "grid_view", label: "Dashboard" },
+    { id: "students", icon: "people_outline", label: "My Students" },
+    {
+      id: "logs",
+      icon: "description",
+      label: "Weekly Logs",
+      count: pendingLogs,
+    },
+    {
+      id: "evaluations",
+      icon: "rate_review",
+      label: "Evaluations",
+      count: pendingEvals,
+    },
+  ];
+
+  return (
+    <aside className={isOpen ? "show-menu" : ""}>
+      <div className="top">
+        <div className="logo">
+          <div className="logo-icon">
+            <span className="material-icons-sharp">work</span>
+          </div>
+          <h2>
+            Intern<span className="accent">System</span>
+          </h2>
+        </div>
+        <div className="close" onClick={onClose}>
+          <span className="material-icons-sharp">close</span>
+        </div>
+      </div>
+      <div className="sidebar">
+        {menuItems.map((item) => (
+          <a
+            key={item.id}
+            href="#"
+            className={activeLink === item.id ? "active" : ""}
+            onClick={(e) => {
+              e.preventDefault();
+              onLinkClick(item.id);
+            }}
+          >
+            <span className="material-icons-sharp">{item.icon}</span>
+            <h3>{item.label}</h3>
+            {item.count !== undefined && item.count > 0 && (
+              <span className="message-count">{item.count}</span>
+            )}
+          </a>
+        ))}
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onLogout();
+          }}
+        >
+          <span className="material-icons-sharp">logout</span>
+          <h3>Logout</h3>
+        </a>
+      </div>
+    </aside>
+  );
+};
+
+export default WorkplaceSideBar;

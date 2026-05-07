@@ -2,6 +2,9 @@ from rest_framework          import status
 from rest_framework.views    import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer, OpenApiParameter
+from rest_framework import serializers as drf_serializers
+
 
 from .models import WeeklyLogs
 from placements.models import InternshipPlacement
@@ -78,6 +81,16 @@ def get_log_or_404(pk, user):
 class WeeklyLogListCreateView(APIView):
     permission_classes = [IsAuthenticated, IsActiveAccount]
 
+    @extend_schema(
+        operation_id="logs_list",
+        parameters=[
+            OpenApiParameter("placement", int, description="Filter by placement ID"),
+            OpenApiParameter("status", str, description="Filter by log status"),
+            OpenApiParameter("week", int, description="Filter by week number"),
+        ],
+        responses={200: WeeklyLogListSerializer(many=True)},
+    )
+
     def get(self, request):
         queryset = get_log_queryset(request.user)
 
@@ -94,6 +107,17 @@ class WeeklyLogListCreateView(APIView):
 
         serializer = WeeklyLogListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+    @extend_schema(
+        operation_id="logs_create",
+        request=WeeklyLogDetailSerializer,
+        responses={
+            201: WeeklyLogDetailSerializer,
+            400: OpenApiResponse(description="Validation errors."),
+            403: OpenApiResponse(description="Only students can create weekly logs."),
+        },
+    )
     
 
     def post(self, request):
@@ -118,6 +142,14 @@ class WeeklyLogListCreateView(APIView):
 class WeeklyLogDetailView(APIView):
    
     permission_classes = [IsAuthenticated, IsActiveAccount]
+    @extend_schema(
+        operation_id="logs_detail",
+        responses={
+            200: WeeklyLogDetailSerializer,
+            403: OpenApiResponse(description="Not linked to this placement."),
+            404: OpenApiResponse(description="Weekly log not found."),
+        },
+    )
 
     def get(self, request, pk):
         log, err = get_log_or_404(pk, request.user)
@@ -125,6 +157,17 @@ class WeeklyLogDetailView(APIView):
             return err
         serializer = WeeklyLogDetailSerializer(log)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @extend_schema(
+        operation_id="logs_partial_update",
+        request=WeeklyLogDetailSerializer,
+        responses={
+            200: WeeklyLogDetailSerializer,
+            400: OpenApiResponse(description="Log not editable or validation error."),
+            403: OpenApiResponse(description="Only the student can edit a log."),
+            404: OpenApiResponse(description="Weekly log not found."),
+        },
+    )
 
     def patch(self, request, pk):
         log, err = get_log_or_404(pk, request.user)
@@ -155,6 +198,21 @@ class WeeklyLogDetailView(APIView):
             )
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+@extend_schema(
+    operation_id="logs_submit",
+    request=None,
+    responses={
+        200: inline_serializer("LogSubmitResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Weekly log not found."),
+    },
+)
+
+
 
 class WeeklyLogSubmitView(APIView):
    
@@ -186,6 +244,21 @@ class WeeklyLogSubmitView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+    
+
+@extend_schema(
+    operation_id="logs_endorse",
+    request=WorkplaceEndorseSerializer,
+    responses={
+        200: inline_serializer("LogEndorseResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        403: OpenApiResponse(description="Not the workplace supervisor for this placement."),
+        404: OpenApiResponse(description="Weekly log not found."),
+    },
+)
 class WeeklyLogEndorseView(APIView):
     
     permission_classes = [IsAuthenticated, IsActiveAccount, IsWorkplaceSupervisor]
@@ -222,7 +295,21 @@ class WeeklyLogEndorseView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
+    
+@extend_schema(
+    operation_id="logs_assess",
+    request=AcademicAssessSerializer,
+    responses={
+        200: inline_serializer("LogAssessResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+            "grade":  drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        403: OpenApiResponse(description="Not the academic supervisor for this placement."),
+        404: OpenApiResponse(description="Weekly log not found."),
+    },
+)
 
 class WeeklyLogAssessView(APIView):
     
@@ -261,6 +348,19 @@ class WeeklyLogAssessView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+    
+@extend_schema(
+    operation_id="logs_close",
+    request=None,
+    responses={
+        200: inline_serializer("LogCloseResponse", fields={
+            "detail": drf_serializers.CharField(),
+            "status": drf_serializers.CharField(),
+        }),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Weekly log not found."),
+    },
+)
 
 class WeeklyLogCloseView(APIView):
     
@@ -290,6 +390,26 @@ class WeeklyLogCloseView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+    
+@extend_schema(
+    operation_id="logs_placement_summary",
+    request=None,
+    responses={
+        200: inline_serializer("PlacementLogSummaryResponse", fields={
+            "placement_id":  drf_serializers.IntegerField(),
+            "organisation":  drf_serializers.CharField(),
+            "student":       drf_serializers.CharField(),
+            "total_weeks":   drf_serializers.IntegerField(),
+            "submitted":     drf_serializers.IntegerField(),
+            "closed":        drf_serializers.IntegerField(),
+            "average_grade": drf_serializers.FloatField(allow_null=True),
+            "status_counts": drf_serializers.DictField(child=drf_serializers.IntegerField()),
+            "logs":          WeeklyLogListSerializer(many=True),
+        }),
+        403: OpenApiResponse(description="Not linked to this placement."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 
 
 class PlacementLogSummaryView(APIView):
@@ -352,6 +472,19 @@ class PlacementLogSummaryView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+    
+@extend_schema(
+    operation_id="logs_pending",
+    request=None,
+    responses={
+        200: inline_serializer("PendingLogsResponse", fields={
+            "count": drf_serializers.IntegerField(),
+            "logs":  WeeklyLogListSerializer(many=True),
+        }),
+        403: OpenApiResponse(description="Pending logs not applicable for your role."),
+    },
+)
+    
 
 
 class PendingLogsView(APIView):

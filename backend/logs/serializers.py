@@ -13,6 +13,9 @@ class WeeklyLogListSerializer(serializers.ModelSerializer):
     organisation = serializers.CharField(
         source="placement.organisation_name", read_only=True
     )
+    programme = serializers.CharField(
+        source="placement.student.programme", read_only=True
+    )
 
     class Meta:
         model  = WeeklyLogs
@@ -20,6 +23,7 @@ class WeeklyLogListSerializer(serializers.ModelSerializer):
             "id",
             "student_name",
             "student_number",
+            "programme",
             "organisation",
             "week_number",
             "week_start_date",
@@ -41,6 +45,9 @@ class WeeklyLogDetailSerializer(serializers.ModelSerializer):
     organisation = serializers.CharField(
         source="placement.organisation_name", read_only=True
     )
+    programme = serializers.CharField(
+        source="placement.student.programme", read_only=True
+    )
     workplace_endorsed_by_name = serializers.CharField(
         source="workplace_endorsed_by.get_full_name",
         read_only=True,
@@ -60,6 +67,7 @@ class WeeklyLogDetailSerializer(serializers.ModelSerializer):
             "student_name",
             "student_number",
             "organisation",
+            "programme",
             "week_number",
             "week_start_date",
             "week_end_date",
@@ -68,11 +76,11 @@ class WeeklyLogDetailSerializer(serializers.ModelSerializer):
             "challenges_faced",
             "student_remarks",
             "status",
-            "workplace_comment",
+            "workplace_remarks",
             "workplace_endorsed_by",
             "workplace_endorsed_by_name",
             "workplace_endorsed_at",
-            "academic_comment",
+            "academic_remarks",
             "academic_grade",
             "academic_assessed_by",
             "academic_assessed_by_name",
@@ -84,10 +92,10 @@ class WeeklyLogDetailSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "status",
-            "workplace_comment",
+            "workplace_remarks",
             "workplace_endorsed_by",
             "workplace_endorsed_at",
-            "academic_comment",
+            "academic_remarks",
             "academic_grade",
             "academic_assessed_by",
             "academic_assessed_at",

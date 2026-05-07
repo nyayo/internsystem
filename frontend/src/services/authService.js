@@ -22,29 +22,10 @@ const cleanString = (value) => `${value ?? ""}`.trim();
 const cleanEmail = (value) => cleanString(value).toLowerCase();
 
 export function createDefaultAuthUsers({
-  currentStudent,
   currentWorkplaceSupervisor,
   currentAcademicSupervisor,
 }) {
   return [
-    {
-      id: currentStudent.id,
-      firstName: currentStudent.firstName,
-      lastName: currentStudent.lastName,
-      email: currentStudent.email,
-      phone: currentStudent.phone,
-      studentNumber: currentStudent.studentNumber,
-      programme: currentStudent.programme,
-      yearOfStudy: currentStudent.yearOfStudy,
-      university: currentStudent.university,
-      faculty: currentStudent.faculty,
-      department: currentStudent.department,
-      gender: currentStudent.gender,
-      district: currentStudent.district,
-      role: "student",
-      password: "password123",
-      accountStatus: currentStudent.accountStatus ?? "active",
-    },
     {
       id: currentWorkplaceSupervisor.id,
       firstName: currentWorkplaceSupervisor.firstName,

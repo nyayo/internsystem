@@ -1,13 +1,31 @@
 import React from "react";
-import Profile1 from '../../assets/images/profile-1.jpg'
-import Profile2 from '../../assets/images/profile-2.jpg'
-import Profile3 from '../../assets/images/profile-3.jpg'
-import Profile4 from '../../assets/images/profile-4.jpg'
-import './RightPanel.css'
-import { useTheme } from '../../context/ThemeContext';
+import "./RightPanel.css";
+import { useTheme } from "../../context/ThemeContext";
 
-export default function RightPanel({ onMenuClick, stats }) {
+export default function RightPanel({
+  onMenuClick,
+  stats,
+  admin,
+  workplaceSupervisors = [],
+  academicSupervisors = [],
+}) {
   const { isDarkMode, toggleTheme } = useTheme();
+  const safeAdmin = admin ?? {
+    fullName: "Administrator",
+    jobTitle: "Internship Administrator",
+    firstName: "A",
+    lastName: "D",
+  };
+
+  const workplaceTotal = workplaceSupervisors.length;
+  const academicTotal = academicSupervisors.length;
+  const workplaceActive = workplaceSupervisors.filter(
+    (item) => item.accountStatus === "active",
+  ).length;
+  const academicActive = academicSupervisors.filter(
+    (item) => item.accountStatus === "active",
+  ).length;
+  const activeCriteria = Number(stats?.activeCriteria ?? 0);
 
   return (
     <div className="right">
@@ -16,59 +34,41 @@ export default function RightPanel({ onMenuClick, stats }) {
           <span className="material-icons-sharp">menu</span>
         </button>
         <div className="theme-toggler" onClick={toggleTheme}>
-          <span className={`material-icons-sharp ${!isDarkMode ? 'active' : ''}`}>light_mode</span>
-          <span className={`material-icons-sharp ${isDarkMode ? 'active' : ''}`}>dark_mode</span>
+          <span
+            className={`material-icons-sharp ${!isDarkMode ? "active" : ""}`}
+          >
+            light_mode
+          </span>
+          <span
+            className={`material-icons-sharp ${isDarkMode ? "active" : ""}`}
+          >
+            dark_mode
+          </span>
         </div>
         <div className="profile">
           <div className="info">
             <p>
-              Hey, <b>Dr. Namutebi</b>
+              Hey, <b>{safeAdmin.fullName}</b>
             </p>
-            <small className="text-muted">Internship Coordinator</small>
+            <small className="text-muted">{safeAdmin.jobTitle}</small>
           </div>
           <div className="profile-photo">
-            <img src={Profile1} alt="Administrator" />
-          </div>
-        </div>
-      </div>
-
-      <div className="recent-updates">
-        <h2>Recent Activity</h2>
-        <div className="updates">
-          <div className="update">
-            <div className="profile-photo">
-              <img src={Profile2} alt="" />
-            </div>
-            <div className="message">
-              <p>
-                <b>Nakato Joy</b> submitted a new internship application for
-                Stanbic Bank.
-              </p>
-              <small>5 Minutes Ago</small>
-            </div>
-          </div>
-          <div className="update">
-            <div className="profile-photo">
-              <img src={Profile3} alt="" />
-            </div>
-            <div className="message">
-              <p>
-                <b>Kato David</b>'s internship at KCCA was approved by the
-                committee.
-              </p>
-              <small>15 Minutes Ago</small>
-            </div>
-          </div>
-          <div className="update">
-            <div className="profile-photo">
-              <img src={Profile4} alt="" />
-            </div>
-            <div className="message">
-              <p>
-                <b>Amongi Faith</b> submitted her weekly progress report from
-                URA.
-              </p>
-              <small>1 Hour Ago</small>
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                background: "var(--color-primary)",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+                fontWeight: "600",
+                fontSize: "0.9rem",
+              }}
+            >
+              {safeAdmin.firstName.split(" ").pop().charAt(0).toUpperCase()}
+              {safeAdmin.lastName.charAt(0).toUpperCase()}
             </div>
           </div>
         </div>
@@ -85,8 +85,19 @@ export default function RightPanel({ onMenuClick, stats }) {
               <h3>Workplace Supervisors</h3>
               <small className="text-muted">Industry professionals</small>
             </div>
-            <h5 className="success">+5%</h5>
-            <h3>{stats.workplaceSupervisors}</h3>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "0.3rem",
+              }}
+            >
+              <h5 className={workplaceTotal ? "success" : "danger"}>
+                {workplaceActive}/{workplaceTotal} active
+              </h5>
+              <h3>{workplaceTotal}</h3>
+            </div>
           </div>
         </div>
         <div className="item offline">
@@ -98,8 +109,19 @@ export default function RightPanel({ onMenuClick, stats }) {
               <h3>Academic Supervisors</h3>
               <small className="text-muted">Faculty members</small>
             </div>
-            <h5 className="success">+2%</h5>
-            <h3>{stats.academicSupervisors}</h3>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "0.3rem",
+              }}
+            >
+              <h5 className={academicTotal ? "success" : "danger"}>
+                {academicActive}/{academicTotal} active
+              </h5>
+              <h3>{academicTotal}</h3>
+            </div>
           </div>
         </div>
         <div className="item customers">
@@ -111,8 +133,19 @@ export default function RightPanel({ onMenuClick, stats }) {
               <h3>Active Criteria</h3>
               <small className="text-muted">Evaluation metrics</small>
             </div>
-            <h5 className="success">{stats.activeCriteria} total</h5>
-            <h3>100%</h3>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "0.3rem",
+              }}
+            >
+              <h5 className={activeCriteria > 0 ? "success" : "danger"}>
+                {activeCriteria} total
+              </h5>
+              <h3>{activeCriteria > 0 ? "Live" : "0"}</h3>
+            </div>
           </div>
         </div>
       </div>

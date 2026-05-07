@@ -17,6 +17,25 @@ export const formatDateValue = (dateString, options = {}) => {
   }
 };
 
+export function formatDateTimeValue(dateValue) {
+  if (!dateValue) {
+    return "-";
+  }
+
+  const parsedDate = new Date(dateValue);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "-";
+  }
+
+  return parsedDate.toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 /**
  * Format a date range
  * @param {string} startDate - Start date ISO string

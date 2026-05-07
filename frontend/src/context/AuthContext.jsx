@@ -6,9 +6,9 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
 import { getRoleHomePath } from "../auth/authConfig";
-import { currentStudent } from "../data/studentDashboardData";
 import {
   currentAcademicSupervisor,
   currentWorkplaceSupervisor,
@@ -16,7 +16,6 @@ import {
 import {
   createDefaultAuthUsers,
   createUserFromRegistration,
-  getLoggedInUser,
   loadRegisteredUsers,
   loadSessionUser,
   saveRegisteredUsers,
@@ -24,7 +23,8 @@ import {
   toSessionUser,
 } from "../services/authService";
 import authApi from "../services/authApi";
-import { API_BASE_URL } from "../services/httpClient";
+import SessionExpiredModal from "../components/modals/SessionExpiredModal";
+import { API_BASE_URL, registerSessionPrompt } from "../services/httpClient";
 
 const AuthContext = createContext(null);
 const IS_API_LOGIN_ENABLED = Boolean(API_BASE_URL);
@@ -32,10 +32,39 @@ const REGISTER_SUCCESS_MESSAGE =
   "Account created. Please check your email to verify your account.";
 
 const DEFAULT_AUTH_USERS = createDefaultAuthUsers({
-  currentStudent,
   currentWorkplaceSupervisor,
   currentAcademicSupervisor,
 });
+
+function normalizeApiUser(raw = {}) {
+  const user = toSessionUser(raw);
+  return {
+    ...user,
+    role: user.role ?? user.user_type ?? "",
+    firstName: user.firstName ?? user.first_name,
+    lastName: user.lastName ?? user.last_name,
+    fullName:
+      user.fullName ??
+      user.full_name ??
+      [user.firstName ?? user.first_name, user.lastName ?? user.last_name]
+        .filter(Boolean)
+        .join(" "),
+    phone: user.phone ?? user.phone_number,
+    studentNumber: user.studentNumber ?? user.student_number,
+    accountStatus: user.accountStatus ?? user.account_status,
+    organization: user.organization ?? user.organisation_name,
+    position: user.position ?? user.job_title,
+    title: user.title ?? user.job_title,
+  };
+}
+
+function hydrateRoleUser(apiUser) {
+  const normalized = normalizeApiUser(apiUser);
+  if (!normalized.role)
+    throw new Error("Login response is missing a user role.");
+  const fallback = ROLE_DEFAULTS[normalized.role] ?? {};
+  return { ...fallback, ...normalized };
+}
 
 function createSessionUserFromApiLogin(apiLoginResponse) {
   const payload =
@@ -43,11 +72,15 @@ function createSessionUserFromApiLogin(apiLoginResponse) {
       ? apiLoginResponse
       : {};
   const source =
-    payload.data && typeof payload.data === "object" && !Array.isArray(payload.data)
+    payload.data &&
+    typeof payload.data === "object" &&
+    !Array.isArray(payload.data)
       ? payload.data
       : payload;
   const userPayload =
-    source.user && typeof source.user === "object" && !Array.isArray(source.user)
+    source.user &&
+    typeof source.user === "object" &&
+    !Array.isArray(source.user)
       ? source.user
       : source;
   const tokenCandidate =
@@ -62,7 +95,9 @@ function createSessionUserFromApiLogin(apiLoginResponse) {
     typeof source.refresh === "string" ? source.refresh : userPayload?.refresh;
   const token = typeof tokenCandidate === "string" ? tokenCandidate.trim() : "";
   const refreshToken =
-    typeof refreshTokenCandidate === "string" ? refreshTokenCandidate.trim() : "";
+    typeof refreshTokenCandidate === "string"
+      ? refreshTokenCandidate.trim()
+      : "";
 
   const sessionUser = toSessionUser(userPayload);
 
@@ -139,14 +174,29 @@ export function AuthProvider({ children }) {
     loadRegisteredUsers(DEFAULT_AUTH_USERS),
   );
   const [user, setUser] = useState(() => loadSessionUser());
+  const [showSessionPrompt, setShowSessionPrompt] = useState(false);
+  const sessionResolverRef = useRef(null);
 
   useEffect(() => {
+    registerSessionPrompt((resolve) => {
+      sessionResolverRef.current = resolve;
+      setShowSessionPrompt(true);
+    });
     saveRegisteredUsers(registeredUsers);
-  }, [registeredUsers]);
-
-  useEffect(() => {
     saveSessionUser(user);
-  }, [user]);
+  }, [registeredUsers, user]);
+
+  const handleExtendSession = useCallback(() => {
+    setShowSessionPrompt(false);
+    sessionResolverRef.current?.(true);
+    sessionResolverRef.current = null;
+  }, []);
+
+  const handleSessionLogout = useCallback(() => {
+    setShowSessionPrompt(false);
+    sessionResolverRef.current?.(false);
+    sessionResolverRef.current = null;
+  }, []);
 
   const register = useCallback(
     async (registrationData) => {
@@ -180,34 +230,47 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async (credentials) => {
-      const loginWithLocalFallback = () => {
-        const fallbackSessionUser = getLoggedInUser(credentials, registeredUsers);
-        setUser(fallbackSessionUser);
-        return fallbackSessionUser;
-      };
-
-      if (!IS_API_LOGIN_ENABLED) {
-        return loginWithLocalFallback();
-      }
-
       try {
         const apiLoginResponse = await authApi.login(credentials);
-        const sessionUser = createSessionUserFromApiLogin(apiLoginResponse);
+        const baseSession = createSessionUserFromApiLogin(apiLoginResponse);
+
+        if (!baseSession?.token) {
+          throw new Error("Access token missing from login response.");
+        }
+
+        const apiCurrentUser = await authApi.getCurrentUser(baseSession.token);
+
+        const sessionUser = {
+          ...normalizeApiUser(apiCurrentUser),
+          token: baseSession.token,
+          refreshToken: baseSession.refreshToken,
+        };
+
+        saveSessionUser(sessionUser);
         setUser(sessionUser);
         return sessionUser;
       } catch (error) {
         if (error?.response) {
           throw error;
         }
-        return loginWithLocalFallback();
       }
     },
     [registeredUsers],
   );
 
-  const logout = useCallback(() => {
-    setUser(null);
-  }, []);
+  const logout = useCallback(async () => {
+    try {
+      if (user?.refreshToken) {
+        await authApi.logout(user.refreshToken);
+      }
+    } catch (error) {
+      // token already blacklisted or expired — proceed anyway
+      console.warn("Logout API error:", error);
+    } finally {
+      setUser(null);
+      saveSessionUser(null);
+    }
+  }, [user]);
 
   const contextValue = useMemo(
     () => ({
@@ -223,7 +286,15 @@ export function AuthProvider({ children }) {
   );
 
   return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>
+      {children}
+      {showSessionPrompt && (
+        <SessionExpiredModal
+          onExtend={handleExtendSession}
+          onLogout={handleSessionLogout}
+        />
+      )}
+    </AuthContext.Provider>
   );
 }
 

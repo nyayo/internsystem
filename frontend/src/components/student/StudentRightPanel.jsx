@@ -1,14 +1,14 @@
 import React from "react";
 import "./StudentRightPanel.css";
 import { useTheme } from "../../context/ThemeContext";
-
+import CalendarWidget from "./CalendarWidget";
 
 export default function StudentRightPanel({ student, placement }) {
-    const { isDarkMode, toggleTheme } = useTheme();
+  const { isDarkMode, toggleTheme } = useTheme();
 
-    const placementStatus = placement?.status || "none";
+  const placementStatus = placement?.status || "none";
 
-    const getStatusInfo = () => {
+  const getStatusInfo = () => {
     switch (placementStatus) {
       case "draft":
         return { label: "Draft", class: "muted", icon: "edit" };
@@ -33,21 +33,42 @@ export default function StudentRightPanel({ student, placement }) {
 
   const statusInfo = getStatusInfo();
 
-    return (
+  return (
     <div className="student-right-panel">
       <div className="theme-toggle-section">
         <div className="theme-toggler" onClick={toggleTheme}>
-          <span className={`material-icons-sharp ${!isDarkMode ? 'active' : ''}`}>light_mode</span>
-          <span className={`material-icons-sharp ${isDarkMode ? 'active' : ''}`}>dark_mode</span>
+          <span
+            className={`material-icons-sharp ${!isDarkMode ? "active" : ""}`}
+          >
+            light_mode
+          </span>
+          <span
+            className={`material-icons-sharp ${isDarkMode ? "active" : ""}`}
+          >
+            dark_mode
+          </span>
         </div>
       </div>
 
       <div className="profile-card">
         <div className="profile-photo">
-          <img
-            src={student.profilePhoto || "/assets/images/profile-1.jpg"}
-            alt={`${student.firstName} ${student.lastName}`}
-          />
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              background: "var(--color-primary)",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontWeight: "600",
+              fontSize: "3.0rem",
+            }}
+          >
+            {student.firstName.split(" ").pop().charAt(0).toUpperCase()}
+            {student.lastName.charAt(0).toUpperCase()}
+          </div>
         </div>
 
         <div className="profile-info">
@@ -82,16 +103,8 @@ export default function StudentRightPanel({ student, placement }) {
           <div className="detail-item">
             <span className="material-icons-sharp">business</span>
             <div className="detail-text">
-              <span className="label">Faculty</span>
-              <span className="value">{student.faculty}</span>
-            </div>
-          </div>
-
-          <div className="detail-item">
-            <span className="material-icons-sharp">apartment</span>
-            <div className="detail-text">
-              <span className="label">Department</span>
-              <span className="value">{student.department}</span>
+              <span className="label">Univsersity</span>
+              <span className="value">{student.university}</span>
             </div>
           </div>
 
@@ -112,6 +125,14 @@ export default function StudentRightPanel({ student, placement }) {
           </div>
         </div>
       </div>
+
+      {placement &&
+        ["approved", "active", "completed"].includes(placement.status) && (
+          <CalendarWidget
+            startDate={placement.startDate}
+            endDate={placement.endDate}
+          />
+        )}
 
       {/* Quick Actions */}
       <div className="quick-actions">

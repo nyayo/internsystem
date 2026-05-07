@@ -6,6 +6,7 @@ import { AdminProvider } from "./context/AdminContext.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { NotificationProvider } from "./context/NotificationContext.jsx";
 import App from "./App.jsx";
+import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(

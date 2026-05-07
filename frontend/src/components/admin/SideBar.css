@@ -50,10 +50,9 @@ aside .sidebar {
   margin-top: 1.4rem;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 86vh;
   position: relative;
   top: 3rem;
-  padding: 0 1.5;
 }
 
 aside h3 {
@@ -64,20 +63,11 @@ aside .sidebar a {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.8rem 1rem;
-
   margin-left: 2rem;
   color: var(--color-info-dark);
   font-weight: 500;
   position: relative;
   height: 3.7rem;
-  border-radius: 8px;
-}
-
-aside{
-  padding-left: 10px;
-  width: 220px;
-  background: #f8f9ff;
 }
 
 aside .sidebar a span {
@@ -92,7 +82,7 @@ aside .sidebar a:last-child {
 }
 
 aside .sidebar a.active {
-  background: #4f46e5;
+  background: var(--color-light);
   color: var(--color-primary);
   margin-left: 0;
 }
@@ -110,11 +100,7 @@ aside .sidebar a.active span {
 }
 
 aside .sidebar a:hover {
-  background: #eef2ff;
-  color: #4f46e5;
-  cursor: pointer;
-  transform: translateX(5PX);
-  transition: ALL 0.3s ease;
+  color: var(--color-primary);
 }
 
 aside .sidebar .message-count {

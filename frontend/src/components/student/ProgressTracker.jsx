@@ -10,13 +10,14 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
     return calculateInternshipProgress(placement.startDate, placement.endDate);
   }, [placement.startDate, placement.endDate]);
   
-  const currentWeek = useMemo(() => {
-    return getCurrentWeekNumber(placement.startDate);
-  }, [placement.startDate]);
-  
   const totalWeeks = useMemo(() => {
     return getTotalWeeks(placement.startDate, placement.endDate);
   }, [placement.startDate, placement.endDate]);
+
+  const currentWeek = useMemo(() => {
+    const week = getCurrentWeekNumber(placement.startDate);
+    return totalWeeks > 0 ? Math.min(week, totalWeeks) : week;
+  }, [placement.startDate, totalWeeks]);
   const logsStats = useMemo(() => {
     const submitted = weeklyLogs.filter(log => log.status !== 'draft').length;
     const assessed = weeklyLogs.filter(log => ['assessed', 'closed'].includes(log.status)).length;
@@ -53,7 +54,7 @@ export default function ProgressTracker({ placement, weeklyLogs }) {
             <div 
               key={index} 
               className={`milestone ${milestone.completed ? 'completed' : ''}`}
-              style={{ left: `${(milestone.week / totalWeeks) * 100}%` }}
+              style={{ left: `${totalWeeks > 0 ? (milestone.week / totalWeeks) * 100 : 0}%` }}
             >
               <div className="milestone-dot">
                 <span className="material-icons-sharp">{milestone.icon}</span>

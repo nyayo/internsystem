@@ -48,7 +48,6 @@ function LoginPage() {
 
     try {
       const sessionUser = await login({ role, email, password });
-      console.log(sessionUser)
       setError("");
       navigate(getRoleHomePath(sessionUser.role), { replace: true });
     } catch (loginError) {
@@ -83,7 +82,7 @@ function LoginPage() {
         )}
 
         <form className="auth-form" onSubmit={handleLogin}>
-          <select
+          {/* <select
             className="auth-input"
             value={role}
             onChange={(event) => setRole(event.target.value)}
@@ -93,7 +92,7 @@ function LoginPage() {
                 {option.label}
               </option>
             ))}
-          </select>
+          </select> */}
 
           <input
             className="auth-input"
@@ -116,6 +115,9 @@ function LoginPage() {
           </button>
         </form>
 
+        <p className="auth-footer">
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
         <p className="auth-footer">
           Don&apos;t have an account? <Link to="/register">Register here</Link>
         </p>

@@ -21,6 +21,11 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
   });
   const [showModal, setShowModal] = useState(false);
   const [editingCriteria, setEditingCriteria] = useState(null);
+  const truncateDescription = (value, max = 110) => {
+    const text = String(value ?? "");
+    if (text.length <= max) return text;
+    return `${text.slice(0, max).trimEnd()}...`;
+  };
 
   // Apply search and filters
   const filteredCriteria = useMemo(() => {
@@ -206,7 +211,7 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
 
       {/* Table */}
       <div className="table-container">
-        <table className="data-table criteria-table">
+        <table className="data-table">
           <thead>
             <tr>
               <th>Title</th>
@@ -236,7 +241,9 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
                       <span className={`criteria-dot ${getCategoryClass(item.category)}`}></span>
                       <div className="criteria-info">
                         <span className="criteria-name">{item.title}</span>
-                        <span className="criteria-desc">{item.description}</span>
+                        <span className="criteria-desc" title={item.description}>
+                          {truncateDescription(item.description)}
+                        </span>
                       </div>
                     </div>
                   </td>

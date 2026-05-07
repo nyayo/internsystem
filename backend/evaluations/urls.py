@@ -1,3 +1,60 @@
 from django.urls import path
+from .views import (
+    EvaluationCriteriaListCreateView,
+    EvaluationCriteriaDetailView,
+    EvaluationListView,
+    EvaluationDetailView,
+    EvaluationSaveDraftView,
+    EvaluationSubmitView,
+    EvaluationAcknowledgeView,
+    PendingEvaluationsView,
+    PlacementEvaluationSummaryView
+)
 
-urlpatterns = []
+urlpatterns = [
+    path(
+        "criteria/",
+        EvaluationCriteriaListCreateView.as_view(),
+        name="criteria_list_create",
+    ),
+    path(
+        "criteria/<int:pk>/",
+        EvaluationCriteriaDetailView.as_view(),
+        name="criteria_detail",
+    ),
+    path(
+        "evaluations/pending/",
+        PendingEvaluationsView.as_view(),
+        name="evaluation_pending",
+    ),
+    path(
+        "evaluations/placement/<int:placement_id>/summary/",
+        PlacementEvaluationSummaryView.as_view(),
+        name="evaluation_placement_summary",
+    ),
+    path(
+        "evaluations/",
+        EvaluationListView.as_view(),
+        name="evaluation_list",
+    ),
+    path(
+        "evaluations/<int:pk>/",
+        EvaluationDetailView.as_view(),
+        name="evaluation_detail",
+    ),
+    path(
+        "evaluations/<int:pk>/save-draft/",
+        EvaluationSaveDraftView.as_view(),
+        name="evaluation_save_draft",
+    ),
+    path(
+        "evaluations/<int:pk>/submit/",
+        EvaluationSubmitView.as_view(),
+        name="evaluation_submit",
+    ),
+    path(
+        "evaluations/<int:pk>/acknowledge/",
+        EvaluationAcknowledgeView.as_view(),
+        name="evaluation_acknowledge",
+    ),
+]

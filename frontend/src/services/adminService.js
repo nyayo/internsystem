@@ -33,14 +33,8 @@ export function toApplicationRows(placements) {
     studentName: placement.student.name,
     regNumber: placement.student.regNumber,
     program: placement.student.program,
-    workplaceSupervisor: getSupervisorName(
-      workplaceSupervisors,
-      placement.workplaceSupervisor,
-    ),
-    academicSupervisor: getSupervisorName(
-      academicSupervisors,
-      placement.academicSupervisor,
-    ),
+    workplaceSupervisor: placement.workplaceSupervisorName,
+    academicSupervisor: placement.academicSupervisorName,
     status: toApplicationStatus(placement.status),
   }));
 }
@@ -52,7 +46,6 @@ export function buildAdminStats(placements, criteria) {
 
   return {
     stats: {
-      ...dashboardStats,
       pendingApplications: pendingCount,
       activeCriteria: criteria.filter((criterion) => criterion.isActive).length,
     },

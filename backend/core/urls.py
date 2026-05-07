@@ -26,12 +26,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("accounts/", include("accounts.urls")),
-    path("logs/", include("logs.urls")),
-    path("placements/", include("placements.urls")),
-    path("evaluations/", include("evaluations.urls")),
-    path("schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("schema/swagger/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
-    path("schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path("api/admin/", admin.site.urls),
+    path("api/accounts/", include("accounts.urls")),
+    path("api/logs/", include("logs.urls")),
+    path("api/placements/", include("placements.urls")),
+    path("api/evaluations/", include("evaluations.urls")),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/schema/swagger/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,9 +1,19 @@
+from urllib import request
+
 from django.utils import timezone
 
-from rest_framework          import status
-from rest_framework.views    import APIView
+from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers  import MultiPartParser, FormParser, JSONParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiResponse,
+    inline_serializer,
+    OpenApiParameter,
+)
+from rest_framework import serializers as drf_serializers
 
 from .models import InternshipPlacement
 from .serializers import (
@@ -27,7 +37,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 def get_queryset_for_role(user):
-   
+
     if user.role == "student":
         return InternshipPlacement.objects.filter(student=user)
 
@@ -42,11 +52,20 @@ def get_queryset_for_role(user):
 
     return InternshipPlacement.objects.none()
 
-class PlacementListCreateView(APIView):
-    
-    permission_classes = [IsAuthenticated, IsActiveAccount]
-    parser_classes     = [MultiPartParser, FormParser, JSONParser]
 
+class PlacementListCreateView(APIView):
+
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    @extend_schema(
+        operation_id="placements_list",
+        parameters=[
+            OpenApiParameter("status", str, description="Filter by placement status"),
+            OpenApiParameter("cohort", str, description="Filter by intake cohort"),
+        ],
+        responses={200: PlacementListSerializer(many=True)},
+    )
     def get(self, request):
         queryset = get_queryset_for_role(request.user)
 
@@ -60,6 +79,15 @@ class PlacementListCreateView(APIView):
         serializer = PlacementListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        operation_id="placements_create",
+        request=PlacementDetailSerializer,
+        responses={
+            201: PlacementDetailSerializer,
+            400: OpenApiResponse(description="Validation errors."),
+            403: OpenApiResponse(description="Only students can create placements."),
+        },
+    )
     def post(self, request):
         if request.user.role != "student":
             return Response(
@@ -77,50 +105,54 @@ class PlacementListCreateView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-
 class PlacementDetailView(APIView):
     """
     GET   /api/placements/<id>/  -- view placement detail
     PATCH /api/placements/<id>/  -- student edits their draft placement
     """
-    permission_classes = [IsAuthenticated, IsActiveAccount]
-    parser_classes     = [MultiPartParser, FormParser, JSONParser]
 
-    def get_object(self, pk, user):
+    permission_classes = [IsAuthenticated, IsActiveAccount]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_object(self, pk, request):
         try:
             obj = InternshipPlacement.objects.get(pk=pk)
         except InternshipPlacement.DoesNotExist:
-            return None, Response(
-                {"detail": "Placement not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        perm = IsLinkedToPlacement()
-        if not perm.has_object_permission(None, None, obj):
-           
-            pass
+            return None, Response({"detail": "Placement not found."}, status=404)
 
-        if not (
-            user == obj.student
-            or user == obj.academic_supervisor
-            or user == obj.workplace_supervisor
-            or user == obj.approved_by
-            or user.role == "internship_administrator"
-        ):
-            return None, Response(
-                {"detail": "You are not linked to this placement."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        perm = IsLinkedToPlacement()
+        if not perm.has_object_permission(request, self, obj):
+            return None, Response({"detail": perm.message}, status=403)
+
         return obj, None
 
+    @extend_schema(
+        operation_id="placements_detail",
+        responses={
+            200: PlacementDetailSerializer,
+            403: OpenApiResponse(description="Not linked to this placement."),
+            404: OpenApiResponse(description="Placement not found."),
+        },
+    )
     def get(self, request, pk):
-        obj, err = self.get_object(pk, request.user)
+        obj, err = self.get_object(pk, request)
         if err:
             return err
         serializer = PlacementDetailSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        operation_id="placements_partial_update",
+        request=PlacementDetailSerializer,
+        responses={
+            200: PlacementDetailSerializer,
+            400: OpenApiResponse(description="Not a draft or validation error."),
+            403: OpenApiResponse(description="Only the student can edit a placement."),
+            404: OpenApiResponse(description="Placement not found."),
+        },
+    )
     def patch(self, request, pk):
-        obj, err = self.get_object(pk, request.user)
+        obj, err = self.get_object(pk, request)
         if err:
             return err
 
@@ -141,9 +173,23 @@ class PlacementDetailView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-
+@extend_schema(
+    operation_id="placements_submit",
+    request=None,
+    responses={
+        200: inline_serializer(
+            "PlacementSubmitResponse",
+            fields={
+                "detail": drf_serializers.CharField(),
+                "status": drf_serializers.CharField(),
+            },
+        ),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 class PlacementSubmitView(APIView):
-    
+
     permission_classes = [IsAuthenticated, IsActiveAccount, IsStudent]
 
     def post(self, request, pk):
@@ -164,9 +210,23 @@ class PlacementSubmitView(APIView):
         )
 
 
-
+@extend_schema(
+    operation_id="placements_approve",
+    request=PlacementApprovalSerializer,
+    responses={
+        200: inline_serializer(
+            "PlacementApprovalResponse",
+            fields={
+                "detail": drf_serializers.CharField(),
+                "status": drf_serializers.CharField(),
+            },
+        ),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 class PlacementApprovalView(APIView):
-    
+
     permission_classes = [IsAuthenticated, IsActiveAccount, IsInternshipAdministrator]
 
     def post(self, request, pk):
@@ -192,9 +252,23 @@ class PlacementApprovalView(APIView):
         )
 
 
-
+@extend_schema(
+    operation_id="placements_activate",
+    request=None,
+    responses={
+        200: inline_serializer(
+            "PlacementActivateResponse",
+            fields={
+                "detail": drf_serializers.CharField(),
+                "status": drf_serializers.CharField(),
+            },
+        ),
+        400: OpenApiResponse(description="Only approved placements can be activated."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 class PlacementActivateView(APIView):
-   
+
     permission_classes = [IsAuthenticated, IsActiveAccount, IsInternshipAdministrator]
 
     def post(self, request, pk):
@@ -210,7 +284,7 @@ class PlacementActivateView(APIView):
                 {"detail": "Only approved placements can be activated."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        obj.status       = "active"
+        obj.status = "active"
         obj.activated_at = timezone.now()
         obj.save()
         return Response(
@@ -218,8 +292,25 @@ class PlacementActivateView(APIView):
             status=status.HTTP_200_OK,
         )
 
+
+@extend_schema(
+    operation_id="placements_withdraw",
+    request=PlacementWithdrawSerializer,
+    responses={
+        200: inline_serializer(
+            "PlacementWithdrawResponse",
+            fields={
+                "detail": drf_serializers.CharField(),
+                "status": drf_serializers.CharField(),
+            },
+        ),
+        400: OpenApiResponse(description="Validation error."),
+        403: OpenApiResponse(description="Not permitted to withdraw this placement."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 class PlacementWithdrawView(APIView):
-   
+
     permission_classes = [IsAuthenticated, IsActiveAccount]
 
     def post(self, request, pk):
@@ -234,7 +325,9 @@ class PlacementWithdrawView(APIView):
         user = request.user
         if user.role not in ("student", "internship_administrator"):
             return Response(
-                {"detail": "Only the student or an administrator can withdraw a placement."},
+                {
+                    "detail": "Only the student or an administrator can withdraw a placement."
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
         if user.role == "student" and obj.student != user:
@@ -252,9 +345,23 @@ class PlacementWithdrawView(APIView):
         )
 
 
-
+@extend_schema(
+    operation_id="placements_complete",
+    request=None,
+    responses={
+        200: inline_serializer(
+            "PlacementCompleteResponse",
+            fields={
+                "detail": drf_serializers.CharField(),
+                "status": drf_serializers.CharField(),
+            },
+        ),
+        400: OpenApiResponse(description="Preconditions not met."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 class PlacementCompleteView(APIView):
-    
+
     permission_classes = [IsAuthenticated, IsActiveAccount, IsInternshipAdministrator]
 
     def post(self, request, pk):
@@ -290,7 +397,7 @@ class PlacementCompleteView(APIView):
                 {"detail": "The final evaluation has not been acknowledged yet."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        obj.status       = "completed"
+        obj.status = "completed"
         obj.completed_at = timezone.now()
         obj.save()
         return Response(
@@ -299,11 +406,19 @@ class PlacementCompleteView(APIView):
         )
 
 
-
+@extend_schema(
+    operation_id="placements_final_report_upload",
+    request=FinalReportSerializer,
+    responses={
+        200: OpenApiResponse(description="Final report uploaded successfully."),
+        400: OpenApiResponse(description="Validation error."),
+        404: OpenApiResponse(description="Placement not found."),
+    },
+)
 class FinalReportUploadView(APIView):
-   
+
     permission_classes = [IsAuthenticated, IsActiveAccount, IsStudent]
-    parser_classes     = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def patch(self, request, pk):
         try:
@@ -323,8 +438,26 @@ class FinalReportUploadView(APIView):
         )
 
 
+@extend_schema(
+    operation_id="placements_stats",
+    request=None,
+    responses={
+        200: inline_serializer(
+            "PlacementStatsResponse",
+            fields={
+                "total": drf_serializers.IntegerField(),
+                "by_status": drf_serializers.DictField(
+                    child=drf_serializers.DictField()
+                ),
+                "by_cohort": drf_serializers.DictField(
+                    child=drf_serializers.DictField()
+                ),
+            },
+        ),
+    },
+)
 class PlacementStatsView(APIView):
-   
+
     permission_classes = [IsAuthenticated, IsActiveAccount, IsInternshipAdministrator]
 
     def get(self, request):
@@ -332,7 +465,7 @@ class PlacementStatsView(APIView):
 
         by_status = {}
         for choice in InternshipPlacement.STATUS_CHOICES:
-            code  = choice[0]
+            code = choice[0]
             label = choice[1]
             by_status[code] = {
                 "label": label,
@@ -341,7 +474,7 @@ class PlacementStatsView(APIView):
 
         by_cohort = {}
         for choice in InternshipPlacement.INTAKE_COHORT_CHOICES:
-            code  = choice[0]
+            code = choice[0]
             label = choice[1]
             by_cohort[code] = {
                 "label": label,
@@ -350,51 +483,9 @@ class PlacementStatsView(APIView):
 
         return Response(
             {
-                "total":     qs.count(),
+                "total": qs.count(),
                 "by_status": by_status,
                 "by_cohort": by_cohort,
             },
             status=status.HTTP_200_OK,
         )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   

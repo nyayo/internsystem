@@ -2,7 +2,7 @@ export const ROLE_LABELS = {
   student: "Student",
   workplace_supervisor: "Workplace Supervisor",
   academic_supervisor: "Academic Supervisor",
-  admin: "Admin",
+  internship_administrator: "Internship Admin",
 };
 
 export const LOGIN_ROLE_OPTIONS = [
@@ -27,7 +27,7 @@ export const ROLE_HOME_PATHS = {
   student: "/student",
   workplace_supervisor: "/supervisor/workplace",
   academic_supervisor: "/supervisor/academic",
-  admin: "/admin",
+  internship_administrator: "/admin",
 };
 
 export const GENDER_OPTIONS = [

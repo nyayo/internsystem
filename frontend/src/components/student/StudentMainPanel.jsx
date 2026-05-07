@@ -7,17 +7,20 @@ import './StudentMainPanel.css';
 export default function StudentMainPanel({ 
   activeLink, 
   student, 
-  placement, 
+  placement,
+  isPlacementLoading,
   weeklyLogs, 
+  acknowledgedEvaluations = [],
   onNewLog, 
   onEditLog,
-  onOpenPlacement 
+  onOpenPlacement,
+  onViewEvaluation
 }) {
   const hasActivePlacement = placement && ['approved', 'active', 'completed'].includes(placement.status);
   const hasPendingPlacement = placement && placement.status === 'pending_approval';
   const hasDraftPlacement = placement && placement.status === 'draft';
   const hasNoPlacement = !placement || placement.status === 'rejected';
-  
+  console.log("Evaluations", acknowledgedEvaluations)
   return (
     <main className="student-main-panel">
       {/* Welcome Banner - Always shown on dashboard */}
@@ -29,7 +32,17 @@ export default function StudentMainPanel({
             onOpenPlacement={onOpenPlacement}
           />
           
-          {hasActivePlacement && (
+          {isPlacementLoading && (
+            <div className="status-card loading">
+              <span className="material-icons-sharp spin">sync</span>
+              <div className="status-content">
+                <h3>Loading Your Placement Information</h3>
+                <p>Please wait while we fetch your placement details...</p>
+              </div>
+            </div>
+          )}
+          
+          {!isPlacementLoading && hasActivePlacement && (
             <>
               <ProgressTracker 
                 placement={placement}
@@ -47,7 +60,7 @@ export default function StudentMainPanel({
             </>
           )}
           
-          {hasPendingPlacement && (
+          {!isPlacementLoading && hasPendingPlacement && (
             <div className="status-card pending">
               <span className="material-icons-sharp">hourglass_top</span>
               <div className="status-content">
@@ -60,7 +73,7 @@ export default function StudentMainPanel({
             </div>
           )}
           
-          {(hasNoPlacement || hasDraftPlacement) && (
+          {!isPlacementLoading && (hasNoPlacement || hasDraftPlacement) && (
             <div className="status-card no-placement">
               <span className="material-icons-sharp">add_business</span>
               <div className="status-content">
@@ -149,11 +162,11 @@ export default function StudentMainPanel({
                 </div>
                 <div className="info-group">
                   <label>Workplace Supervisor</label>
-                  <p>{placement.workplaceSupervisor?.name}</p>
+                  <p>{placement.workplaceSupervisorName}</p>
                 </div>
                 <div className="info-group">
                   <label>Academic Supervisor</label>
-                  <p>{placement.academicSupervisor?.name}</p>
+                  <p>{placement.academicSupervisorName}</p>
                 </div>
               </div>
             </div>
@@ -192,11 +205,49 @@ export default function StudentMainPanel({
             </div>
           </div>
           
-          <div className="empty-state">
-            <span className="material-icons-sharp">assessment</span>
-            <h3>No Evaluations Yet</h3>
-            <p>Evaluations will appear here once your supervisors submit their assessments.</p>
-          </div>
+          {acknowledgedEvaluations.length > 0 ? (
+            <table className="student-evaluations-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Organization</th>
+                  <th>Score</th>
+                  <th>Acknowledged</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {acknowledgedEvaluations.map((evaluation) => (
+                  <tr key={evaluation.id}>
+                    <td>{evaluation.evaluationTypeDisplay}</td>
+                    <td>{evaluation.organization}</td>
+                    <td>
+                      {evaluation.totalScore ?? 0}/{evaluation.maxPossibleScore ?? 0}
+                    </td>
+                    <td>
+                      {evaluation.acknowledgedAt
+                        ? new Date(evaluation.acknowledgedAt).toLocaleDateString()
+                        : '-'}
+                    </td>
+                    <td>
+                      <button
+                        className="btn-small"
+                        onClick={() => onViewEvaluation?.(evaluation)}
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="empty-state">
+              <span className="material-icons-sharp">assessment</span>
+              <h3>No Acknowledged Evaluations Yet</h3>
+              <p>Your acknowledged evaluations will appear here once your supervisors complete and acknowledge them.</p>
+            </div>
+          )}
         </div>
       )}
       
