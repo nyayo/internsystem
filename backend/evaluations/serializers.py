@@ -255,7 +255,7 @@ class EvaluationSubmitSerializer(serializers.Serializer):
         instance.status          = "submitted"
         instance.submitted_at    = timezone.now()
         instance.save()
-        # instance.calculate_total_score()
+        instance.calculate_total_score()
 
         return instance
 

@@ -30,6 +30,7 @@ import {
   submitEvaluation as submitEvaluationApi,
   acknowledgeEvaluation as acknowledgeEvaluationApi,
 } from "../services/evaluationApi";
+import { toast } from "react-toastify";
 
 const SupervisorContext = createContext(null);
 
@@ -199,7 +200,7 @@ export const SupervisorProvider = ({ children, role }) => {
   const [logs, setLogs] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
   const [criteria, setCriteria] = useState(evaluationCriteria);
-  const [notification, setNotification] = useState(null);
+  const notification = null;
 
   const stats = useMemo(() => {
     if (isWorkplace) {
@@ -399,8 +400,22 @@ export const SupervisorProvider = ({ children, role }) => {
   }, [user]);
 
   const showNotification = useCallback((message, type = "success") => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 4000);
+    const text = String(message ?? "").trim();
+    if (!text) return;
+
+    if (type === "error" || type === "danger") {
+      toast.error(text);
+      return;
+    }
+    if (type === "warning") {
+      toast.warn(text);
+      return;
+    }
+    if (type === "info") {
+      toast.info(text);
+      return;
+    }
+    toast.success(text);
   }, []);
 
   const endorseLog = useCallback(

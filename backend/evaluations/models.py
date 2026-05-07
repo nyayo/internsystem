@@ -51,6 +51,22 @@ class Evaluation(models.Model):
     submitted_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def calculate_total_score(self):
+        """
+        Sums all EvaluationScore.score_awarded values linked
+        to this evaluation and stores the result in total_score.
+        Call this after all EvaluationScore records have been saved.
+        """
+        from django.db.models import Sum
+
+        total = self.scores.aggregate(
+            total=Sum("score_awarded")
+        )["total"]
+
+        self.total_score = total if total is not None else 0
+        self.save(update_fields=["total_score"])
+        return self.total_score
 
     class Meta:
         verbose_name = "Evaluation"

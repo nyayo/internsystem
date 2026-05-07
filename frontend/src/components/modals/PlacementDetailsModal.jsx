@@ -8,7 +8,8 @@ import {
   formatDate,
   calculateDurationWeeks
 } from '../../data/dashboardData';
-import { useAdmin, AdminProvider } from "../../context/AdminContext";
+import { useAdmin } from "../../context/AdminContext";
+import { API_BASE_URL } from "../../services/httpClient";
 
 export default function PlacementDetailsModal({ placement, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -19,6 +20,26 @@ export default function PlacementDetailsModal({ placement, onClose, onSave }) {
     comments: '',
   });
   const { workplaceSupervisors, academicSupervisors } = useAdmin();
+
+  const toAbsoluteUrl = (filePath) => {
+    if (!filePath) return null;
+    if (/^https?:\/\//i.test(filePath)) return filePath;
+    const base = String(API_BASE_URL ?? "").replace(/\/+$/, "");
+    const path = String(filePath).startsWith("/") ? filePath : `/${filePath}`;
+    return base ? `${base}${path}` : path;
+  };
+
+  const getFileName = (filePath) => {
+    if (!filePath) return "No file uploaded";
+    const normalized = String(filePath).split("?")[0];
+    return normalized.substring(normalized.lastIndexOf("/") + 1) || normalized;
+  };
+
+  const openDocument = (filePath) => {
+    const url = toAbsoluteUrl(filePath);
+    if (!url) return;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,6 +68,11 @@ export default function PlacementDetailsModal({ placement, onClose, onSave }) {
   };
 
   const durationWeeks = calculateDurationWeeks(placement.startDate, placement.endDate);
+  const documents = [
+    { name: "Request Letter", file: placement.requestLetter },
+    { name: "Acceptance Letter", file: placement.acceptanceLetter },
+    { name: "Final Report", file: placement.finalReport },
+  ].filter((document) => document.file);
 
   return (
     <div className="modal-overlay show" onClick={handleOverlayClick}>
@@ -198,26 +224,32 @@ export default function PlacementDetailsModal({ placement, onClose, onSave }) {
                 Submitted Documents
               </h3>
               <div className="documents-list">
-                <div className="document-item">
-                  <span className="material-icons-sharp doc-icon">description</span>
-                  <div className="doc-info">
-                    <span className="doc-name">Request Letter</span>
-                    <span className="doc-file">{placement.requestLetter}</span>
+                {documents.length > 0 ? (
+                  documents.map((document) => (
+                    <div className="document-item" key={document.name}>
+                      <span className="material-icons-sharp doc-icon">description</span>
+                      <div className="doc-info">
+                        <span className="doc-name">{document.name}</span>
+                        <span className="doc-file">{getFileName(document.file)}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-download"
+                        onClick={() => openDocument(document.file)}
+                        title={`View ${document.name}`}
+                      >
+                        <span className="material-icons-sharp">visibility</span>
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="document-item">
+                    <span className="material-icons-sharp doc-icon">info</span>
+                    <div className="doc-info">
+                      <span className="doc-name">No documents uploaded</span>
+                    </div>
                   </div>
-                  <button type="button" className="btn-download">
-                    <span className="material-icons-sharp">download</span>
-                  </button>
-                </div>
-                <div className="document-item">
-                  <span className="material-icons-sharp doc-icon">description</span>
-                  <div className="doc-info">
-                    <span className="doc-name">Acceptance Letter</span>
-                    <span className="doc-file">{placement.acceptanceLetter}</span>
-                  </div>
-                  <button type="button" className="btn-download">
-                    <span className="material-icons-sharp">download</span>
-                  </button>
-                </div>
+                )}
               </div>
             </div>
 

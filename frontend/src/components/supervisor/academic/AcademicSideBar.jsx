@@ -16,7 +16,7 @@ const AcademicSideBar = ({ activeLink, onLinkClick, pendingLogs, pendingEvals, o
             <span className="material-icons-sharp">school</span>
           </div>
           <h2>
-            Intern<span className="accent">Hub</span>
+            Intern<span className="accent">System</span>
           </h2>
         </div>
         <div className="close" onClick={onClose}>

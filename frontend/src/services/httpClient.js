@@ -7,6 +7,8 @@ const PUBLIC_AUTH_PATHS = [
   "/accounts/auth/login/",
   "/accounts/auth/register/",
   "/accounts/auth/verify-email/",
+  "/accounts/auth/forgot-password/",
+  "/accounts/auth/reset-password/",
 ];
 
 let isRefreshing = false;

@@ -7,10 +7,66 @@ import usePagination from '../../../hooks/usePagination';
 import StatusFilterTabs from '../../../components/supervisor/shared/StatusFilterTabs';
 import '../../../components/supervisor/shared/SupervisorStyles.css';
 
-const WorkplaceEvaluationsPage = () => {
-  const { evaluations, criteria, saveEvaluationDraft, submitEvaluation } = useSupervisor();
+const DAY_IN_MS = 1000 * 60 * 60 * 24;
+
+const toUtcDate = (value) => {
+  if (!value) return null;
+  const dateOnly = typeof value === 'string' ? value.split('T')[0] : value;
+  const parsed = new Date(`${dateOnly}T00:00:00Z`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const addUtcDays = (date, days) => new Date(date.getTime() + days * DAY_IN_MS);
+
+const WorkplaceEvaluationsPage = ({ enforceSchedule = false }) => {
+  const { evaluations, criteria, students, saveEvaluationDraft, submitEvaluation } = useSupervisor();
   const [activeFilter, setActiveFilter] = useState('pending');
   const [selectedEvaluation, setSelectedEvaluation] = useState(null);
+
+  const studentByPlacementId = new Map(
+    (students || [])
+      .filter((student) => student.placementId)
+      .map((student) => [student.placementId, student]),
+  );
+
+  const getTimingRule = (evaluation) => {
+    if (!enforceSchedule || !['not_started', 'in_progress'].includes(evaluation.status)) {
+      return { canEdit: true, reason: null };
+    }
+
+    const student = studentByPlacementId.get(evaluation.placementId);
+    const startDate = toUtcDate(student?.placementStartDate || student?.startDate);
+    const endDate = toUtcDate(student?.placementEndDate || student?.endDate);
+
+    if (!startDate || !endDate) {
+      return { canEdit: true, reason: null };
+    }
+
+    const today = toUtcDate(new Date().toISOString());
+    const totalDays = Math.max(0, Math.floor((endDate - startDate) / DAY_IN_MS));
+    const midtermOpenDate = addUtcDays(startDate, Math.floor(totalDays / 2));
+    const finalOpenDate = addUtcDays(endDate, -7);
+
+    if (evaluation.evaluationType === 'midterm') {
+      if (today < midtermOpenDate) {
+        return { canEdit: false, reason: `Available from ${formatDate(midtermOpenDate)}` };
+      }
+      if (today > endDate) {
+        return { canEdit: false, reason: 'Midterm window has closed' };
+      }
+    }
+
+    if (evaluation.evaluationType === 'final') {
+      if (today < finalOpenDate) {
+        return { canEdit: false, reason: `Available from ${formatDate(finalOpenDate)}` };
+      }
+      if (today > endDate) {
+        return { canEdit: false, reason: 'Final window has closed' };
+      }
+    }
+
+    return { canEdit: true, reason: null };
+  };
 
   const filteredEvaluations = evaluations.filter(eval_ => {
     switch (activeFilter) {
@@ -40,13 +96,21 @@ const WorkplaceEvaluationsPage = () => {
     resetPagination();
   };
 
-  const handleSaveDraft = (evaluationId, scores, overallRemarks) => {
-    saveEvaluationDraft(evaluationId, scores, overallRemarks);
+  const handleSaveDraft = async (evaluationId, scores, overallRemarks) => {
+    const evaluation = evaluations.find((item) => item.id === evaluationId);
+    const { canEdit } = getTimingRule(evaluation || {});
+    if (!canEdit) return;
+
+    await saveEvaluationDraft(evaluationId, scores, overallRemarks);
     setSelectedEvaluation(null);
   };
 
-  const handleSubmit = (evaluationId, scores, overallRemarks) => {
-    submitEvaluation(evaluationId, scores, overallRemarks);
+  const handleSubmit = async (evaluationId, scores, overallRemarks) => {
+    const evaluation = evaluations.find((item) => item.id === evaluationId);
+    const { canEdit } = getTimingRule(evaluation || {});
+    if (!canEdit) return;
+
+    await submitEvaluation(evaluationId, scores, overallRemarks);
     setSelectedEvaluation(null);
   };
 
@@ -85,6 +149,14 @@ const WorkplaceEvaluationsPage = () => {
     },
     { value: "all", label: "All" },
   ];
+
+  const selectedTimingRule = selectedEvaluation ? getTimingRule(selectedEvaluation) : { canEdit: true, reason: null };
+  const modalReadOnly = Boolean(
+    selectedEvaluation &&
+      (selectedEvaluation.status === 'submitted' ||
+        selectedEvaluation.status === 'acknowledged' ||
+        !selectedTimingRule.canEdit),
+  );
 
   return (
     <main>
@@ -159,31 +231,52 @@ const WorkplaceEvaluationsPage = () => {
                     </span>
                   </td>
                   <td>
-                    {evaluation.status === 'not_started' && (
-                      <button 
-                        className="btn-view"
-                        onClick={() => setSelectedEvaluation(evaluation)}
-                      >
-                        Start
-                      </button>
-                    )}
-                    {evaluation.status === 'in_progress' && (
-                      <button 
-                        className="btn-view"
-                        onClick={() => setSelectedEvaluation(evaluation)}
-                      >
-                        Continue
-                      </button>
-                    )}
-                    {(evaluation.status === 'submitted' || evaluation.status === 'acknowledged') && (
-                      <button 
-                        className="btn-view"
-                        onClick={() => setSelectedEvaluation(evaluation)}
-                        style={{ background: 'var(--color-light)', color: 'var(--color-dark)' }}
-                      >
-                        View
-                      </button>
-                    )}
+                    {(() => {
+                      const timingRule = getTimingRule(evaluation);
+                      const isLocked = !timingRule.canEdit;
+
+                      return (
+                        <>
+                          {evaluation.status === 'not_started' && (
+                            <button
+                              className="btn-view"
+                              disabled={isLocked}
+                              onClick={() => !isLocked && setSelectedEvaluation(evaluation)}
+                              style={isLocked ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
+                            >
+                              Start
+                            </button>
+                          )}
+                          {evaluation.status === 'in_progress' && (
+                            <button
+                              className="btn-view"
+                              disabled={isLocked}
+                              onClick={() => !isLocked && setSelectedEvaluation(evaluation)}
+                              style={isLocked ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
+                            >
+                              Continue
+                            </button>
+                          )}
+                          {(evaluation.status === 'submitted' || evaluation.status === 'acknowledged') && (
+                            <button
+                              className="btn-view"
+                              onClick={() => setSelectedEvaluation(evaluation)}
+                              style={{ background: 'var(--color-light)', color: 'var(--color-dark)' }}
+                            >
+                              View
+                            </button>
+                          )}
+                          {isLocked && ['not_started', 'in_progress'].includes(evaluation.status) && (
+                            <small
+                              className="text-muted"
+                              style={{ display: 'block', marginTop: '0.35rem' }}
+                            >
+                              {timingRule.reason}
+                            </small>
+                          )}
+                        </>
+                      );
+                    })()}
                   </td>
                 </tr>
               ))
@@ -227,9 +320,10 @@ const WorkplaceEvaluationsPage = () => {
           onClose={() => setSelectedEvaluation(null)}
           onSaveDraft={handleSaveDraft}
           onSubmit={handleSubmit}
-          readOnly={selectedEvaluation.status === 'submitted' || selectedEvaluation.status === 'acknowledged'}
+          readOnly={modalReadOnly}
         />
       )}
+
     </main>
   );
 };

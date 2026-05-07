@@ -99,7 +99,7 @@ def send_placement_submitted_email(placement):
                 f"Start date:   {placement.start_date}\n"
                 f"End date:     {placement.end_date}\n\n"
                 f"Please log in to review and approve or reject the application:\n"
-                f"{settings.FRONTEND_URL}/admin/placements/{placement.id}/"
+                f"{settings.FRONTEND_URL}/admin/"
                 f"{_footer()}"
             ),
             recipient=admin.email,
@@ -121,9 +121,9 @@ def send_placement_approved_email(placement):
             f"  Start date:         {placement.start_date}\n"
             f"  End date:           {placement.end_date}\n"
             f"  Academic supervisor:{placement.academic_supervisor.get_full_name()}\n"
-            f"  Intake cohort:      {placement.get_intake_cohort_display()}\n\n"
+            f"  Intake cohort:      {placement.intake_cohort}\n\n"
             f"Log in to view your placement dashboard:\n"
-            f"{settings.FRONTEND_URL}/student/placement/"
+            f"{settings.FRONTEND_URL}/student/"
             f"{_footer()}"
         ),
         recipient=student.email,
@@ -142,7 +142,7 @@ def send_placement_approved_email(placement):
                 f"Start date:   {placement.start_date}\n"
                 f"End date:     {placement.end_date}\n\n"
                 f"Log in to view the placement:\n"
-                f"{settings.FRONTEND_URL}/academic/placements/{placement.id}/"
+                f"{settings.FRONTEND_URL}/academic/"
                 f"{_footer()}"
             ),
             recipient=ac_sup.email,
@@ -211,7 +211,7 @@ def send_placement_completed_email(placement):
             f"Your internship at {placement.organisation_name} has been "
             f"marked as completed. Well done!\n\n"
             f"You can view your final evaluation and grades on your dashboard:\n"
-            f"{settings.FRONTEND_URL}/student/dashboard/"
+            f"{settings.FRONTEND_URL}/student/"
             f"{_footer()}"
         ),
         recipient=student.email,
@@ -262,7 +262,7 @@ def send_log_endorsed_email(log):
             f"Hello {ac_sup.first_name},\n\n"
             f"{student.get_full_name()}'s Week {log.week_number} log has been "
             f"endorsed by the workplace supervisor and is ready for your assessment.\n\n"
-            f'Workplace comment:\n"{log.workplace_comment}"\n\n'
+            f'Workplace comment:\n"{log.workplace_remarks}"\n\n'
             f"Please log in to grade the log:\n"
             f"{settings.FRONTEND_URL}/academic/logs/{log.id}/"
             f"{_footer()}"
@@ -282,7 +282,7 @@ def send_log_returned_email(log):
             f"Hello {student.first_name},\n\n"
             f"Your Week {log.week_number} log has been returned by your "
             f"workplace supervisor for revision.\n\n"
-            f'Supervisor comment:\n"{log.workplace_comment}"\n\n'
+            f'Supervisor comment:\n"{log.workplace_remarks}"\n\n'
             f"Please update and resubmit your log:\n"
             f"{settings.FRONTEND_URL}/student/logs/{log.id}/"
             f"{_footer()}"
@@ -303,7 +303,7 @@ def send_log_assessed_email(log):
             f"Your Week {log.week_number} log has been assessed by your "
             f"academic supervisor.\n\n"
             f"Grade:   {log.academic_grade}%\n"
-            f"Comment: {log.academic_comment or 'No comment provided.'}\n\n"
+            f"Comment: {log.academic_remarks or 'No comment provided.'}\n\n"
             f"Log in to view your assessment:\n"
             f"{settings.FRONTEND_URL}/student/logs/{log.id}/"
             f"{_footer()}"

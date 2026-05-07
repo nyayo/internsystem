@@ -38,6 +38,10 @@ import {
   submitLog,
   getLog,
 } from "../services/logsApi";
+import {
+  listEvaluations,
+  getEvaluation as getEvaluationApi,
+} from "../services/evaluationApi";
 
 const StudentContext = createContext(null);
 
@@ -69,6 +73,7 @@ export function StudentProvider({ children }) {
   }, [user]);
   const [placement, setPlacement] = useState(null);
   const [weeklyLogs, setWeeklyLogs] = useState([]);
+  const [acknowledgedEvaluations, setAcknowledgedEvaluations] = useState([]);
 
   const [placementDraft, setPlacementDraft] = useState(() =>
     getDraft(DRAFT_KEYS.placement),
@@ -141,6 +146,82 @@ export function StudentProvider({ children }) {
     updatedAt: log.updated_at ?? null,
   });
 
+  const normalizeEvaluationScore = (score = {}) => ({
+    criteriaId: score.criteria ?? score.criteria_id ?? score.criteriaId,
+    criteriaTitle:
+      score.criteria_title ??
+      score.criteria_name ??
+      score.criteriaTitle ??
+      score.criteria_detail?.title ??
+      `Criteria ${score.criteria ?? score.criteria_id ?? score.criteriaId ?? ""}`.trim(),
+    maxScore: Number(
+      score.max_score ??
+        score.maxScore ??
+        score.criteria_max_score ??
+        score.criteria_detail?.max_score ??
+        20,
+    ),
+    scoreAwarded:
+      score.score_awarded !== undefined && score.score_awarded !== null
+        ? Number(score.score_awarded)
+        : score.scoreAwarded !== undefined && score.scoreAwarded !== null
+          ? Number(score.scoreAwarded)
+          : null,
+    comment: score.comment ?? "",
+  });
+
+  const normalizeEvaluation = (evaluation = {}) => {
+    const scoresRaw = Array.isArray(evaluation.scores) ? evaluation.scores : [];
+    const scores = scoresRaw.map(normalizeEvaluationScore);
+    const totalScoreRaw = evaluation.total_score ?? evaluation.totalScore;
+    const totalScore =
+      totalScoreRaw === null || totalScoreRaw === undefined || totalScoreRaw === ""
+        ? null
+        : Number(totalScoreRaw);
+    const maxPossibleScore =
+      Number(evaluation.max_possible_score ?? evaluation.maxPossibleScore) ||
+      scores.reduce((sum, score) => sum + (Number(score.maxScore) || 0), 0);
+
+    return {
+      id: evaluation.id,
+      studentName: evaluation.student_name ?? student?.fullName ?? "-",
+      programme: evaluation.programme ?? student?.programme ?? "-",
+      organization:
+        evaluation.organisation_name ??
+        evaluation.organisation ??
+        evaluation.placement_organisation_name ??
+        placement?.organisationName ??
+        "-",
+      workplaceSupervisor:
+        evaluation.evaluator_name ??
+        evaluation.workplaceSupervisor ??
+        placement?.workplaceSupervisorName ??
+        "-",
+      evaluationType: evaluation.evaluation_type ?? evaluation.evaluationType ?? "",
+      evaluationTypeDisplay:
+        evaluation.evaluation_type ??
+        evaluation.evaluationTypeDisplay ??
+        "Evaluation",
+      status: evaluation.status ?? "not_started",
+      totalScore,
+      maxPossibleScore,
+      overallRemarks:
+        evaluation.overall_remarks ?? evaluation.overallRemarks ?? "",
+      scores,
+      submittedAt: evaluation.submitted_at ?? evaluation.submittedAt ?? null,
+      acknowledgementNotes:
+        evaluation.acknowledgement_notes ??
+        evaluation.acknowledgementNotes ??
+        "",
+      acknowledgedBy:
+        evaluation.acknowledged_by_name ??
+        evaluation.acknowledgedBy ??
+        "",
+      acknowledgedAt:
+        evaluation.acknowledged_at ?? evaluation.acknowledgedAt ?? null,
+    };
+  };
+
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
@@ -188,8 +269,33 @@ export function StudentProvider({ children }) {
       }
     };
 
+    const loadAcknowledgedEvaluations = async () => {
+      try {
+        const raw = await listEvaluations();
+        if (cancelled || !raw) return;
+        const rows = Array.isArray(raw)
+          ? raw
+          : (raw?.results ?? raw?.evaluations ?? []);
+        const detailedRows = await Promise.all(
+          rows
+            .filter((row) => row?.id)
+            .map(async (row) => (await getEvaluationApi(row.id)) ?? row),
+        );
+        const normalized = detailedRows
+          .filter(Boolean)
+          .map(normalizeEvaluation)
+          .filter((evaluation) => evaluation.status === "acknowledged");
+        if (!cancelled) setAcknowledgedEvaluations(normalized);
+      } catch (error) {
+        if (!cancelled) {
+          console.warn("Failed to load evaluations:", error);
+        }
+      }
+    };
+
     loadPlacement();
     loadLogs();
+    loadAcknowledgedEvaluations();
     return () => {
       cancelled = true;
     };
@@ -332,6 +438,7 @@ export function StudentProvider({ children }) {
       student,
       placement,
       weeklyLogs,
+      acknowledgedEvaluations,
       isPlacementLoading,
       placementDraft,
       weeklyLogDraft,
@@ -350,6 +457,7 @@ export function StudentProvider({ children }) {
       student,
       placement,
       weeklyLogs,
+      acknowledgedEvaluations,
       isPlacementLoading,
       placementDraft,
       weeklyLogDraft,

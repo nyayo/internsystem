@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import Notification from "./components/Notification";
+import { ToastContainer } from "react-toastify";
 import {
   DefaultRedirect,
   PublicOnlyRoute,
@@ -10,6 +10,8 @@ import CheckEmailPage from "./pages/auth/verify/CheckEmailPage";
 import VerifyEmailPage from "./pages/auth/verify/VerifyEmailPage";
 import EmailConfirmedPage from "./pages/auth/verify/EmailConfirmedPage";
 import RegisterPage from "./pages/auth/register/RegisterPage";
+import ForgotPasswordPage from "./pages/auth/password/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/password/ResetPasswordPage";
 import Dashboard from "./pages/admin/Dashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import AcademicDashboard from "./pages/supervisor/academic/AcademicDashboard";
@@ -33,6 +35,22 @@ function App() {
           element={
             <PublicOnlyRoute>
               <RegisterPage />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicOnlyRoute>
+              <ForgotPasswordPage />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicOnlyRoute>
+              <ResetPasswordPage />
             </PublicOnlyRoute>
           }
         />
@@ -93,7 +111,16 @@ function App() {
       {/* <StudentDashboard /> */}
       {/* <WorkplaceDashboard /> */}
       {/* <AcademicDashboard /> */}
-      <Notification />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
+      />
     </>
   );
 }

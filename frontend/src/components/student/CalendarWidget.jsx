@@ -1,11 +1,28 @@
 import React, { useState } from 'react';
 import './CalendarWidget.css';
 
+const parseDateOnly = (value) => {
+  if (!value) return null;
+  const datePart = String(value).split('T')[0];
+  const [year, month, day] = datePart.split('-').map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+};
+
+const formatDateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export default function CalendarWidget({ startDate, endDate }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   
-  const internshipStart = new Date(startDate);
-  const internshipEnd = new Date(endDate);
+  const internshipStart = parseDateOnly(startDate);
+  const internshipEnd = parseDateOnly(endDate);
+  const startDateKey = internshipStart ? formatDateKey(internshipStart) : null;
+  const endDateKey = internshipEnd ? formatDateKey(internshipEnd) : null;
   const today = new Date();
   
   const year = currentMonth.getFullYear();
@@ -23,16 +40,16 @@ export default function CalendarWidget({ startDate, endDate }) {
 
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
-    const dateStr = date.toISOString().split('T')[0];
+    const dateKey = formatDateKey(date);
     let type = 'normal';
 
-    if (date >= internshipStart && date <= internshipEnd) {
+    if (internshipStart && internshipEnd && date >= internshipStart && date <= internshipEnd) {
       type = 'internship';
     }
 
-    if (dateStr === startDate) {
+    if (dateKey === startDateKey) {
       type = 'start';
-    } else if (dateStr === endDate) {
+    } else if (dateKey === endDateKey) {
       type = 'end';
     }
 

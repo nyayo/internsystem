@@ -88,6 +88,7 @@ export async function endorseLog(
       workplace_remarks: workplaceRemarks,
       ...(action === "return" && { resubmit_reason: resubmitReason }),
     };
+    console.log("Payload", payload)
     const response = await httpClient.post(
       `${AUTH_BASE_PATH}/${logId}/endorse/`,
       payload

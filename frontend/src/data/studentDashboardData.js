@@ -280,35 +280,51 @@ export const getWeeklyLogStatusClass = (status) => {
   return classes[status] || '';
 };
 
+const DAY_IN_MS = 1000 * 60 * 60 * 24;
+
+const toUTCDateOnly = (value) => {
+  if (!value) return null;
+  const dateOnly = typeof value === "string" ? value.split("T")[0] : value;
+  const parsed = new Date(`${dateOnly}T00:00:00Z`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
 export const calculateInternshipProgress = (startDate, endDate) => {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  const today = new Date();
+  const start = toUTCDateOnly(startDate);
+  const end = toUTCDateOnly(endDate);
+  const today = toUTCDateOnly(new Date().toISOString());
+
+  if (!start || !end || !today) return 0;
   
   if (today < start) return 0;
   if (today > end) return 100;
   
-  const totalDays = (end - start) / (1000 * 60 * 60 * 24);
-  const elapsedDays = (today - start) / (1000 * 60 * 60 * 24);
+  const totalDays = Math.max(1, Math.floor((end - start) / DAY_IN_MS));
+  const elapsedDays = Math.max(0, Math.floor((today - start) / DAY_IN_MS));
   
   return Math.round((elapsedDays / totalDays) * 100);
 };
 
 export const getCurrentWeekNumber = (startDate) => {
-  const start = new Date(startDate);
-  const today = new Date();
+  const start = toUTCDateOnly(startDate);
+  const today = toUTCDateOnly(new Date().toISOString());
+
+  if (!start || !today) return 0;
   
   if (today < start) return 0;
   
-  const daysDiff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+  const daysDiff = Math.max(0, Math.floor((today - start) / DAY_IN_MS));
   return Math.floor(daysDiff / 7) + 1;
 };
 
 export const getTotalWeeks = (startDate, endDate) => {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  const daysDiff = Math.floor((end - start) / (1000 * 60 * 60 * 24));
-  return Math.ceil(daysDiff / 7);
+  const start = toUTCDateOnly(startDate);
+  const end = toUTCDateOnly(endDate);
+
+  if (!start || !end || end <= start) return 0;
+
+  const daysDiff = Math.floor((end - start) / DAY_IN_MS);
+  return Math.max(1, Math.floor(daysDiff / 7));
 };
 
 export const formatDate = (dateString) => {

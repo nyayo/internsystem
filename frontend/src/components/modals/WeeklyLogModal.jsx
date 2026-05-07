@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useStudent } from "../../context/StudentContext";
 import {
   getCurrentWeekNumber,
@@ -17,21 +17,22 @@ export default function WeeklyLogModal({
 }) {
   const {
     weeklyLogDraft,
-    saveWeeklyLogDraft,
     clearWeeklyLogDraft,
     weeklyLogs,
   } = useStudent();
 
   const currentWeekNumber = getCurrentWeekNumber(placement.startDate);
   const totalWeeks = getTotalWeeks(placement.startDate, placement.endDate);
+  const allowedWeekForSubmission =
+    totalWeeks > 0 ? Math.min(Math.max(currentWeekNumber, 0), totalWeeks) : 0;
 
   // Get next available week number for new log
   const getNextAvailableWeek = () => {
     const existingWeeks = weeklyLogs.map((l) => l.weekNumber);
-    for (let i = 1; i <= totalWeeks; i++) {
+    for (let i = 1; i <= allowedWeekForSubmission; i++) {
       if (!existingWeeks.includes(i)) return i;
     }
-    return currentWeekNumber;
+    return allowedWeekForSubmission || "";
   };
 
   // Calculate week dates based on week number
@@ -72,9 +73,7 @@ export default function WeeklyLogModal({
 
   const getInitialData = () => {
     if (log) return toFormLog(log); // editing existing log
-    console.log(log);
     if (weeklyLogDraft) return toFormLog(weeklyLogDraft); // restore draft
-    console.log(weeklyLogDraft);
     // brand new log — auto-assign next available week + dates
     const weekNum = getNextAvailableWeek();
     const dates = getWeekDates(weekNum);
@@ -83,9 +82,12 @@ export default function WeeklyLogModal({
 
   const [formData, setFormData] = useState(getInitialData);
   const [errors, setErrors] = useState({});
-  const [isDirty, setIsDirty] = useState(false);
   const isViewOnly = log && !["draft", "resubmit"].includes(log.status);
   const isResubmit = log && log.status === "resubmit";
+  const isFutureWeekSelected =
+    !log &&
+    Number(formData.weekNumber) > 0 &&
+    Number(formData.weekNumber) > allowedWeekForSubmission;
 
   // Auto-save draft on form changes (debounced)
   // useEffect(() => {
@@ -109,8 +111,6 @@ export default function WeeklyLogModal({
     } else {
       setFormData((previousData) => ({ ...previousData, [field]: value }));
     }
-    setIsDirty(true);
-
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: null }));
     }
@@ -134,7 +134,6 @@ export default function WeeklyLogModal({
 
   const handleSaveDraft = () => {
     onSaveDraft(formData);
-    console.log(formData);
   };
 
   // Available weeks for selection
@@ -145,8 +144,9 @@ export default function WeeklyLogModal({
     for (let i = 1; i <= totalWeeks; i++) {
       const exists = existingWeeks.includes(i);
       const isCurrentLog = log && log.weekNumber === i;
+      const isFutureWeek = i > allowedWeekForSubmission;
 
-      if (!exists || isCurrentLog) {
+      if ((!exists || isCurrentLog) && (!isFutureWeek || isCurrentLog)) {
         weeks.push({
           number: i,
           label: `Week ${i}`,
@@ -156,7 +156,7 @@ export default function WeeklyLogModal({
     }
 
     return weeks;
-  }, [weeklyLogs, totalWeeks, currentWeekNumber, log]);
+  }, [weeklyLogs, totalWeeks, currentWeekNumber, log, allowedWeekForSubmission]);
 
   return (
     <div className="student-modal-overlay" onClick={onClose}>
@@ -218,6 +218,16 @@ export default function WeeklyLogModal({
                     </option>
                   ))}
                 </select>
+                {allowedWeekForSubmission < 1 && (
+                  <span className="error-text">
+                    You can submit logs after your placement start date.
+                  </span>
+                )}
+                {isFutureWeekSelected && (
+                  <span className="error-text">
+                    Future week logs are not allowed yet.
+                  </span>
+                )}
               </div>
 
               <div className="form-group">
@@ -397,11 +407,16 @@ export default function WeeklyLogModal({
                 type="button"
                 className="btn-secondary"
                 onClick={handleSaveDraft}
+                disabled={isFutureWeekSelected || allowedWeekForSubmission < 1}
               >
                 <span className="material-icons-sharp">save</span>
                 Save as Draft
               </button>
-              <button type="submit" className="btn-primary">
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={isFutureWeekSelected || allowedWeekForSubmission < 1}
+              >
                 <span className="material-icons-sharp">send</span>
                 {isResubmit ? "Resubmit Log" : "Submit Log"}
               </button>

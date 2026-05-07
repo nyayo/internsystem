@@ -16,7 +16,7 @@ import "../../../components/supervisor/shared/SupervisorStyles.css";
 const AcademicDashboardContent = () => {
   const [activeLink, setActiveLink] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { stats, notification } = useSupervisor();
+  const { stats } = useSupervisor();
   const { logout } = useAuth();
 
   const navigate = useNavigate();
@@ -79,12 +79,6 @@ const AcademicDashboardContent = () => {
       />
       {renderMainContent()}
       <AcademicRightPanel onMenuClick={() => setSidebarOpen(true)} />
-
-      {notification && (
-        <div className={`supervisor-notification ${notification.type}`}>
-          {notification.message}
-        </div>
-      )}
     </div>
   );
 };

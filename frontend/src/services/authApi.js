@@ -39,6 +39,28 @@ export async function verifyEmail(token = "") {
   );
 }
 
+export async function forgotPassword(email = "") {
+  return responseData(
+    await httpClient.post(`${AUTH_BASE_PATH}/forgot-password/`, {
+      email,
+    }),
+  );
+}
+
+export async function resetPassword({
+  token = "",
+  newPassword = "",
+  newPassword2 = "",
+} = {}) {
+  return responseData(
+    await httpClient.post(`${AUTH_BASE_PATH}/reset-password/`, {
+      token,
+      new_password: newPassword,
+      new_password2: newPassword2,
+    }),
+  );
+}
+
 export async function getCurrentUser(token = "") {
    const clean = String(token).replace(/^Bearer\s+/i, "").trim();
    const config = clean
@@ -53,6 +75,8 @@ const authApi = {
   logout,
   register,
   verifyEmail,
+  forgotPassword,
+  resetPassword,
   getCurrentUser,
 };
 

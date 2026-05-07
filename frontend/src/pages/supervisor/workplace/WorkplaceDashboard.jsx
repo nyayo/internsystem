@@ -13,7 +13,7 @@ import '../../../components/supervisor/shared/SupervisorStyles.css';
 const WorkplaceDashboardContent = () => {
   const [activeLink, setActiveLink] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { stats, notification } = useSupervisor();
+  const { stats } = useSupervisor();
   const { logout } = useAuth();
 
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ const WorkplaceDashboardContent = () => {
       case 'logs':
         return <WorkplaceLogsPage />;
       case 'evaluations':
-        return <WorkplaceEvaluationsPage />;
+        return <WorkplaceEvaluationsPage enforceSchedule />;
       case 'settings':
         return (
           <main>
@@ -60,12 +60,6 @@ const WorkplaceDashboardContent = () => {
       />
       {renderMainContent()}
       <WorkplaceRightPanel onMenuClick={() => setSidebarOpen(true)} />
-      
-      {notification && (
-        <div className={`supervisor-notification ${notification.type}`}>
-          {notification.message}
-        </div>
-      )}
     </div>
   );
 };

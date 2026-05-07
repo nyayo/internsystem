@@ -282,6 +282,28 @@
   background: rgba(99, 102, 241, 0.2);
 }
 
+/* Evaluations Table */
+.student-main-panel .student-evaluations-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-white);
+}
+
+.student-main-panel .student-evaluations-table th {
+  text-align: left;
+  padding: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--color-info-dark);
+  border-bottom: 1px solid var(--color-info-light);
+}
+
+.student-main-panel .student-evaluations-table td {
+  padding: 0.8rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--color-info-light);
+  color: var(--color-dark);
+}
+
 /* Mobile responsive */
 @media screen and (max-width: 768px) {
   .student-main-panel .status-card {
