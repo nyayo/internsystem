@@ -1,14 +1,12 @@
 services:
   db:
     image: postgres:16-alpine
-    env_file:
-      - ./backend/.env
     environment:
       POSTGRES_DB: interndb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-    ports:
-      - "5434:5432"
+    expose:
+      - "5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d interndb"]
       interval: 10s
@@ -19,13 +17,23 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6399:6379"
+    expose:
+      - "6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  frontend:
+    build: ./frontend
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "9173:5173"
+    restart: unless-stopped
+    depends_on:
+      - backend
 
   backend:
     build:
@@ -34,8 +42,8 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      DJANGO_DEBUG: "1"
-      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,backend"
+      DJANGO_DEBUG: "0"                                 
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,backend,https://internsystem.unshifter.site"
       DB_NAME: interndb
       DB_USER: postgres
       DB_PASSWORD: password
@@ -43,7 +51,7 @@ services:
       DB_PORT: "5432"
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/1
-      FRONTEND_URL: http://localhost:5173
+      FRONTEND_URL: https://internsystem.unshifter.site 
     depends_on:
       db:
         condition: service_healthy
@@ -62,8 +70,8 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      DJANGO_DEBUG: "1"
-      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,backend"
+      DJANGO_DEBUG: "0"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,backend,https://internsystem.unshifter.site"
       DB_NAME: interndb
       DB_USER: postgres
       DB_PASSWORD: password
@@ -71,7 +79,7 @@ services:
       DB_PORT: "5432"
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/1
-      FRONTEND_URL: http://localhost:5173
+      FRONTEND_URL: https://internsystem.unshifter.site    
     depends_on:
       db:
         condition: service_healthy
@@ -88,8 +96,8 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      DJANGO_DEBUG: "1"
-      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,backend"
+      DJANGO_DEBUG: "0"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,backend,https://internsystem.unshifter.site"
       DB_NAME: interndb
       DB_USER: postgres
       DB_PASSWORD: password
@@ -97,7 +105,7 @@ services:
       DB_PORT: "5432"
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/1
-      FRONTEND_URL: http://localhost:5173
+      FRONTEND_URL: https://internsystem.unshifter.site    
     depends_on:
       db:
         condition: service_healthy
@@ -108,4 +116,3 @@ services:
 
 volumes:
   postgres_data:
-
