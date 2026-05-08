@@ -30,7 +30,7 @@ services:
     env_file:
       - ./frontend/.env
     ports:
-      - "9173:5173"
+      - "9173:4173"
     restart: unless-stopped
     depends_on:
       - backend
