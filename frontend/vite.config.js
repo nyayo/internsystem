@@ -7,6 +7,6 @@ export default defineConfig({
   preview: {
     host: '0.0.0.0',
     port: 4173,
-    allowedHosts: ['internsystem.unshifter.site']
+    allowedHosts: ['internsystem.unshifter.site', 'internsystem-frontend-1.onrender.com']
   }
 })
