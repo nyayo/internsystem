@@ -26,11 +26,6 @@ const MIN_TEXT_RULES = [
     minLength: 30,
     error: "Please provide at least 30 characters describing challenges",
   },
-  // {
-  //   field: "supervisorInteractions",
-  //   minLength: 20,
-  //   error: "Please describe your supervisor interactions",
-  // },
 ];
 
 function hasEnoughText(value, minLength) {

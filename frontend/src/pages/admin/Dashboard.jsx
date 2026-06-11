@@ -11,11 +11,24 @@ import SupervisorsPage from "./SupervisorsPage";
 import EvaluationCriteriaPage from "./EvaluationCriteriaPage";
 import { useAdmin, AdminProvider } from "../../context/AdminContext";
 
-
 const DashboardContent = () => {
   const [activeLink, setActiveLink] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { placements, students, criteria, applications, stats, pendingCount, workplaceSupervisors, academicSupervisors, handleUpdatePlacement, handleUpdateApplication, handleAddCriteria, handleUpdateCriteria, adminUser } = useAdmin();
+  const {
+    placements,
+    students,
+    criteria,
+    applications,
+    stats,
+    pendingCount,
+    workplaceSupervisors,
+    academicSupervisors,
+    handleUpdatePlacement,
+    handleUpdateApplication,
+    handleAddCriteria,
+    handleUpdateCriteria,
+    adminUser,
+  } = useAdmin();
 
   // Render the appropriate main content based on activeLink
   const renderMainContent = () => {
@@ -38,11 +51,11 @@ const DashboardContent = () => {
       case "active":
         return (
           <main>
-            <ActiveInternshipsPage placements={placements} />
+            <ActiveInternshipsPage placements={placements} workplaceSupervisors={workplaceSupervisors} />
           </main>
         );
       case "supervisors":
-        return (          
+        return (
           <main>
             <SupervisorsPage
               workplaceSupervisors={workplaceSupervisors}
@@ -95,8 +108,7 @@ const DashboardContent = () => {
       />
     </div>
   );
-}
-
+};
 
 export default function Dashboard() {
   return (

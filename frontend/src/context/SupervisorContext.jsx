@@ -7,13 +7,8 @@ import {
   useState,
   useEffect,
 } from "react";
-import {
-  evaluationCriteria,
-} from "../data/supervisorData";
 import { useAuth } from "./AuthContext";
-import {
-  buildSupervisorProfile,
-} from "../services/supervisorService";
+import { buildSupervisorProfile } from "../services/supervisorService";
 import {
   listLogs,
   getLog,
@@ -30,6 +25,12 @@ import {
   submitEvaluation as submitEvaluationApi,
   acknowledgeEvaluation as acknowledgeEvaluationApi,
 } from "../services/evaluationApi";
+import {
+  normalizeEvaluation,
+  normalizeLog,
+  normalizeCriteria,
+} from "../utils/normalizer";
+
 import { toast } from "react-toastify";
 
 const SupervisorContext = createContext(null);
@@ -42,148 +43,9 @@ export const useSupervisor = () => {
   return context;
 };
 
-const normalizeLog = (log) => ({
-  id: log.id,
-  placement: log.placement ?? null,
-  student: {
-    name: log.student_name ?? "-",
-    regNumber: log.student_number ?? "-",
-    organisation: log.organisation ?? "-",
-    programme: log.programme ?? "-",
-  },
-  weekNumber: log.week_number,
-  weekStartDate: log.week_start_date ?? null,
-  weekEndDate: log.week_end_date ?? null,
-  activitiesPerformed: log.activities_performed ?? "",
-  skillsGained: log.skills_gained ?? "",
-  challengesFaced: log.challenges_faced ?? "",
-  studentRemarks: log.student_remarks ?? "",
-  status: log.status ?? "draft",
-
-  workplaceComment: log.workplace_remarks ?? null,
-  workplaceEndorsedBy: log.workplace_endorsed_by ?? null,
-  workplaceEndorsedByName: log.workplace_endorsed_by_name ?? null,
-  workplaceEndorsedAt: log.workplace_endorsed_at ?? null,
-
-  academicComment: log.academic_remarks ?? null,
-  academicGrade: log.academic_grade ?? null,
-  academicAssessedBy: log.academic_assessed_by ?? null,
-  academicAssessedByName: log.academic_assessed_by_name ?? null,
-  academicAssessedAt: log.academic_assessed_at ?? null,
-
-  submittedAt: log.submitted_at ?? null,
-  createdAt: log.created_at ?? null,
-  updatedAt: log.updated_at ?? null,
-});
-
 const EVALUATION_TYPE_LABELS = {
   midterm: "Midterm Evaluation",
   final: "Final Evaluation",
-};
-
-const normalizeCriteria = (item) => ({
-  id: item.id,
-  title: item.title ?? "",
-  description: item.description ?? "",
-  category: item.category ?? "",
-  maxScore: Number(item.max_score ?? item.maxScore ?? 0),
-  evaluatorRole: item.evaluator_role ?? item.evaluatorRole ?? "",
-  isActive: item.is_active ?? item.isActive ?? true,
-});
-
-const normalizeEvaluationScore = (score = {}) => ({
-  criteriaId: score.criteria ?? score.criteria_id ?? score.criteriaId,
-  criteriaTitle:
-    score.criteria_title ??
-    score.criteria_name ??
-    score.criteriaTitle ??
-    score.criteria_detail?.title ??
-    score.criteria_obj?.title ??
-    `Criteria ${score.criteria ?? score.criteria_id ?? score.criteriaId ?? ""}`.trim(),
-  maxScore: Number(
-    score.max_score ??
-      score.maxScore ??
-      score.criteria_max_score ??
-      score.criteria_detail?.max_score ??
-      score.criteria_obj?.max_score ??
-      20,
-  ),
-  scoreAwarded:
-    score.score_awarded !== undefined && score.score_awarded !== null
-      ? Number(score.score_awarded)
-      : score.scoreAwarded !== undefined && score.scoreAwarded !== null
-        ? Number(score.scoreAwarded)
-        : null,
-  comment: score.comment ?? "",
-});
-
-const normalizeEvaluation = (evaluation = {}) => {
-  const scoresRaw = Array.isArray(evaluation.scores) ? evaluation.scores : [];
-  const scores = scoresRaw.map(normalizeEvaluationScore);
-  const totalScoreRaw = evaluation.total_score ?? evaluation.totalScore;
-  const totalScore =
-    totalScoreRaw === null || totalScoreRaw === undefined || totalScoreRaw === ""
-      ? null
-      : Number(totalScoreRaw);
-  const maxPossibleScoreRaw =
-    evaluation.max_possible_score ?? evaluation.maxPossibleScore;
-  const computedMaxScore = scores.reduce(
-    (sum, score) => sum + (Number(score.maxScore) || 0),
-    0,
-  );
-
-  return {
-    id: evaluation.id,
-    studentId: evaluation.student ?? evaluation.student_id ?? null,
-    studentName:
-      evaluation.student_name ??
-      evaluation.studentName ??
-      evaluation.placement_student_name ??
-      "-",
-    programme:
-      evaluation.programme ??
-      evaluation.student_programme ??
-      evaluation.program ??
-      "-",
-    placementId: evaluation.placement ?? evaluation.placement_id ?? null,
-    organization:
-      evaluation.organisation_name ??
-      evaluation.organisation ??
-      evaluation.placement_organisation_name ??
-      "-",
-    workplaceSupervisor:
-      evaluation.evaluator_name ??
-      evaluation.workplaceSupervisor ??
-      "-",
-    evaluationType: evaluation.evaluation_type ?? evaluation.evaluationType ?? "",
-    evaluationTypeDisplay:
-      evaluation.evaluation_type_display ??
-      evaluation.evaluationTypeDisplay ??
-      EVALUATION_TYPE_LABELS[
-        evaluation.evaluation_type ?? evaluation.evaluationType ?? ""
-      ] ??
-      "Evaluation",
-    status: evaluation.status ?? "not_started",
-    dueDate: evaluation.due_date ?? evaluation.dueDate ?? null,
-    totalScore,
-    maxPossibleScore: Number(maxPossibleScoreRaw ?? computedMaxScore ?? 0),
-    overallRemarks:
-      evaluation.overall_remarks ?? evaluation.overallRemarks ?? "",
-    scores,
-    submittedAt: evaluation.submitted_at ?? evaluation.submittedAt ?? null,
-    acknowledgementNotes:
-      evaluation.acknowledgement_notes ??
-      evaluation.acknowledgementNotes ??
-      "",
-    acknowledgedBy:
-      evaluation.acknowledged_by_name ??
-      evaluation.acknowledgedBy ??
-      "",
-    acknowledgedAt:
-      evaluation.acknowledged_at ?? evaluation.acknowledgedAt ?? null,
-    createdAt: evaluation.created_at ?? evaluation.createdAt ?? null,
-    updatedAt: evaluation.updated_at ?? evaluation.updatedAt ?? null,
-  };
 };
 
 export const SupervisorProvider = ({ children, role }) => {
@@ -199,7 +61,7 @@ export const SupervisorProvider = ({ children, role }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [logs, setLogs] = useState([]);
   const [evaluations, setEvaluations] = useState([]);
-  const [criteria, setCriteria] = useState(evaluationCriteria);
+  const [criteria, setCriteria] = useState(null);
   const notification = null;
 
   const stats = useMemo(() => {
@@ -390,10 +252,14 @@ export const SupervisorProvider = ({ children, role }) => {
       }
     };
 
-    Promise.all([loadLogs(), loadStudents(), loadCriteria(), loadEvaluations()])
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
+    Promise.all([
+      loadLogs(),
+      loadStudents(),
+      loadCriteria(),
+      loadEvaluations(),
+    ]).finally(() => {
+      if (!cancelled) setIsLoading(false);
+    });
     return () => {
       cancelled = true;
     };

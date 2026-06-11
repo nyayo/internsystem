@@ -10,11 +10,6 @@ import {
 } from "react";
 import { getRoleHomePath } from "../auth/authConfig";
 import {
-  currentAcademicSupervisor,
-  currentWorkplaceSupervisor,
-} from "../data/supervisorData";
-import {
-  createDefaultAuthUsers,
   createUserFromRegistration,
   loadRegisteredUsers,
   loadSessionUser,
@@ -30,11 +25,6 @@ const AuthContext = createContext(null);
 const IS_API_LOGIN_ENABLED = Boolean(API_BASE_URL);
 const REGISTER_SUCCESS_MESSAGE =
   "Account created. Please check your email to verify your account.";
-
-const DEFAULT_AUTH_USERS = createDefaultAuthUsers({
-  currentWorkplaceSupervisor,
-  currentAcademicSupervisor,
-});
 
 function normalizeApiUser(raw = {}) {
   const user = toSessionUser(raw);
@@ -56,14 +46,6 @@ function normalizeApiUser(raw = {}) {
     position: user.position ?? user.job_title,
     title: user.title ?? user.job_title,
   };
-}
-
-function hydrateRoleUser(apiUser) {
-  const normalized = normalizeApiUser(apiUser);
-  if (!normalized.role)
-    throw new Error("Login response is missing a user role.");
-  const fallback = ROLE_DEFAULTS[normalized.role] ?? {};
-  return { ...fallback, ...normalized };
 }
 
 function createSessionUserFromApiLogin(apiLoginResponse) {
@@ -170,9 +152,7 @@ function createRegisterResult(responseData, fallbackData) {
 }
 
 export function AuthProvider({ children }) {
-  const [registeredUsers, setRegisteredUsers] = useState(() =>
-    loadRegisteredUsers(DEFAULT_AUTH_USERS),
-  );
+  const [registeredUsers, setRegisteredUsers] = useState(null);
   const [user, setUser] = useState(() => loadSessionUser());
   const [showSessionPrompt, setShowSessionPrompt] = useState(false);
   const sessionResolverRef = useRef(null);
@@ -255,7 +235,7 @@ export function AuthProvider({ children }) {
         }
       }
     },
-    [registeredUsers],
+    [],
   );
 
   const logout = useCallback(async () => {

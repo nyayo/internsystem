@@ -10,13 +10,6 @@ import {
 import { useNotification } from "./NotificationContext";
 import { useAuth } from "./AuthContext";
 import {
-  initialPlacements,
-  initialEvaluationCriteria,
-  initialStudents,
-  workplaceSupervisors,
-  academicSupervisors,
-} from "../data/dashboardData";
-import {
   buildAdminStats,
   toApplicationRows,
   withCriteriaDisplayValues,
@@ -24,6 +17,13 @@ import {
 import placementApi from "../services/placementApi";
 import adminApi from "../services/adminApi";
 import evaluationApi from "../services/evaluationApi";
+import {
+  normalizePlacement,
+  normalizeStudents,
+  normalizeWorkplaceSupervisors,
+  normalizeAcademicSupervisors,
+  normalizeCriteria,
+} from "../utils/normalizer";
 
 const AdminContext = createContext(null);
 
@@ -78,92 +78,6 @@ export const AdminProvider = ({ children }) => {
     () => buildAdminStats(placements, criteria),
     [placements, criteria],
   );
-
-  const normalizePlacement = (p) => ({
-    id: p.id,
-    student: {
-      name: p.student_name ?? "-",
-      regNumber: p.student_number ?? "-",
-      program: p.programme ?? p.student_programme ?? "-",
-      email: p.student_email ?? "-",
-    },
-    organisationName: p.organisation_name,
-    organisationType: p.organisation_type,
-    organisationDistrict: p.organisation_district,
-    organisationAddress: p.organisation_address,
-    department: p.department,
-    startDate: p.start_date,
-    endDate: p.end_date,
-    status: p.status,
-    intakeCohort: p.intake_cohort,
-    remunerationType: p.remuneration_type,
-    requestLetter: p.request_letter,
-    acceptanceLetter: p.acceptance_letter,
-    wpSupervisorName: p.wp_supervisor_name,
-    wpSupervisorEmail: p.wp_supervisor_email,
-    wpSupervisorPhone: p.wp_supervisor_phone,
-    wpSupervisorTitle: p.wp_supervisor_title,
-    workplaceSupervisorName: p.workplace_sup_name,
-    academicSupervisorName: p.academic_sup_name,
-    createdAt: p.created_at ?? null,
-  });
-
-  const normalizeStudents = (s) => ({
-    id: s.id,
-    firstName: s.first_name,
-    lastName: s.last_name,
-    email: s.email,
-    phone: s.phone_number,
-    studentName: s.student_number,
-    programme: s.programme,
-    yearOfStudy: s.year_of_study,
-    university: s.university,
-    gender: s.gender,
-    district: s.district,
-    accountStatus: s.account_status,
-    dateJoined: s.date_joined,
-  });
-
-  const normalizeWorkplaceSupervisors = (w) => ({
-    id: w.id,
-    firstName: w.first_name,
-    lastName: w.last_name,
-    name: w.full_name,
-    email: w.email,
-    phone: w.phone_number,
-    organisation: w.organisation_name,
-    department: w.department,
-    jobTitle: w.job_title,
-    gender: w.gender,
-    district: w.district,
-    accountStatus: w.account_status,
-    dateJoined: w.date_joined,
-  });
-
-  const normalizeAcademicSupervisors = (a) => ({
-    id: a.id,
-    firstName: a.first_name,
-    lastName: a.last_name,
-    name: a.full_name,
-    email: a.email,
-    phone: a.phone_number,
-    university: a.university,
-    jobTitle: a.job_title,
-    gender: a.gender,
-    district: a.district,
-    accountStatus: a.account_status,
-    dateJoined: a.date_joined,
-  });
-
-  const normalizeCriteria = (item) => ({
-    id: item.id,
-    title: item.title ?? "",
-    description: item.description ?? "",
-    category: item.category ?? "",
-    maxScore: item.max_score ?? item.maxScore ?? 0,
-    evaluatorRole: item.evaluator_role ?? item.evaluatorRole ?? "",
-    isActive: item.is_active ?? item.isActive ?? true,
-  });
 
   useEffect(() => {
     if (!adminUser) return;
@@ -286,7 +200,10 @@ export const AdminProvider = ({ children }) => {
       const criteriaWithDisplay = withCriteriaDisplayValues([
         normalizeCriteria(saved),
       ])[0];
-      setCriteria((previousCriteria) => [...previousCriteria, criteriaWithDisplay]);
+      setCriteria((previousCriteria) => [
+        ...previousCriteria,
+        criteriaWithDisplay,
+      ]);
       showNotification(
         `Evaluation criteria "${criteriaWithDisplay.title}" has been created!`,
         "success",
@@ -306,13 +223,18 @@ export const AdminProvider = ({ children }) => {
         is_active: updatedCriteria.isActive ?? true,
       };
 
-      const saved = await evaluationApi.updateCriteria(updatedCriteria.id, payload);
+      const saved = await evaluationApi.updateCriteria(
+        updatedCriteria.id,
+        payload,
+      );
       const criteriaWithDisplay = withCriteriaDisplayValues([
         normalizeCriteria(saved),
       ])[0];
       setCriteria((previousCriteria) =>
         previousCriteria.map((criterion) =>
-          criterion.id === criteriaWithDisplay.id ? criteriaWithDisplay : criterion,
+          criterion.id === criteriaWithDisplay.id
+            ? criteriaWithDisplay
+            : criterion,
         ),
       );
       showNotification(

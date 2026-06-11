@@ -1,9 +1,6 @@
 import {
-  dashboardStats,
   getCategoryDisplay,
   getEvaluatorDisplay,
-  workplaceSupervisors,
-  academicSupervisors,
 } from "../data/dashboardData";
 
 function getSupervisorName(supervisors, supervisorId) {

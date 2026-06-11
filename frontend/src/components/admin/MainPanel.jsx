@@ -5,7 +5,7 @@ import PlacementDetailsModal from "../modals/PlacementDetailsModal";
 import CriteriaModal from "../modals/CriteriaModal";
 
 export default function MainPanel({ 
-  stats, 
+  // stats, 
   applications, 
   criteria, 
   onUpdateApplication, 
@@ -26,9 +26,9 @@ export default function MainPanel({
   const activeInternships = applications.filter(app => app.status === 'active');
   const completedThisSemester = applications.filter(app => app.status === 'completed' && new Date(app.completedAt) >= new Date(new Date().setMonth(new Date().getMonth() - 6))).length;
 
-  const handleUpdateApplication = (updatedApp) => {
-      onUpdateApplication(updatedApp);
-  };
+  // const handleUpdateApplication = (updatedApp) => {
+  //     onUpdateApplication(updatedApp);
+  // };
 
   const handleViewDetails = (student) => {
     setSelectedStudent(student);

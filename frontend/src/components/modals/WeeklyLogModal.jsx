@@ -317,27 +317,6 @@ export default function WeeklyLogModal({
             </div>
           </section>
 
-          {/* Supervisor Interactions */}
-          {/* <section className="form-section">
-            <h3>
-              <span className="material-icons-sharp">groups</span>
-              Supervisor Interactions
-            </h3>
-            
-            <div className="form-group full-width">
-              <label>Describe your interactions with supervisors *</label>
-              <textarea
-                value={formData.supervisorInteractions}
-                onChange={(e) => handleChange('supervisorInteractions', e.target.value)}
-                placeholder="Meetings, feedback sessions, guidance received..."
-                rows={3}
-                disabled={isViewOnly}
-                className={errors.supervisorInteractions ? 'error' : ''}
-              />
-              {errors.supervisorInteractions && <span className="error-text">{errors.supervisorInteractions}</span>}
-            </div>
-          </section> */}
-
           {/* Additional Remarks */}
           <section className="form-section">
             <h3>

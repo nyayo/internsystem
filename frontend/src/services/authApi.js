@@ -10,7 +10,6 @@ export async function login(loginCredentials = {}) {
   const credentials = loginCredentials ?? {};
   return responseData(
     await httpClient.post(`${AUTH_BASE_PATH}/login/`, {
-      // role: credentials.role,
       email: credentials.email,
       password: credentials.password,
     }),
