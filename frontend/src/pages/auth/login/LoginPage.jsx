@@ -33,7 +33,6 @@ function LoginPage() {
   const { login, getRoleHomePath } = useAuth();
   const registrationState = location.state ?? {};
 
-  const [role, setRole] = useState(registrationState.role ?? "student");
   const [email, setEmail] = useState(registrationState.email ?? "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -47,7 +46,7 @@ function LoginPage() {
     }
 
     try {
-      const sessionUser = await login({ role, email, password });
+      const sessionUser = await login({ email, password });
       setError("");
       navigate(getRoleHomePath(sessionUser.role), { replace: true });
     } catch (loginError) {
@@ -82,18 +81,6 @@ function LoginPage() {
         )}
 
         <form className="auth-form" onSubmit={handleLogin}>
-          {/* <select
-            className="auth-input"
-            value={role}
-            onChange={(event) => setRole(event.target.value)}
-          >
-            {LOGIN_ROLE_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select> */}
-
           <input
             className="auth-input"
             type="email"

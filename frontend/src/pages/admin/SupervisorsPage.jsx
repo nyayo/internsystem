@@ -1,36 +1,51 @@
-import React, { useState, useMemo } from 'react';
-import './StudentsPage.css';
-import Pagination from '../../components/Pagination';
-import { accountStatusChoices } from '../../data/dashboardData';
-import usePagination from '../../hooks/usePagination';
+import React, { useState, useMemo } from "react";
+import "./StudentsPage.css";
+import Pagination from "../../components/Pagination";
+import { accountStatusChoices } from "../../data/dashboardData";
+import usePagination from "../../hooks/usePagination";
 
-export default function SupervisorsPage({ workplaceSupervisors, academicSupervisors }) {
-  const [searchTerm, setSearchTerm] = useState('');
+export default function SupervisorsPage({
+  workplaceSupervisors,
+  academicSupervisors,
+}) {
+  const [searchTerm, setSearchTerm] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
-    role: '',
-    accountStatus: '',
+    role: "",
+    accountStatus: "",
   });
 
-   // Combine all supervisors
+  // Combine all supervisors
   const allSupervisors = useMemo(() => {
-    const wpSups = workplaceSupervisors.map(s => ({ ...s, role: 'workplace_supervisor' }));
-    const acSups = academicSupervisors.map(s => ({ ...s, role: 'academic_supervisor' }));
+    const wpSups = workplaceSupervisors.map((s) => ({
+      ...s,
+      role: "workplace_supervisor",
+    }));
+    const acSups = academicSupervisors.map((s) => ({
+      ...s,
+      role: "academic_supervisor",
+    }));
     return [...wpSups, ...acSups];
   }, [workplaceSupervisors, academicSupervisors]);
   // Apply search and filters
   const filteredSupervisors = useMemo(() => {
-    return allSupervisors.filter(supervisor => {
+    return allSupervisors.filter((supervisor) => {
       const searchLower = searchTerm.toLowerCase();
-      const fullName = `${supervisor.firstName} ${supervisor.lastName}`.toLowerCase();
-      const matchesSearch = !searchTerm || 
+      const fullName =
+        `${supervisor.firstName} ${supervisor.lastName}`.toLowerCase();
+      const matchesSearch =
+        !searchTerm ||
         fullName.includes(searchLower) ||
         supervisor.email.toLowerCase().includes(searchLower) ||
-        (supervisor.organisation && supervisor.organisation.toLowerCase().includes(searchLower)) ||
-        (supervisor.department && supervisor.department.toLowerCase().includes(searchLower));
+        (supervisor.organisation &&
+          supervisor.organisation.toLowerCase().includes(searchLower)) ||
+        (supervisor.department &&
+          supervisor.department.toLowerCase().includes(searchLower));
 
       const matchesRole = !filters.role || supervisor.role === filters.role;
-      const matchesStatus = !filters.accountStatus || supervisor.accountStatus === filters.accountStatus;
+      const matchesStatus =
+        !filters.accountStatus ||
+        supervisor.accountStatus === filters.accountStatus;
 
       return matchesSearch && matchesRole && matchesStatus;
     });
@@ -47,13 +62,13 @@ export default function SupervisorsPage({ workplaceSupervisors, academicSupervis
   } = usePagination(filteredSupervisors);
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
     resetPagination();
   };
 
   const clearFilters = () => {
-    setFilters({ role: '', accountStatus: '' });
-    setSearchTerm('');
+    setFilters({ role: "", accountStatus: "" });
+    setSearchTerm("");
     resetPagination();
   };
 
@@ -61,20 +76,25 @@ export default function SupervisorsPage({ workplaceSupervisors, academicSupervis
 
   const getStatusClass = (status) => {
     switch (status) {
-      case 'active': return 'success';
-      case 'registered': return 'warning';
-      case 'suspended': return 'danger';
-      case 'deactivated': return 'muted';
-      default: return '';
+      case "active":
+        return "success";
+      case "registered":
+        return "warning";
+      case "suspended":
+        return "danger";
+      case "deactivated":
+        return "muted";
+      default:
+        return "";
     }
   };
 
   const getRoleLabel = (role) => {
-    return role === 'workplace_supervisor' ? 'Workplace' : 'Academic';
+    return role === "workplace_supervisor" ? "Workplace" : "Academic";
   };
 
   const getRoleClass = (role) => {
-    return role === 'workplace_supervisor' ? 'info' : 'success';
+    return role === "workplace_supervisor" ? "info" : "success";
   };
 
   return (
@@ -106,18 +126,21 @@ export default function SupervisorsPage({ workplaceSupervisors, academicSupervis
             type="text"
             placeholder="Search by name, email, organisation, department..."
             value={searchTerm}
-            onChange={(e) => { setSearchTerm(e.target.value); resetPagination(); }}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              resetPagination();
+            }}
           />
           {searchTerm && (
-            <button className="clear-search" onClick={() => setSearchTerm('')}>
+            <button className="clear-search" onClick={() => setSearchTerm("")}>
               <span className="material-icons-sharp">close</span>
             </button>
           )}
         </div>
-        
+
         <div className="toolbar-actions">
-          <button 
-            className={`btn-filter ${filterOpen ? 'active' : ''} ${hasActiveFilters ? 'has-filters' : ''}`}
+          <button
+            className={`btn-filter ${filterOpen ? "active" : ""} ${hasActiveFilters ? "has-filters" : ""}`}
             onClick={() => setFilterOpen(!filterOpen)}
           >
             <span className="material-icons-sharp">filter_list</span>
@@ -131,29 +154,35 @@ export default function SupervisorsPage({ workplaceSupervisors, academicSupervis
         <div className="filter-panel">
           <div className="filter-group">
             <label>Supervisor Type</label>
-            <select 
+            <select
               value={filters.role}
-              onChange={(e) => handleFilterChange('role', e.target.value)}
+              onChange={(e) => handleFilterChange("role", e.target.value)}
             >
               <option value="">All Types</option>
-              <option value="workplace_supervisor">Workplace Supervisors</option>
+              <option value="workplace_supervisor">
+                Workplace Supervisors
+              </option>
               <option value="academic_supervisor">Academic Supervisors</option>
             </select>
           </div>
-          
+
           <div className="filter-group">
             <label>Status</label>
-            <select 
+            <select
               value={filters.accountStatus}
-              onChange={(e) => handleFilterChange('accountStatus', e.target.value)}
+              onChange={(e) =>
+                handleFilterChange("accountStatus", e.target.value)
+              }
             >
               <option value="">All Statuses</option>
-              {accountStatusChoices.map(s => (
-                <option key={s.value} value={s.value}>{s.label}</option>
+              {accountStatusChoices.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
               ))}
             </select>
           </div>
-          
+
           {hasActiveFilters && (
             <button className="btn-clear-filters" onClick={clearFilters}>
               <span className="material-icons-sharp">clear_all</span>
@@ -165,7 +194,8 @@ export default function SupervisorsPage({ workplaceSupervisors, academicSupervis
 
       {/* Results Info */}
       <div className="results-info">
-        Showing {paginatedSupervisors.length} of {filteredSupervisors.length} supervisors
+        Showing {paginatedSupervisors.length} of {filteredSupervisors.length}{" "}
+        supervisors
       </div>
 
       {/* Table */}
@@ -193,16 +223,20 @@ export default function SupervisorsPage({ workplaceSupervisors, academicSupervis
                 </td>
               </tr>
             ) : (
-              paginatedSupervisors.map(supervisor => (
+              paginatedSupervisors.map((supervisor) => (
                 <tr key={`${supervisor.role}-${supervisor.id}`}>
                   <td className="name-cell">
                     <div className="name-info">
-                      <span className="full-name">{supervisor.firstName} {supervisor.lastName}</span>
+                      <span className="full-name">
+                        {supervisor.firstName} {supervisor.lastName}
+                      </span>
                       <span className="email">{supervisor.email}</span>
                     </div>
                   </td>
                   <td>
-                    <span className={`status-badge ${getRoleClass(supervisor.role)}`}>
+                    <span
+                      className={`status-badge ${getRoleClass(supervisor.role)}`}
+                    >
                       {getRoleLabel(supervisor.role)}
                     </span>
                   </td>
@@ -218,8 +252,12 @@ export default function SupervisorsPage({ workplaceSupervisors, academicSupervis
                   </td>
                   <td className="contact-cell">{supervisor.phone}</td>
                   <td>
-                    <span className={`status-badge ${getStatusClass(supervisor.accountStatus)}`}>
-                      {accountStatusChoices.find(s => s.value === supervisor.accountStatus)?.label || supervisor.accountStatus}
+                    <span
+                      className={`status-badge ${getStatusClass(supervisor.accountStatus)}`}
+                    >
+                      {accountStatusChoices.find(
+                        (s) => s.value === supervisor.accountStatus,
+                      )?.label || supervisor.accountStatus}
                     </span>
                   </td>
                   <td>

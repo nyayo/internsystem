@@ -10,7 +10,7 @@ import {
   calculateDurationWeeks
 } from '../../data/dashboardData';
 
-export default function ActiveInternshipsPage({ placements }) {
+export default function ActiveInternshipsPage({ placements, workplaceSupervisors }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({

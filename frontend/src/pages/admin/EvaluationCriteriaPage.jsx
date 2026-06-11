@@ -1,23 +1,27 @@
-import React, { useState, useMemo } from 'react';
-import './StudentsPage.css';
-import './EvaluationCriteriaPage.css';
-import Pagination from '../../components/Pagination';
-import CriteriaModal from '../../components/modals/CriteriaModal';
-import usePagination from '../../hooks/usePagination';
-import { 
-  categoryOptions, 
+import React, { useState, useMemo } from "react";
+import "./StudentsPage.css";
+import "./EvaluationCriteriaPage.css";
+import Pagination from "../../components/Pagination";
+import CriteriaModal from "../../components/modals/CriteriaModal";
+import usePagination from "../../hooks/usePagination";
+import {
+  categoryOptions,
   evaluatorRoleOptions,
   getCategoryDisplay,
-  getEvaluatorDisplay
-} from '../../data/dashboardData';
+  getEvaluatorDisplay,
+} from "../../data/dashboardData";
 
-export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpdateCriteria }) {
-  const [searchTerm, setSearchTerm] = useState('');
+export default function EvaluationCriteriaPage({
+  criteria,
+  onAddCriteria,
+  onUpdateCriteria,
+}) {
+  const [searchTerm, setSearchTerm] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
-    category: '',
-    evaluatorRole: '',
-    isActive: '',
+    category: "",
+    evaluatorRole: "",
+    isActive: "",
   });
   const [showModal, setShowModal] = useState(false);
   const [editingCriteria, setEditingCriteria] = useState(null);
@@ -29,18 +33,24 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
 
   // Apply search and filters
   const filteredCriteria = useMemo(() => {
-    return criteria.filter(item => {
+    return criteria.filter((item) => {
       const searchLower = searchTerm.toLowerCase();
-      const matchesSearch = !searchTerm || 
+      const matchesSearch =
+        !searchTerm ||
         item.title.toLowerCase().includes(searchLower) ||
         item.description.toLowerCase().includes(searchLower);
 
-      const matchesCategory = !filters.category || item.category === filters.category;
-      const matchesEvaluator = !filters.evaluatorRole || item.evaluatorRole === filters.evaluatorRole;
-      const matchesActive = filters.isActive === '' || 
-        (filters.isActive === 'true' ? item.isActive : !item.isActive);
+      const matchesCategory =
+        !filters.category || item.category === filters.category;
+      const matchesEvaluator =
+        !filters.evaluatorRole || item.evaluatorRole === filters.evaluatorRole;
+      const matchesActive =
+        filters.isActive === "" ||
+        (filters.isActive === "true" ? item.isActive : !item.isActive);
 
-      return matchesSearch && matchesCategory && matchesEvaluator && matchesActive;
+      return (
+        matchesSearch && matchesCategory && matchesEvaluator && matchesActive
+      );
     });
   }, [criteria, searchTerm, filters]);
 
@@ -55,17 +65,18 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
   } = usePagination(filteredCriteria);
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
     resetPagination();
   };
 
   const clearFilters = () => {
-    setFilters({ category: '', evaluatorRole: '', isActive: '' });
-    setSearchTerm('');
+    setFilters({ category: "", evaluatorRole: "", isActive: "" });
+    setSearchTerm("");
     resetPagination();
   };
 
-  const hasActiveFilters = filters.category || filters.evaluatorRole || filters.isActive !== '';
+  const hasActiveFilters =
+    filters.category || filters.evaluatorRole || filters.isActive !== "";
 
   const handleAddClick = () => {
     setEditingCriteria(null);
@@ -87,18 +98,21 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
     setEditingCriteria(null);
   };
 
-  const totalScore = criteria.reduce((sum, c) => sum + (c.isActive ? c.maxScore : 0), 0);
+  const totalScore = criteria.reduce(
+    (sum, c) => sum + (c.isActive ? c.maxScore : 0),
+    0,
+  );
 
   const getCategoryClass = (category) => {
     const classes = {
-      professional_conduct: 'professional',
-      technical_skills: 'technical',
-      communication: 'communication',
-      initiative: 'initiative',
-      teamwork: 'teamwork',
-      punctuality: 'punctuality',
+      professional_conduct: "professional",
+      technical_skills: "technical",
+      communication: "communication",
+      initiative: "initiative",
+      teamwork: "teamwork",
+      punctuality: "punctuality",
     };
-    return classes[category] || '';
+    return classes[category] || "";
   };
 
   return (
@@ -106,12 +120,16 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
       <div className="page-header">
         <div className="header-content">
           <h1>Evaluation Criteria</h1>
-          <p className="subtitle">Define and manage internship assessment criteria</p>
+          <p className="subtitle">
+            Define and manage internship assessment criteria
+          </p>
         </div>
         <div className="header-stats">
           <div className="stat-badge">
             <span className="material-icons-sharp">fact_check</span>
-            <span className="stat-value">{criteria.filter(c => c.isActive).length}</span>
+            <span className="stat-value">
+              {criteria.filter((c) => c.isActive).length}
+            </span>
             <span className="stat-label">Active</span>
           </div>
           <div className="stat-badge secondary">
@@ -130,18 +148,21 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
             type="text"
             placeholder="Search by title or description..."
             value={searchTerm}
-            onChange={(e) => { setSearchTerm(e.target.value); resetPagination(); }}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              resetPagination();
+            }}
           />
           {searchTerm && (
-            <button className="clear-search" onClick={() => setSearchTerm('')}>
+            <button className="clear-search" onClick={() => setSearchTerm("")}>
               <span className="material-icons-sharp">close</span>
             </button>
           )}
         </div>
-        
+
         <div className="toolbar-actions">
-          <button 
-            className={`btn-filter ${filterOpen ? 'active' : ''} ${hasActiveFilters ? 'has-filters' : ''}`}
+          <button
+            className={`btn-filter ${filterOpen ? "active" : ""} ${hasActiveFilters ? "has-filters" : ""}`}
             onClick={() => setFilterOpen(!filterOpen)}
           >
             <span className="material-icons-sharp">filter_list</span>
@@ -159,42 +180,48 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
         <div className="filter-panel">
           <div className="filter-group">
             <label>Category</label>
-            <select 
+            <select
               value={filters.category}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
+              onChange={(e) => handleFilterChange("category", e.target.value)}
             >
               <option value="">All Categories</option>
-              {categoryOptions.map(cat => (
-                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              {categoryOptions.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
               ))}
             </select>
           </div>
-          
+
           <div className="filter-group">
             <label>Evaluator</label>
-            <select 
+            <select
               value={filters.evaluatorRole}
-              onChange={(e) => handleFilterChange('evaluatorRole', e.target.value)}
+              onChange={(e) =>
+                handleFilterChange("evaluatorRole", e.target.value)
+              }
             >
               <option value="">All Evaluators</option>
-              {evaluatorRoleOptions.map(role => (
-                <option key={role.value} value={role.value}>{role.label}</option>
+              {evaluatorRoleOptions.map((role) => (
+                <option key={role.value} value={role.value}>
+                  {role.label}
+                </option>
               ))}
             </select>
           </div>
-          
+
           <div className="filter-group">
             <label>Status</label>
-            <select 
+            <select
               value={filters.isActive}
-              onChange={(e) => handleFilterChange('isActive', e.target.value)}
+              onChange={(e) => handleFilterChange("isActive", e.target.value)}
             >
               <option value="">All Statuses</option>
               <option value="true">Active</option>
               <option value="false">Inactive</option>
             </select>
           </div>
-          
+
           {hasActiveFilters && (
             <button className="btn-clear-filters" onClick={clearFilters}>
               <span className="material-icons-sharp">clear_all</span>
@@ -234,14 +261,19 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
                 </td>
               </tr>
             ) : (
-              paginatedCriteria.map(item => (
+              paginatedCriteria.map((item) => (
                 <tr key={item.id}>
                   <td>
                     <div className="criteria-title-cell">
-                      <span className={`criteria-dot ${getCategoryClass(item.category)}`}></span>
+                      <span
+                        className={`criteria-dot ${getCategoryClass(item.category)}`}
+                      ></span>
                       <div className="criteria-info">
                         <span className="criteria-name">{item.title}</span>
-                        <span className="criteria-desc" title={item.description}>
+                        <span
+                          className="criteria-desc"
+                          title={item.description}
+                        >
                           {truncateDescription(item.description)}
                         </span>
                       </div>
@@ -253,12 +285,17 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
                   </td>
                   <td>{getEvaluatorDisplay(item.evaluatorRole)}</td>
                   <td>
-                    <span className={`status-badge ${item.isActive ? 'success' : 'muted'}`}>
-                      {item.isActive ? 'Active' : 'Inactive'}
+                    <span
+                      className={`status-badge ${item.isActive ? "success" : "muted"}`}
+                    >
+                      {item.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td>
-                    <button className="btn-action" onClick={() => handleEditClick(item)}>
+                    <button
+                      className="btn-action"
+                      onClick={() => handleEditClick(item)}
+                    >
                       <span className="material-icons-sharp">edit</span>
                     </button>
                   </td>
@@ -283,7 +320,10 @@ export default function EvaluationCriteriaPage({ criteria, onAddCriteria, onUpda
       {showModal && (
         <CriteriaModal
           criteria={editingCriteria}
-          onClose={() => { setShowModal(false); setEditingCriteria(null); }}
+          onClose={() => {
+            setShowModal(false);
+            setEditingCriteria(null);
+          }}
           onSave={handleSaveCriteria}
         />
       )}

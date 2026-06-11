@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { workplaceSupervisors, academicSupervisors } from '../../data/dashboardData';
 import { useNotification } from '../../context/NotificationContext';
+import { useSupervisor } from '../../context/SupervisorContext';
 import './Modal.css';
 
 export default function StudentDetailsModal({ student, onClose, onSave }) {
+  const { workplaceSupervisors, academicSupervisors } = useSupervisor();  
   const { showNotification } = useNotification();
   const [formData, setFormData] = useState({
     workplaceSupervisor: student.workplaceSupervisor || '',

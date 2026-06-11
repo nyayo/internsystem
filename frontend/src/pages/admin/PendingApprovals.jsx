@@ -1,61 +1,69 @@
-import React, { useState, useMemo } from 'react';
-import './PendingApprovals.css';
-import PlacementDetailsModal from '../../components/modals/PlacementDetailsModal';
-import Pagination from '../../components/Pagination';
-import usePagination from '../../hooks/usePagination';
-import { 
-  getOrganisationTypeLabel, 
-  getStatusLabel, 
+import React, { useState, useMemo } from "react";
+import "./PendingApprovals.css";
+import PlacementDetailsModal from "../../components/modals/PlacementDetailsModal";
+import Pagination from "../../components/Pagination";
+import usePagination from "../../hooks/usePagination";
+import {
+  getOrganisationTypeLabel,
+  getStatusLabel,
   formatDate,
   organisationTypes,
-  intakeCohorts 
-} from '../../data/dashboardData';
+  intakeCohorts,
+} from "../../data/dashboardData";
 
 export default function PendingApprovals({ placements, onUpdatePlacement }) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
-    organisationType: '',
-    intakeCohort: '',
-    district: '',
+    organisationType: "",
+    intakeCohort: "",
+    district: "",
   });
   const [selectedPlacement, setSelectedPlacement] = useState(null);
 
   // Get unique districts for filter
   const districts = useMemo(() => {
-    const uniqueDistricts = [...new Set(placements.map(p => p.organisationDistrict))];
+    const uniqueDistricts = [
+      ...new Set(placements.map((p) => p.organisationDistrict)),
+    ];
     return uniqueDistricts.sort();
   }, [placements]);
 
   // Filter only pending placements
   const pendingPlacements = useMemo(() => {
-    return placements.filter(p => p.status === 'pending_approval');
+    return placements.filter((p) => p.status === "pending_approval");
   }, [placements]);
 
   // Apply search and filters
   const filteredPlacements = useMemo(() => {
-    return pendingPlacements.filter(placement => {
+    return pendingPlacements.filter((placement) => {
       // Search filter
       const searchLower = searchTerm.toLowerCase();
-      const matchesSearch = !searchTerm || 
+      const matchesSearch =
+        !searchTerm ||
         placement.student.name.toLowerCase().includes(searchLower) ||
         placement.student.regNumber.toLowerCase().includes(searchLower) ||
         placement.organisationName.toLowerCase().includes(searchLower) ||
         placement.department.toLowerCase().includes(searchLower);
 
       // Organisation type filter
-      const matchesOrgType = !filters.organisationType || 
+      const matchesOrgType =
+        !filters.organisationType ||
         placement.organisationType === filters.organisationType;
 
       // Intake cohort filter
-      const matchesCohort = !filters.intakeCohort || 
+      const matchesCohort =
+        !filters.intakeCohort ||
         placement.intakeCohort === filters.intakeCohort;
 
       // District filter
-      const matchesDistrict = !filters.district || 
+      const matchesDistrict =
+        !filters.district ||
         placement.organisationDistrict === filters.district;
 
-      return matchesSearch && matchesOrgType && matchesCohort && matchesDistrict;
+      return (
+        matchesSearch && matchesOrgType && matchesCohort && matchesDistrict
+      );
     });
   }, [pendingPlacements, searchTerm, filters]);
 
@@ -70,28 +78,31 @@ export default function PendingApprovals({ placements, onUpdatePlacement }) {
   } = usePagination(filteredPlacements);
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
     resetPagination();
   };
 
   const clearFilters = () => {
     setFilters({
-      organisationType: '',
-      intakeCohort: '',
-      district: '',
+      organisationType: "",
+      intakeCohort: "",
+      district: "",
     });
-    setSearchTerm('');
+    setSearchTerm("");
     resetPagination();
   };
 
-  const hasActiveFilters = filters.organisationType || filters.intakeCohort || filters.district;
+  const hasActiveFilters =
+    filters.organisationType || filters.intakeCohort || filters.district;
 
   return (
     <div className="pending-approvals-page">
       <div className="page-header">
         <div className="header-content">
           <h1>Pending Approvals</h1>
-          <p className="subtitle">Review and process internship placement applications</p>
+          <p className="subtitle">
+            Review and process internship placement applications
+          </p>
         </div>
         <div className="header-stats">
           <div className="stat-badge">
@@ -116,15 +127,15 @@ export default function PendingApprovals({ placements, onUpdatePlacement }) {
             }}
           />
           {searchTerm && (
-            <button className="clear-search" onClick={() => setSearchTerm('')}>
+            <button className="clear-search" onClick={() => setSearchTerm("")}>
               <span className="material-icons-sharp">close</span>
             </button>
           )}
         </div>
-        
+
         <div className="toolbar-actions">
-          <button 
-            className={`btn-filter ${filterOpen ? 'active' : ''} ${hasActiveFilters ? 'has-filters' : ''}`}
+          <button
+            className={`btn-filter ${filterOpen ? "active" : ""} ${hasActiveFilters ? "has-filters" : ""}`}
             onClick={() => setFilterOpen(!filterOpen)}
           >
             <span className="material-icons-sharp">filter_list</span>
@@ -139,43 +150,53 @@ export default function PendingApprovals({ placements, onUpdatePlacement }) {
         <div className="filter-panel">
           <div className="filter-group">
             <label>Organisation Type</label>
-            <select 
+            <select
               value={filters.organisationType}
-              onChange={(e) => handleFilterChange('organisationType', e.target.value)}
+              onChange={(e) =>
+                handleFilterChange("organisationType", e.target.value)
+              }
             >
               <option value="">All Types</option>
-              {organisationTypes.map(type => (
-                <option key={type.value} value={type.value}>{type.label}</option>
+              {organisationTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
               ))}
             </select>
           </div>
-          
+
           <div className="filter-group">
             <label>Intake Cohort</label>
-            <select 
+            <select
               value={filters.intakeCohort}
-              onChange={(e) => handleFilterChange('intakeCohort', e.target.value)}
+              onChange={(e) =>
+                handleFilterChange("intakeCohort", e.target.value)
+              }
             >
               <option value="">All Cohorts</option>
-              {intakeCohorts.map(cohort => (
-                <option key={cohort.value} value={cohort.value}>{cohort.label}</option>
+              {intakeCohorts.map((cohort) => (
+                <option key={cohort.value} value={cohort.value}>
+                  {cohort.label}
+                </option>
               ))}
             </select>
           </div>
-          
+
           <div className="filter-group">
             <label>District</label>
-            <select 
+            <select
               value={filters.district}
-              onChange={(e) => handleFilterChange('district', e.target.value)}
+              onChange={(e) => handleFilterChange("district", e.target.value)}
             >
               <option value="">All Districts</option>
-              {districts.map(district => (
-                <option key={district} value={district}>{district}</option>
+              {districts.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
               ))}
             </select>
           </div>
-          
+
           {hasActiveFilters && (
             <button className="btn-clear-filters" onClick={clearFilters}>
               <span className="material-icons-sharp">clear_all</span>
@@ -187,7 +208,8 @@ export default function PendingApprovals({ placements, onUpdatePlacement }) {
 
       {/* Results Info */}
       <div className="results-info">
-        Showing {filteredPlacements.length} of {pendingPlacements.length} pending applications
+        Showing {filteredPlacements.length} of {pendingPlacements.length}{" "}
+        pending applications
       </div>
 
       {/* Placements Table */}
@@ -216,19 +238,29 @@ export default function PendingApprovals({ placements, onUpdatePlacement }) {
                 </td>
               </tr>
             ) : (
-              paginatedPlacements.map(placement => (
+              paginatedPlacements.map((placement) => (
                 <tr key={placement.id}>
                   <td className="student-cell">
                     <div className="student-info">
-                      <span className="student-name">{placement.student.name}</span>
-                      <span className="student-reg">{placement.student.regNumber}</span>
-                      <span className="student-program">{placement.student.program}</span>
+                      <span className="student-name">
+                        {placement.student.name}
+                      </span>
+                      <span className="student-reg">
+                        {placement.student.regNumber}
+                      </span>
+                      <span className="student-program">
+                        {placement.student.program}
+                      </span>
                     </div>
                   </td>
                   <td>
                     <div className="org-info">
-                      <span className="org-name">{placement.organisationName}</span>
-                      <span className="org-type">{getOrganisationTypeLabel(placement.organisationType)}</span>
+                      <span className="org-name">
+                        {placement.organisationName}
+                      </span>
+                      <span className="org-type">
+                        {getOrganisationTypeLabel(placement.organisationType)}
+                      </span>
                     </div>
                   </td>
                   <td>{placement.department}</td>
@@ -239,14 +271,16 @@ export default function PendingApprovals({ placements, onUpdatePlacement }) {
                       <span>{formatDate(placement.endDate)}</span>
                     </div>
                   </td>
-                  <td className="date-cell">{formatDate(placement.createdAt)}</td>
+                  <td className="date-cell">
+                    {formatDate(placement.createdAt)}
+                  </td>
                   <td>
                     <span className="status-badge pending">
                       {getStatusLabel(placement.status)}
                     </span>
                   </td>
                   <td>
-                    <button 
+                    <button
                       className="btn-details"
                       onClick={() => setSelectedPlacement(placement)}
                     >
@@ -260,17 +294,17 @@ export default function PendingApprovals({ placements, onUpdatePlacement }) {
           </tbody>
         </table>
         {filteredPlacements.length > 0 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={filteredPlacements.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={(newSize) => {
-            setItemsPerPage(newSize);
-          }}
-        />
-      )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={filteredPlacements.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={(newSize) => {
+              setItemsPerPage(newSize);
+            }}
+          />
+        )}
       </div>
 
       {/* Placement Details Modal */}
