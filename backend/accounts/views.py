@@ -8,17 +8,14 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_seriali
 from rest_framework import serializers as drf_serializers
 
 from accounts.models import CustomUser
-from accounts.permissions import IsActiveAccount, IsStudent, IsWorkplaceSupervisor, IsAcademicSupervisor, IsInternshipAdministrator
+from accounts.permissions import IsActiveAccount
 from accounts.serializers import UserRegistrationSerializer, LoginSerializer, UserProfileSerializer
 from accounts.tokens import (
-    generate_email_verification_token,
     verify_email_token,
-    generate_password_reset_token,
     verify_password_reset_token,
 )
 from accounts.tasks  import (
     send_password_reset_email_task,
-    send_password_changed_email_task,
     send_verification_email_task
 )
 @extend_schema(

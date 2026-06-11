@@ -160,7 +160,7 @@ class WeeklyLogSubmitSerializer(serializers.ModelSerializer):
         for field in required:
             if not getattr(instance, field, "").strip():
                 raise serializers.ValidationError(
-                    {field: f"This field cannot be empty before submitting."}
+                    {field: "This field cannot be empty before submitting."}
                 )
 
         instance.status       = "submitted"

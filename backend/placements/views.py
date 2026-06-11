@@ -1,5 +1,3 @@
-from urllib import request
-
 from django.utils import timezone
 
 from rest_framework import status
@@ -27,13 +25,9 @@ from .serializers import (
 from accounts.permissions import (
     IsActiveAccount,
     IsStudent,
-    IsWorkplaceSupervisor,
-    IsAcademicSupervisor,
     IsInternshipAdministrator,
-    IsPlacementOwner,
     IsLinkedToPlacement,
 )
-from rest_framework.permissions import IsAuthenticated
 
 
 def get_queryset_for_role(user):

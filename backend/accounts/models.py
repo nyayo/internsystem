@@ -24,7 +24,8 @@ class CustomUser(AbstractUser):
     gender = models.CharField(max_length=20, blank=True, choices=GENDER)
     district = models.CharField(max_length=100, blank=True)
     profile_photo = models.ImageField(
-        upload_to="profile_photos/", blank=True,
+        upload_to="profile_photos/",
+        blank=True,
     )
     account_status = models.CharField(max_length=20, choices=ACCOUNT_STATUS)
     is_active = models.BooleanField(default=True)
@@ -42,6 +43,6 @@ class CustomUser(AbstractUser):
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
-    
+
     def get_role_display(self):
         return dict(self.ROLES).get(self.role, "Unknown Role")

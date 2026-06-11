@@ -105,6 +105,23 @@ def send_placement_submitted_email(placement):
             recipient=admin.email,
         )
 
+    # Send invite to workplace supervisor
+    _send(
+        subject=f"Internship supervisor invitation -- {student.get_full_name()}",
+        message=(
+            f"Hello {placement.wp_supervisor_name},\n\n"
+            f"You have been listed as the workplace supervisor for "
+            f"{student.get_full_name()} during their internship at "
+            f"{placement.organisation_name}.\n\n"
+            f"Please register on InternSystem to review and endorse "
+            f"the student's weekly logs:\n"
+            f"{settings.FRONTEND_URL}/register/\n\n"
+            f"Use the email address this message was sent to when registering."
+            f"{_footer()}"
+        ),
+        recipient=placement.wp_supervisor_email,
+    )
+
 def send_placement_approved_email(placement):
     """Notify the student and both supervisors that a placement has been approved."""
 
@@ -148,22 +165,6 @@ def send_placement_approved_email(placement):
             recipient=ac_sup.email,
         )
 
-    # Send invite to workplace supervisor
-    _send(
-        subject=f"Internship supervisor invitation -- {student.get_full_name()}",
-        message=(
-            f"Hello {placement.wp_supervisor_name},\n\n"
-            f"You have been listed as the workplace supervisor for "
-            f"{student.get_full_name()} during their internship at "
-            f"{placement.organisation_name}.\n\n"
-            f"Please register on InternSystem to review and endorse "
-            f"the student's weekly logs:\n"
-            f"{settings.FRONTEND_URL}/register/\n\n"
-            f"Use the email address this message was sent to when registering."
-            f"{_footer()}"
-        ),
-        recipient=placement.wp_supervisor_email,
-    )
 
 
 def send_placement_rejected_email(placement):
