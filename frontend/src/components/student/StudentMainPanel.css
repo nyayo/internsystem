@@ -19,7 +19,7 @@
 }
 
 .student-main-panel .status-card.rejected {
-  border-left-color: var(--color-warning);
+  border-left-color: var(--color-danger);
 }
 
 .student-main-panel .status-card.no-placement {
@@ -40,7 +40,7 @@
 }
 
 .student-main-panel .status-card.rejected > span.material-icons-sharp {
-  color: var(--color-warning);
+  color: var(--color-danger);
 }
 
 .student-main-panel .status-card.loading > span.material-icons-sharp {

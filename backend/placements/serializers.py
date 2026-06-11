@@ -229,9 +229,9 @@ class PlacementSubmitSerializer(serializers.ModelSerializer):
         fields = ["status"]
 
     def update(self, instance, validated_data):
-        if instance.status != "draft":
+        if instance.status not in ("draft", "rejected"):
             raise serializers.ValidationError(
-                {"status": "Only draft placements can be submitted."}
+                {"status": "Only draft or rejected placements can be submitted."}
             )
         if not instance.request_letter:
             raise serializers.ValidationError(
