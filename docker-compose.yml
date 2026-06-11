@@ -12,6 +12,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - monitoring
+      - internal
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -19,6 +22,9 @@ services:
     image: redis:7-alpine
     expose:
       - "6379"
+    networks:
+      - monitoring
+      - internal
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -32,6 +38,9 @@ services:
     ports:
       - "9173:4173"
     restart: unless-stopped
+    networks:
+      - monitoring
+      - internal
     depends_on:
       - backend
 
@@ -52,6 +61,9 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/1
       FRONTEND_URL: https://internsystem.unshifter.site 
+    networks:
+      - monitoring
+      - internal
     depends_on:
       db:
         condition: service_healthy
@@ -79,7 +91,10 @@ services:
       DB_PORT: "5432"
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/1
-      FRONTEND_URL: https://internsystem.unshifter.site    
+      FRONTEND_URL: https://internsystem.unshifter.site  
+    networks:
+          - monitoring
+          - internal  
     depends_on:
       db:
         condition: service_healthy
@@ -105,7 +120,10 @@ services:
       DB_PORT: "5432"
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/1
-      FRONTEND_URL: https://internsystem.unshifter.site    
+      FRONTEND_URL: https://internsystem.unshifter.site 
+    networks:
+      - monitoring
+      - internal   
     depends_on:
       db:
         condition: service_healthy
@@ -116,3 +134,9 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  internal:
+    driver: bridge
+  monitoring:
+    external: true
