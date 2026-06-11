@@ -155,9 +155,9 @@ class PlacementDetailView(APIView):
                 {"detail": "Only the student can edit a placement."},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        if obj.status != "draft":
+        if obj.status not in ("draft", "rejected"):
             return Response(
-                {"detail": "Only draft placements can be edited."},
+                {"detail": "Only draft or rejected placements can be edited."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         serializer = PlacementDetailSerializer(obj, data=request.data, partial=True)
