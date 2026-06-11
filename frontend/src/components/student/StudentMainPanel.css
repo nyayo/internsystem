@@ -18,6 +18,10 @@
   border-left-color: var(--color-warning);
 }
 
+.student-main-panel .status-card.rejected {
+  border-left-color: var(--color-warning);
+}
+
 .student-main-panel .status-card.no-placement {
   border-left-color: var(--color-primary);
 }
@@ -32,6 +36,10 @@
 }
 
 .student-main-panel .status-card.pending > span.material-icons-sharp {
+  color: var(--color-warning);
+}
+
+.student-main-panel .status-card.rejected > span.material-icons-sharp {
   color: var(--color-warning);
 }
 

@@ -19,8 +19,8 @@ export default function StudentMainPanel({
   const hasActivePlacement = placement && ['approved', 'active', 'completed'].includes(placement.status);
   const hasPendingPlacement = placement && placement.status === 'pending_approval';
   const hasDraftPlacement = placement && placement.status === 'draft';
-  const hasNoPlacement = !placement || placement.status === 'rejected';
-  console.log("Evaluations", acknowledgedEvaluations)
+  const hasNoPlacement = !placement;
+  const hasRejectedPlacement = placement && placement.status === 'rejected';
   return (
     <main className="student-main-panel">
       {/* Welcome Banner - Always shown on dashboard */}
@@ -73,7 +73,7 @@ export default function StudentMainPanel({
             </div>
           )}
           
-          {!isPlacementLoading && (hasNoPlacement || hasDraftPlacement) && (
+          {!isPlacementLoading && hasDraftPlacement && (
             <div className="status-card no-placement">
               <span className="material-icons-sharp">add_business</span>
               <div className="status-content">
@@ -81,6 +81,19 @@ export default function StudentMainPanel({
                 <p>You haven't submitted an internship placement application yet. Start by providing details about your internship organisation.</p>
                 <button className="btn-primary" onClick={onOpenPlacement}>
                   {hasDraftPlacement ? 'Continue Application' : 'Apply Now'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!isPlacementLoading && hasRejectedPlacement && (
+            <div className="status-card rejected">
+              <span className="material-icons-sharp">cancel</span>
+              <div className="status-content">
+                <h3>Placement Application Rejected</h3>
+                <p>Your placement application was not approved by the internship administrator. Please review the feedback and resubmit a revised application.</p>
+                <button className="btn-primary" onClick={onOpenPlacement}>
+                  Revise & Resubmit
                 </button>
               </div>
             </div>
@@ -130,10 +143,10 @@ export default function StudentMainPanel({
               <h2>My Placement</h2>
               <p className="subtitle">View and manage your internship placement</p>
             </div>
-            {(hasNoPlacement || hasDraftPlacement) && (
+            {(hasNoPlacement || hasDraftPlacement || hasRejectedPlacement) && (
               <button className="btn-primary" onClick={onOpenPlacement}>
                 <span className="material-icons-sharp">add</span>
-                {hasDraftPlacement ? 'Continue Application' : 'Apply Now'}
+                {hasDraftPlacement ? 'Continue Application' : hasRejectedPlacement ? 'Resubmit Application' : 'Apply Now'}
               </button>
             )}
           </div>
@@ -190,6 +203,19 @@ export default function StudentMainPanel({
               <span className="material-icons-sharp">work</span>
               <h3>No Placement Application</h3>
               <p>Start your internship journey by submitting a placement application.</p>
+            </div>
+          )}
+
+          {hasRejectedPlacement && (
+            <div className="status-card rejected">
+              <span className="material-icons-sharp">cancel</span>
+              <div className="status-content">
+                <h3>Application Rejected</h3>
+                <p>Your placement application was not approved. Please review the feedback and resubmit a revised application.</p>
+                <button className="btn-secondary" onClick={onOpenPlacement}>
+                  View Feedback
+                </button>
+              </div>
             </div>
           )}
         </div>

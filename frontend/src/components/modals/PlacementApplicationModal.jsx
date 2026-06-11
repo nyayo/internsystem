@@ -123,6 +123,7 @@ export default function PlacementApplicationModal({
 
   const isViewOnly =
     placement && !["draft", "rejected"].includes(placement.status);
+  const isRejected = placement?.status === "rejected";
 
   return (
     <div className="student-modal-overlay" onClick={onClose}>
@@ -145,6 +146,19 @@ export default function PlacementApplicationModal({
           <div className="draft-notice">
             <span className="material-icons-sharp">save</span>
             Draft saved automatically
+          </div>
+        )}
+
+        {isRejected && (
+          <div className="rejection-notice">
+            <span className="material-icons-sharp">cancel</span>
+            <div>
+              <strong>Application Rejected</strong>
+              {placement.rejectionReason && (
+                <p>{placement.rejectionReason}</p>
+              )}
+              <span>Please review the feedback, make the necessary changes, and resubmit.</span>
+            </div>
           </div>
         )}
 
@@ -464,17 +478,19 @@ export default function PlacementApplicationModal({
           {/* Actions */}
           {!isViewOnly && (
             <div className="form-actions">
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={handleSaveDraft}
-              >
-                <span className="material-icons-sharp">save</span>
-                Save Draft
-              </button>
+              {!isRejected && (
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={handleSaveDraft}
+                >
+                  <span className="material-icons-sharp">save</span>
+                  Save Draft
+                </button>
+              )}
               <button type="submit" className="btn-primary">
-                <span className="material-icons-sharp">send</span>
-                Submit Application
+                <span className="material-icons-sharp">{isRejected ? "refresh" : "send"}</span>
+                {isRejected ? "Resubmit Application" : "Submit Application"}
               </button>
             </div>
           )}
