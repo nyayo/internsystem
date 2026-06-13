@@ -132,3 +132,19 @@ class TestWeeklyLogStatusTracking:
         assert log._WeeklyLogs__original_status == "draft"
         assert log.status == "submitted"
         
+
+class TestInternshipPlacementDurationWeeks:
+    """
+    Unit Test 4
+    Verifies that the duration_weeks property returns the correct
+    number of weeks between start_date and end_date.
+    """
+
+    def test_duration_weeks_correct(self, make_placement):
+        # start_date = 2025-01-06, end_date = 2025-04-30 = 114 days = 16 weeks
+        assert make_placement.duration_weeks == 16
+
+    def test_duration_weeks_none_when_dates_missing(self, make_placement):
+        make_placement.start_date = None
+        make_placement.end_date   = None
+        assert make_placement.duration_weeks is None
