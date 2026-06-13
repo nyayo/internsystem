@@ -73,3 +73,29 @@ def auth_client(api_client):
         )
         return api_client
     return _auth
+
+# ── Model factories ───────────────────────────────────────────────
+
+@pytest.fixture
+def make_placement(student, wp_supervisor, ac_supervisor, admin):
+    """Creates an active InternshipPlacement."""
+    return InternshipPlacement.objects.create(
+        student               = student,
+        workplace_supervisor  = wp_supervisor,
+        academic_supervisor   = ac_supervisor,
+        approved_by           = admin,
+        organisation_name     = "MTN Uganda",
+        organisation_type     = "private",
+        organisation_district = "Kampala",
+        department            = "Software Development",
+        wp_supervisor_name    = wp_supervisor.get_full_name(),
+        wp_supervisor_email   = wp_supervisor.email,
+        wp_supervisor_phone   = "+256700000001",
+        start_date            = "2025-01-06",
+        end_date              = "2025-04-30",
+        intake_cohort         = "january",
+        remuneration_type     = "unpaid",
+        request_letter        = "request.pdf",
+        acceptance_letter     = "acceptance.pdf",
+        status                = "active",
+    )
