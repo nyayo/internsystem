@@ -132,4 +132,84 @@ class TestPlacementSubmissionAndApprovalFlow:
         assert placement.approved_by == admin
 
 
-        
+class TestWeeklyLogFullWorkflow:
+    """
+    E2E Test 3
+    Full log lifecycle: student creates draft → submits →
+    workplace supervisor endorses → academic supervisor assesses → closed.
+    """
+
+    def test_log_lifecycle_draft_to_closed(
+        self,
+        auth_client,
+        student,
+        wp_supervisor,
+        ac_supervisor,
+        admin,
+        make_placement,
+    ):
+        # Step 1 -- Student creates draft log
+        student_client = auth_client(student)
+        create_resp = student_client.post(reverse("log_list_create"), {
+            "placement":             make_placement.id,
+            "week_number":           1,
+            "week_start_date":       "2025-01-06",
+            "week_end_date":         "2025-01-10",
+            "activities_performed":  "Worked on API integration.",
+            "skills_gained":         "Django REST Framework.",
+            "challenges_faced":      "CORS issues resolved.",
+            "student_remarks":       "Good week.",
+        }, format="json")
+        assert create_resp.status_code == status.HTTP_201_CREATED
+        log_id = create_resp.data["id"]
+
+        # Step 2 -- Student submits the log
+        submit_resp = student_client.post(
+            reverse("log_submit", kwargs={"pk": log_id})
+        )
+        assert submit_resp.status_code == status.HTTP_200_OK
+        assert submit_resp.data["status"] == "submitted"
+
+        # Step 3 -- Workplace supervisor endorses
+        wp_client    = auth_client(wp_supervisor)
+        endorse_resp = wp_client.post(
+            reverse("log_endorse", kwargs={"pk": log_id}),
+            {
+                "action":            "endorse",
+                "workplace_comment": "Good progress this week.",
+            },
+            format="json",
+        )
+        assert endorse_resp.status_code == status.HTTP_200_OK
+        assert endorse_resp.data["status"] == "endorsed"
+
+        # Step 4 -- Academic supervisor assesses
+        ac_client    = auth_client(ac_supervisor)
+        assess_resp  = ac_client.post(
+            reverse("log_assess", kwargs={"pk": log_id}),
+            {
+                "academic_grade":   78,
+                "academic_comment": "Solid technical work.",
+            },
+            format="json",
+        )
+        assert assess_resp.status_code == status.HTTP_200_OK
+        assert assess_resp.data["status"] == "assessed"
+        assert assess_resp.data["grade"] == "78.00"
+
+        # Step 5 -- Admin closes the log
+        admin_client = auth_client(admin)
+        close_resp   = admin_client.post(
+            reverse("log_close", kwargs={"pk": log_id})
+        )
+        assert close_resp.status_code == status.HTTP_200_OK
+        assert close_resp.data["status"] == "closed"
+
+        # Step 6 -- Verify final state in DB
+        from logs.models import WeeklyLogs
+        log = WeeklyLogs.objects.get(pk=log_id)
+        assert log.status == "closed"
+        assert log.academic_grade == 78
+        assert log.workplace_endorsed_by == wp_supervisor
+        assert log.academic_assessed_by == ac_supervisor
+
