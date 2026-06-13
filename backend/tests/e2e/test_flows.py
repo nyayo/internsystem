@@ -213,3 +213,81 @@ class TestWeeklyLogFullWorkflow:
         assert log.workplace_endorsed_by == wp_supervisor
         assert log.academic_assessed_by == ac_supervisor
 
+class TestEvaluationFullWorkflow:
+    """
+    E2E Test 4
+    Full evaluation lifecycle: evaluation auto-created → workplace
+    supervisor saves draft → submits → academic supervisor acknowledges →
+    student can view their score.
+    """
+
+    def test_evaluation_lifecycle_not_started_to_acknowledged(
+        self,
+        auth_client,
+        student,
+        wp_supervisor,
+        ac_supervisor,
+        admin,
+        make_placement,
+        make_criteria,
+    ):
+        c1, c2 = make_criteria
+
+        # Step 1 -- Verify evaluation records were auto-created
+        # (signal fires when placement status = active)
+        from evaluations.models import Evaluation
+        evals = Evaluation.objects.filter(placement=make_placement)
+        assert evals.count() == 2
+        midterm = evals.get(evaluation_type="midterm")
+        assert midterm.status == "not_started"
+
+        # Step 2 -- WP supervisor saves a draft
+        wp_client = auth_client(wp_supervisor)
+        draft_resp = wp_client.post(
+            reverse("evaluation_save_draft", kwargs={"pk": midterm.id}),
+            {
+                "overall_remarks": "",
+                "scores": [
+                    {"criteria": c1.id, "score_awarded": 15},
+                ],
+            },
+            format="json",
+        )
+        assert draft_resp.status_code == status.HTTP_200_OK
+        assert draft_resp.data["status"] == "in_progress"
+
+        # Step 3 -- WP supervisor submits with all criteria
+        submit_resp = wp_client.post(
+            reverse("evaluation_submit", kwargs={"pk": midterm.id}),
+            {
+                "overall_remarks": "Good intern overall.",
+                "scores": [
+                    {"criteria": c1.id, "score_awarded": 17, "comment": "Always on time."},
+                    {"criteria": c2.id, "score_awarded": 16, "comment": "Professional."},
+                ],
+            },
+            format="json",
+        )
+        assert submit_resp.status_code == status.HTTP_200_OK
+        assert submit_resp.data["status"] == "submitted"
+        assert submit_resp.data["total_score"] == "33.00"
+
+        # Step 4 -- Academic supervisor acknowledges
+        ac_client = auth_client(ac_supervisor)
+        ack_resp  = ac_client.post(
+            reverse("evaluation_acknowledge", kwargs={"pk": midterm.id}),
+            {"acknowledgement_notes": "Scores reviewed and accepted."},
+            format="json",
+        )
+        assert ack_resp.status_code == status.HTTP_200_OK
+        assert ack_resp.data["status"] == "acknowledged"
+
+        # Step 5 -- Student views their evaluation
+        student_client = auth_client(student)
+        detail_resp = student_client.get(
+            reverse("evaluation_detail", kwargs={"pk": midterm.id})
+        )
+        assert detail_resp.status_code == status.HTTP_200_OK
+        assert detail_resp.data["total_score"] == "33.00"
+        assert detail_resp.data["status"] == "acknowledged"
+        assert len(detail_resp.data["scores"]) == 2
