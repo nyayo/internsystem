@@ -35,3 +35,41 @@ def make_user():
         user.save()
         return user
     return _make
+
+
+@pytest.fixture
+def student(make_user):
+    return make_user(role="student", student_number="21/U/001", programme="B.Sc Computer Science", university="Makerere University")
+
+@pytest.fixture
+def wp_supervisor(make_user):
+    return make_user(role="workplace_supervisor", job_title="Senior Engineer", organisation_name="MTN Uganda")
+
+@pytest.fixture
+def ac_supervisor(make_user):
+    return make_user(role="academic_supervisor")
+
+@pytest.fixture
+def admin(make_user):
+    return make_user(role="internship_administrator")
+
+
+# ── Auth helper ───────────────────────────────────────────────────
+
+@pytest.fixture
+def api_client():
+    return APIClient()
+
+@pytest.fixture
+def auth_client(api_client):
+    """
+    Returns a callable that authenticates the client as any user.
+    Usage: auth_client(student)
+    """
+    def _auth(user):
+        refresh = RefreshToken.for_user(user)
+        api_client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}"
+        )
+        return api_client
+    return _auth
