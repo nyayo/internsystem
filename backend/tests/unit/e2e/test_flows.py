@@ -106,3 +106,28 @@ class TestEvaluationScoreValidation:
             score_awarded = 0,
         )
         score.clean()   # no exception expected
+
+
+        
+class TestWeeklyLogStatusTracking:
+    """
+    Unit Test 3
+    Verifies that WeeklyLogs.__original_status is set on load
+    and that status changes are tracked correctly.
+    """
+
+    def test_original_status_is_set_on_instantiation(self, make_log):
+        log = make_log
+        assert log._WeeklyLogs__original_status == "draft"
+
+    def test_original_status_reflects_db_value_on_fetch(self, make_log):
+        # Fetch from DB -- __init__ runs again
+        log = WeeklyLogs.objects.get(pk=make_log.pk)
+        assert log._WeeklyLogs__original_status == "draft"
+
+    def test_original_status_does_not_change_before_save(self, make_log):
+        log        = make_log
+        log.status = "submitted"
+        # Has not been saved -- original should still be draft
+        assert log._WeeklyLogs__original_status == "draft"
+        
