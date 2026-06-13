@@ -181,3 +181,25 @@ class TestWeeklyLogUniqueConstraint:
                 challenges_faced     = "None.",
                 status               = "draft",
             )
+    def test_different_weeks_are_allowed(self, make_placement):
+        WeeklyLogs.objects.create(
+            placement            = make_placement,
+            week_number          = 1,
+            week_start_date      = "2025-01-06",
+            week_end_date        = "2025-01-10",
+            activities_performed = "Week 1.",
+            skills_gained        = "Skills.",
+            challenges_faced     = "None.",
+            status               = "draft",
+        )
+        log2 = WeeklyLogs.objects.create(
+            placement            = make_placement,
+            week_number          = 2,
+            week_start_date      = "2025-01-13",
+            week_end_date        = "2025-01-17",
+            activities_performed = "Week 2.",
+            skills_gained        = "More skills.",
+            challenges_faced     = "None.",
+            status               = "draft",
+        )
+        assert log2.pk is not None
