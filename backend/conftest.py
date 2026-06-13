@@ -99,3 +99,39 @@ def make_placement(student, wp_supervisor, ac_supervisor, admin):
         acceptance_letter     = "acceptance.pdf",
         status                = "active",
     )
+
+
+
+@pytest.fixture
+def make_criteria(admin):
+    """Creates 2 active EvaluationCriteria totalling 40 points."""
+    c1 = EvaluationCriteria.objects.create(
+        title          = "Punctuality & Attendance",
+        description    = "Was the student present and on time?",
+        max_score      = 20,
+        category       = "punctuality",
+        evaluator_role = "workplace_supervisor",
+        is_active      = True,
+        created_by     = admin,
+    )
+    c2 = EvaluationCriteria.objects.create(
+        title          = "Professional Conduct",
+        description    = "Workplace behaviour and attitude.",
+        max_score      = 20,
+        category       = "professional_conduct",
+        evaluator_role = "workplace_supervisor",
+        is_active      = True,
+        created_by     = admin,
+    )
+    return c1, c2
+
+@pytest.fixture
+def make_evaluation(make_placement, wp_supervisor):
+    """Creates a not_started midterm Evaluation."""
+    return Evaluation.objects.create(
+        placement       = make_placement,
+        evaluator       = wp_supervisor,
+        evaluation_type = "midterm",
+        status          = "not_started",
+    )
+
