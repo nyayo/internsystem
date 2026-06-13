@@ -134,4 +134,18 @@ def make_evaluation(make_placement, wp_supervisor):
         evaluation_type = "midterm",
         status          = "not_started",
     )
-
+@pytest.fixture
+def make_log(make_placement):
+    """Creates a draft WeeklyLog for week 1."""
+    return WeeklyLogs.objects.create(
+        placement            = make_placement,
+        week_number          = 1,
+        week_start_date      = "2025-01-06",
+        week_end_date        = "2025-01-10",
+        activities_performed = "Worked on REST API integration.",
+        skills_gained        = "Learned Django REST Framework.",
+        challenges_faced     = "CORS issues resolved with middleware.",
+        student_remarks      = "Good first week.",
+        status               = "draft",
+    )
+        
