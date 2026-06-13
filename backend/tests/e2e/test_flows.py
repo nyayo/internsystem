@@ -291,3 +291,63 @@ class TestEvaluationFullWorkflow:
         assert detail_resp.data["total_score"] == "33.00"
         assert detail_resp.data["status"] == "acknowledged"
         assert len(detail_resp.data["scores"]) == 2
+
+class TestRoleBasedAccessControl:
+    """
+    E2E Test 5
+    Verifies that role-based access control is enforced correctly.
+    Tests that users cannot access or perform actions outside their role.
+    """
+
+    def test_student_cannot_approve_placement(
+        self, auth_client, student, make_placement
+    ):
+        client = auth_client(student)
+        resp   = client.post(
+            reverse("placement_approve", kwargs={"pk": make_placement.id}),
+            {"status": "approved"},
+            format="json",
+        )
+        # Student does not have internship_administrator role
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_wp_supervisor_cannot_assess_log(
+        self, auth_client, wp_supervisor, make_log
+    ):
+        client = auth_client(wp_supervisor)
+        resp   = client.post(
+            reverse("log_assess", kwargs={"pk": make_log.id}),
+            {"academic_grade": 80, "academic_comment": "Good."},
+            format="json",
+        )
+        # Only academic supervisors can assess
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_unauthenticated_user_cannot_access_placements(
+        self, api_client
+    ):
+        resp = api_client.get(reverse("placement_list_create"))
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_suspended_user_cannot_login(self, api_client, make_user):
+        user = make_user(role="student", account_status="suspended")
+        resp = api_client.post(reverse("login"), {
+            "email":    user.email,
+            "password": "testpass123",
+        })
+        assert resp.status_code == status.HTTP_400_BAD_REQUEST
+        assert "suspended" in str(resp.data).lower()
+
+    def test_wrong_supervisor_cannot_endorse_log(
+        self, auth_client, make_user, make_log
+    ):
+        # A different workplace supervisor who is NOT assigned to this placement
+        other_wp = make_user(role="workplace_supervisor")
+        client   = auth_client(other_wp)
+        resp     = client.post(
+            reverse("log_endorse", kwargs={"pk": make_log.id}),
+            {"action": "endorse", "workplace_comment": ""},
+            format="json",
+        )
+        # Not the assigned workplace supervisor for this placement
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
