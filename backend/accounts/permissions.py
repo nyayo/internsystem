@@ -3,6 +3,7 @@ from rest_framework.permissions import BasePermission
 class IsActiveAccount(BasePermission):
     """
     Blocks suspended and deactivated accounts from any API access.
+    
     """
     message = 'Your account is not active.'
  
