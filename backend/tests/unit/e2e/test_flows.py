@@ -148,3 +148,36 @@ class TestInternshipPlacementDurationWeeks:
         make_placement.start_date = None
         make_placement.end_date   = None
         assert make_placement.duration_weeks is None
+
+class TestWeeklyLogUniqueConstraint:
+    """
+    Unit Test 5
+    Verifies that the unique_together constraint on (placement, week_number)
+    prevents duplicate logs for the same week.
+    """
+
+    def test_duplicate_week_raises_integrity_error(self, make_placement):
+        from django.db import IntegrityError
+
+        WeeklyLogs.objects.create(
+            placement            = make_placement,
+            week_number          = 1,
+            week_start_date      = "2025-01-06",
+            week_end_date        = "2025-01-10",
+            activities_performed = "First log.",
+            skills_gained        = "Django skills.",
+            challenges_faced     = "None.",
+            status               = "draft",
+        )
+
+        with pytest.raises(IntegrityError):
+            WeeklyLogs.objects.create(
+                placement            = make_placement,
+                week_number          = 1,   # duplicate
+                week_start_date      = "2025-01-06",
+                week_end_date        = "2025-01-10",
+                activities_performed = "Second log same week.",
+                skills_gained        = "More skills.",
+                challenges_faced     = "None.",
+                status               = "draft",
+            )
