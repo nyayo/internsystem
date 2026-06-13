@@ -108,7 +108,7 @@ class TestEvaluationScoreValidation:
         score.clean()   # no exception expected
 
 
-        
+
 class TestWeeklyLogStatusTracking:
     """
     Unit Test 3
@@ -130,4 +130,5 @@ class TestWeeklyLogStatusTracking:
         log.status = "submitted"
         # Has not been saved -- original should still be draft
         assert log._WeeklyLogs__original_status == "draft"
+        assert log.status == "submitted"
         
