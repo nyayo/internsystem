@@ -58,3 +58,51 @@ class TestCalculateTotalScore:
         evaluation.calculate_total_score()
         evaluation.refresh_from_db()
         assert evaluation.total_score == Decimal("28")
+class TestEvaluationScoreValidation:
+    """
+    Unit Test 2
+    Verifies that EvaluationScore.clean() raises ValidationError
+    when score_awarded exceeds criteria.max_score.
+    """
+
+    def test_score_exceeding_max_raises_validation_error(
+        self, make_evaluation, make_criteria
+    ):
+        evaluation = make_evaluation
+        c1, _      = make_criteria
+
+        score = EvaluationScore(
+            evaluation    = evaluation,
+            criteria      = c1,
+            score_awarded = 25,   # max is 20
+        )
+
+        with pytest.raises(ValidationError) as exc:
+            score.clean()
+
+        assert "exceeds the maximum" in str(exc.value)
+
+    def test_score_at_max_does_not_raise(
+        self, make_evaluation, make_criteria
+    ):
+        evaluation = make_evaluation
+        c1, _      = make_criteria
+
+        score = EvaluationScore(
+            evaluation    = evaluation,
+            criteria      = c1,
+            score_awarded = 20,   # exactly at max
+        )
+        # Should not raise
+        score.clean()
+
+    def test_score_of_zero_is_valid(self, make_evaluation, make_criteria):
+        evaluation = make_evaluation
+        c1, _      = make_criteria
+
+        score = EvaluationScore(
+            evaluation    = evaluation,
+            criteria      = c1,
+            score_awarded = 0,
+        )
+        score.clean()   # no exception expected
