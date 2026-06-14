@@ -64,9 +64,22 @@ export async function submitPlacement(placementId) {
   }
 }
 
-export async function getPlacementStats(placementId) {
+export async function getPlacementStats() {
   try {
     const response = await httpClient.get(`${AUTH_BASE_PATH}/stats/`);
+    return responseData(response);
+  } catch (error) {
+    const statusCode = error?.response?.status;
+    if (statusCode === 404) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function getAdminReportStats() {
+  try {
+    const response = await httpClient.get(`${AUTH_BASE_PATH}/reports/`);
     return responseData(response);
   } catch (error) {
     const statusCode = error?.response?.status;
@@ -96,6 +109,7 @@ const placementApi = {
   updatePlacementDraft,
   submitPlacement,
   getPlacementStats,
+  getAdminReportStats,
   approvePlacement
 };
 

@@ -9,6 +9,7 @@ from .views import (
     PlacementCompleteView,
     FinalReportUploadView,
     PlacementStatsView,
+    PlacementReportView,
 )
 
 urlpatterns = [
@@ -60,8 +61,12 @@ urlpatterns = [
         PlacementStatsView.as_view(),
         name="placement_stats",
     ),
+    path(
+        "placements/reports/",
+        PlacementReportView.as_view(),
+        name="placement_reports",
+    ),
 ]
-
 
 
 

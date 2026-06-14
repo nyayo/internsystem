@@ -110,3 +110,41 @@ aside .sidebar .message-count {
   font-size: 11px;
   border-radius: var(--border-radius-1);
 }
+
+@media screen and (max-width: 1200px) {
+  aside {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 18rem;
+    z-index: 1000;
+    background: var(--color-white);
+    box-shadow: 1rem 3rem 4rem var(--color-light);
+    transition: left 0.3s ease;
+    overflow-y: auto;
+  }
+
+  aside.show-menu {
+    left: 0;
+  }
+
+  aside .close {
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  aside .logo h2,
+  aside .sidebar h3 {
+    display: inline;
+  }
+
+  aside .sidebar a {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  aside {
+    width: min(18rem, 100vw);
+  }
+}

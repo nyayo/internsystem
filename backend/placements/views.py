@@ -1,4 +1,6 @@
 from django.utils import timezone
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -45,6 +47,194 @@ def get_queryset_for_role(user):
         return InternshipPlacement.objects.all()
 
     return InternshipPlacement.objects.none()
+
+
+def build_admin_report_payload():
+    from evaluations.models import Evaluation
+    from logs.models import WeeklyLogs
+
+    placements = InternshipPlacement.objects.select_related(
+        "student",
+        "workplace_supervisor",
+        "academic_supervisor",
+    )
+
+    total_placements = placements.count()
+    final_reports_uploaded = placements.exclude(final_report="").exclude(
+        final_report__isnull=True
+    ).count()
+    active_count = placements.filter(status="active").count()
+    completed_count = placements.filter(status="completed").count()
+    pending_approval_count = placements.filter(status="pending").count()
+    approved_count = placements.filter(status="approved").count()
+    withdrawn_count = placements.filter(status="withdrawn").count()
+
+    pending_logs_qs = WeeklyLogs.objects.filter(status__in=("submitted", "endorsed"))
+    pending_evaluations_qs = Evaluation.objects.exclude(status="acknowledged")
+
+    def choice_breakdown(choices, field_name):
+        rows = []
+        for value, label in choices:
+            count = placements.filter(**{field_name: value}).count()
+            rows.append(
+                {
+                    "value": value,
+                    "label": label,
+                    "count": count,
+                    "percentage": round((count / total_placements) * 100, 1)
+                    if total_placements
+                    else 0,
+                }
+            )
+        return rows
+
+    def top_rows(values, label_key, name_builder):
+        return [
+            {
+                "label": name_builder(row),
+                "count": row["count"],
+                "key": row[label_key],
+            }
+            for row in values
+        ]
+
+    monthly_created = [
+        {
+            "month": row["month"].isoformat() if row["month"] else None,
+            "count": row["count"],
+        }
+        for row in (
+            placements.annotate(month=TruncMonth("created_at"))
+            .values("month")
+            .annotate(count=Count("id"))
+            .order_by("month")
+        )
+    ]
+    monthly_approved = [
+        {
+            "month": row["month"].isoformat() if row["month"] else None,
+            "count": row["count"],
+        }
+        for row in (
+            placements.exclude(approval_date__isnull=True)
+            .annotate(month=TruncMonth("approval_date"))
+            .values("month")
+            .annotate(count=Count("id"))
+            .order_by("month")
+        )
+    ]
+    monthly_activated = [
+        {
+            "month": row["month"].isoformat() if row["month"] else None,
+            "count": row["count"],
+        }
+        for row in (
+            placements.exclude(activated_at__isnull=True)
+            .annotate(month=TruncMonth("activated_at"))
+            .values("month")
+            .annotate(count=Count("id"))
+            .order_by("month")
+        )
+    ]
+    monthly_completed = [
+        {
+            "month": row["month"].isoformat() if row["month"] else None,
+            "count": row["count"],
+        }
+        for row in (
+            placements.exclude(completed_at__isnull=True)
+            .annotate(month=TruncMonth("completed_at"))
+            .values("month")
+            .annotate(count=Count("id"))
+            .order_by("month")
+        )
+    ]
+
+    top_organisations = top_rows(
+        placements.values("organisation_name")
+        .annotate(count=Count("id"))
+        .order_by("-count", "organisation_name")[:10],
+        "organisation_name",
+        lambda row: row["organisation_name"] or "Unknown organisation",
+    )
+    top_districts = top_rows(
+        placements.values("organisation_district")
+        .annotate(count=Count("id"))
+        .order_by("-count", "organisation_district")[:10],
+        "organisation_district",
+        lambda row: row["organisation_district"] or "Unknown district",
+    )
+    top_programmes = top_rows(
+        placements.values("student__programme")
+        .annotate(count=Count("id"))
+        .order_by("-count", "student__programme")[:10],
+        "student__programme",
+        lambda row: row["student__programme"] or "Unknown programme",
+    )
+    top_workplace_supervisors = top_rows(
+        placements.exclude(workplace_supervisor__isnull=True)
+        .values(
+            "workplace_supervisor__id",
+            "workplace_supervisor__first_name",
+            "workplace_supervisor__last_name",
+        )
+        .annotate(count=Count("id"))
+        .order_by("-count", "workplace_supervisor__first_name")[:10],
+        "workplace_supervisor__id",
+        lambda row: (
+            f"{row['workplace_supervisor__first_name']} {row['workplace_supervisor__last_name']}".strip()
+            or "Unnamed supervisor"
+        ),
+    )
+    top_academic_supervisors = top_rows(
+        placements.exclude(academic_supervisor__isnull=True)
+        .values(
+            "academic_supervisor__id",
+            "academic_supervisor__first_name",
+            "academic_supervisor__last_name",
+        )
+        .annotate(count=Count("id"))
+        .order_by("-count", "academic_supervisor__first_name")[:10],
+        "academic_supervisor__id",
+        lambda row: (
+            f"{row['academic_supervisor__first_name']} {row['academic_supervisor__last_name']}".strip()
+            or "Unnamed supervisor"
+        ),
+    )
+
+    return {
+        "overview": {
+            "totalPlacements": total_placements,
+            "pendingApprovals": pending_approval_count,
+            "approvedPlacements": approved_count,
+            "activePlacements": active_count,
+            "completedPlacements": completed_count,
+            "withdrawnPlacements": withdrawn_count,
+            "finalReportsUploaded": final_reports_uploaded,
+            "pendingLogs": pending_logs_qs.count(),
+            "pendingEvaluations": pending_evaluations_qs.count(),
+        },
+        "breakdowns": {
+            "byStatus": choice_breakdown(InternshipPlacement.STATUS, "status"),
+            "byCohort": choice_breakdown(InternshipPlacement.INTAKE_COHORT, "intake_cohort"),
+            "byOrganisationType": choice_breakdown(
+                InternshipPlacement.ORGANIZATION_TYPES, "organisation_type"
+            ),
+            "byDistrict": top_districts,
+            "byProgramme": top_programmes,
+        },
+        "trends": {
+            "created": monthly_created,
+            "approved": monthly_approved,
+            "activated": monthly_activated,
+            "completed": monthly_completed,
+        },
+        "workload": {
+            "topOrganisations": top_organisations,
+            "topWorkplaceSupervisors": top_workplace_supervisors,
+            "topAcademicSupervisors": top_academic_supervisors,
+        },
+    }
 
 
 class PlacementListCreateView(APIView):
@@ -458,7 +648,7 @@ class PlacementStatsView(APIView):
         qs = InternshipPlacement.objects.all()
 
         by_status = {}
-        for choice in InternshipPlacement.STATUS_CHOICES:
+        for choice in InternshipPlacement.STATUS:
             code = choice[0]
             label = choice[1]
             by_status[code] = {
@@ -467,7 +657,7 @@ class PlacementStatsView(APIView):
             }
 
         by_cohort = {}
-        for choice in InternshipPlacement.INTAKE_COHORT_CHOICES:
+        for choice in InternshipPlacement.INTAKE_COHORT:
             code = choice[0]
             label = choice[1]
             by_cohort[code] = {
@@ -481,5 +671,15 @@ class PlacementStatsView(APIView):
                 "by_status": by_status,
                 "by_cohort": by_cohort,
             },
+            status=status.HTTP_200_OK,
+        )
+
+
+class PlacementReportView(APIView):
+    permission_classes = [IsAuthenticated, IsActiveAccount, IsInternshipAdministrator]
+
+    def get(self, request):
+        return Response(
+            build_admin_report_payload(),
             status=status.HTTP_200_OK,
         )
