@@ -405,12 +405,29 @@
 
 /* Responsive */
 @media screen and (max-width: 1200px) {
+  .container {
+    width: 94%;
+    grid-template-columns: 7rem minmax(0, 1fr);
+  }
+
   .supervisor-stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .right {
+    grid-column: 1 / -1;
+    width: 100%;
+    position: relative;
+    margin-top: 2rem;
   }
 }
 
 @media screen and (max-width: 768px) {
+  .container {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
   .supervisor-stats {
     grid-template-columns: 1fr;
   }
@@ -421,5 +438,93 @@
   
   .filter-tabs {
     flex-wrap: wrap;
+  }
+
+  .supervisor-page,
+  .supervisor-activity-table,
+  .table-container {
+    width: 100%;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .data-table {
+    min-width: 640px;
+  }
+
+  .supervisor-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  aside {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: min(18rem, 100vw);
+    z-index: 1000;
+    background: var(--color-white);
+    box-shadow: 1rem 3rem 4rem var(--color-light);
+    transition: left 0.3s ease;
+    overflow-y: auto;
+  }
+
+  aside.show-menu {
+    left: 0;
+  }
+
+  aside .close {
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  .right {
+    grid-column: 1;
+    width: 100%;
+    margin: 0 auto 4rem;
+  }
+
+  .right .top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    align-items: center;
+    background: var(--color-white);
+    padding: 0 0.8rem;
+    height: 4.6rem;
+    width: 100%;
+    margin: 0;
+    z-index: 2;
+    box-shadow: 0 1rem 1rem var(--color-light);
+  }
+
+  .right .top button {
+    display: inline-block;
+    background: transparent;
+    cursor: pointer;
+    color: var(--color-dark);
+    position: absolute;
+    left: 1rem;
+  }
+
+  .right .top button span {
+    font-size: 2rem;
+  }
+
+  .right .top .theme-toggler {
+    width: 4.4rem;
+    position: absolute;
+    left: 66%;
+  }
+
+  .right .profile .info {
+    display: none;
+  }
+
+  .right .analytics {
+    margin-top: 6rem;
   }
 }

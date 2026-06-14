@@ -1,11 +1,13 @@
+from datetime import date
+
 import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from placements.models import InternshipPlacement
 from evaluations.models import Evaluation, EvaluationCriteria, EvaluationScore
 from logs.models import WeeklyLogs
+from placements.models import InternshipPlacement
 
 User = get_user_model()
 
@@ -83,7 +85,7 @@ def make_placement(student, wp_supervisor, ac_supervisor, admin):
         student               = student,
         workplace_supervisor  = wp_supervisor,
         academic_supervisor   = ac_supervisor,
-        approved_by           = admin,
+        approval_by           = admin,
         organisation_name     = "MTN Uganda",
         organisation_type     = "private",
         organisation_district = "Kampala",
@@ -91,13 +93,13 @@ def make_placement(student, wp_supervisor, ac_supervisor, admin):
         wp_supervisor_name    = wp_supervisor.get_full_name(),
         wp_supervisor_email   = wp_supervisor.email,
         wp_supervisor_phone   = "+256700000001",
-        start_date            = "2025-01-06",
-        end_date              = "2025-04-30",
-        intake_cohort         = "january",
-        remuneration_type     = "unpaid",
-        request_letter        = "request.pdf",
-        acceptance_letter     = "acceptance.pdf",
-        status                = "active",
+        start_date              = date(2025, 1, 6),
+        end_date                = date(2025, 4, 30),
+        intake_cohort           = "january",
+        remuneration_type       = "unpaid",
+        request_letter          = "request.pdf",
+        acceptance_letter       = "acceptance.pdf",
+        status                  = "active",
     )
 
 
@@ -148,4 +150,3 @@ def make_log(make_placement):
         student_remarks      = "Good first week.",
         status               = "draft",
     )
-        

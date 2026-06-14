@@ -25,7 +25,7 @@ export default function SideBar({
     { id: "supervisors", icon: "badge", label: "Supervisors" },
     { id: "criteria", icon: "fact_check", label: "Evaluation Criteria" },
     // { id: 'progress', icon: 'trending_up', label: 'Progress Tracking' },
-    // { id: 'reports', icon: 'assessment', label: 'Reports' },
+    { id: "reports", icon: "assessment", label: "Reports" },
     // { id: 'settings', icon: 'settings', label: 'Settings' },
   ];
 

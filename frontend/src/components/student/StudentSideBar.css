@@ -132,7 +132,7 @@
 }
 
 /* Mobile styles */
-/* @media screen and (max-width: 1200px) {
+@media screen and (max-width: 1200px) {
   .student-sidebar {
     position: fixed;
     left: -300px;
@@ -164,4 +164,10 @@
     left: auto;
     right: 1rem;
   }
-} */
+}
+
+@media screen and (max-width: 768px) {
+  .student-sidebar {
+    width: min(18rem, 100vw);
+  }
+}

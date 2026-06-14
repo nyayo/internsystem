@@ -9,6 +9,7 @@ import StudentsPage from "./StudentsPage";
 import ActiveInternshipsPage from "./ActiveInternshipsPage";
 import SupervisorsPage from "./SupervisorsPage";
 import EvaluationCriteriaPage from "./EvaluationCriteriaPage";
+import ReportsPage from "./ReportsPage";
 import { useAdmin, AdminProvider } from "../../context/AdminContext";
 
 const DashboardContent = () => {
@@ -71,6 +72,12 @@ const DashboardContent = () => {
               onAddCriteria={handleAddCriteria}
               onUpdateCriteria={handleUpdateCriteria}
             />
+          </main>
+        );
+      case "reports":
+        return (
+          <main>
+            <ReportsPage />
           </main>
         );
       default:

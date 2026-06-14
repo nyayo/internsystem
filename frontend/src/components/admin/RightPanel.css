@@ -160,3 +160,61 @@
 .right .top button {
   display: none;
 }
+
+@media screen and (max-width: 1200px) {
+  .right {
+    grid-column: 1 / -1;
+    position: relative;
+    width: 100%;
+    margin-top: 2rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .right {
+    width: 100%;
+    margin: 0 auto 4rem;
+  }
+
+  .right .top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    align-items: center;
+    background: var(--color-white);
+    padding: 0 0.8rem;
+    height: 4.6rem;
+    width: 100%;
+    margin: 0;
+    z-index: 2;
+    box-shadow: 0 1rem 1rem var(--color-light);
+  }
+
+  .right .top button {
+    display: inline-block;
+    background: transparent;
+    cursor: pointer;
+    color: var(--color-dark);
+    position: absolute;
+    left: 1rem;
+  }
+
+  .right .top button span {
+    font-size: 2rem;
+  }
+
+  .right .top .theme-toggler {
+    width: 4.4rem;
+    position: absolute;
+    left: 66%;
+  }
+
+  .right .profile .info {
+    display: none;
+  }
+
+  .right .analytics {
+    margin-top: 6rem;
+  }
+}
