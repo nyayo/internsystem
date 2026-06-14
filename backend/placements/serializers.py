@@ -34,6 +34,7 @@ class PlacementListSerializer(serializers.ModelSerializer):
             "student_email",
             "student_programme",
             "organisation_type",
+            "organisation_name",
             "organisation_district",
             "organisation_address",
             "department",
